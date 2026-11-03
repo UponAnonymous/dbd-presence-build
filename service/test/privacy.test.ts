@@ -209,7 +209,7 @@ describe("bans survive deletion", () => {
       },
     });
     const headers = { ...(await h.adminHeaders()), "Content-Type": "application/json" };
-    const response = await handleRequest(new Request(`https://admin.arcavale.com/api/users/${userId}`, { method: "DELETE", headers, body: JSON.stringify({ confirm: userId }) }), { ...env, DB: racing }, h.deps);
+    const response = await handleRequest(new Request(`https://dbdadmin.arcavale.com/api/users/${userId}`, { method: "DELETE", headers, body: JSON.stringify({ confirm: userId }) }), { ...env, DB: racing }, h.deps);
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({ schemaVersion: 1, error: "user_changed" });
     expect(await rowCount("users", "id = ? AND status = 'revoked'", userId)).toBe(1);

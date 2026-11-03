@@ -262,7 +262,7 @@ function route(method, path, query, body) {
     const active = users.filter((u) => u.status === "active");
     return {
       environment: "production",
-      hosts: { api: "api.arcavale.com", admin: "admin.arcavale.com", cdn: "cdn.arcavale.com" },
+      hosts: { api: "api.arcavale.com", admin: "dbdadmin.arcavale.com", cdn: "cdn.arcavale.com" },
       users: { total: users.length, withAccess: active.filter((u) => u.access_granted_at !== null).length, waitingForInvite: active.filter((u) => u.access_granted_at === null).length, revoked: users.length - active.length, activeThisWeek: active.filter((u) => u.last_seen_at >= now - 7 * DAY).length },
       invites: { pending: invites.filter((i) => inviteStatus(i) === "active").length },
       uploads: { total: uploads.length, thisWeek: uploads.filter((x) => x.created_at >= now - 7 * DAY).length },

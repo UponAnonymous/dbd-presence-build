@@ -86,18 +86,18 @@ async function sampleTiles() {
 const browser = await chromium.launch({
   executablePath: chromiumPath(),
   args: [
-    "--host-resolver-rules=MAP admin.arcavale.com 127.0.0.1, MAP admin-staging.arcavale.com 127.0.0.1",
+    "--host-resolver-rules=MAP dbdadmin.arcavale.com 127.0.0.1, MAP admin-staging.arcavale.com 127.0.0.1",
     "--disable-features=HttpsUpgrades,HttpsFirstBalancedModeAutoEnable",
     // The local server speaks plain HTTP; treating these two origins as secure makes the browser behave as it does
     // on the real HTTPS sites (it sends Sec-Fetch-Site, applies COOP and allows the clipboard API).
-    `--unsafely-treat-insecure-origin-as-secure=http://admin.arcavale.com:${port},http://admin-staging.arcavale.com:${port}`,
+    `--unsafely-treat-insecure-origin-as-secure=http://dbdadmin.arcavale.com:${port},http://admin-staging.arcavale.com:${port}`,
   ],
 });
 
 const problems = [];
 const shots = [];
 
-async function newPage(theme, { host = "admin.arcavale.com", width = 1360, height = 900, expectedStatus = null } = {}) {
+async function newPage(theme, { host = "dbdadmin.arcavale.com", width = 1360, height = 900, expectedStatus = null } = {}) {
   const context = await browser.newContext({ colorScheme: theme, viewport: { width, height }, deviceScaleFactor: 1, reducedMotion: "reduce", locale: "en-GB", timezoneId: "Europe/London" });
   context.setDefaultTimeout(15_000);
   const page = await context.newPage();

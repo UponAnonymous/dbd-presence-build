@@ -19,7 +19,7 @@ export const PAGES_PROJECTS = { staging: "dbd-presence-panel-staging", productio
 
 export const HOSTS = {
   staging: { api: "api-staging.arcavale.com", admin: "admin-staging.arcavale.com" },
-  production: { api: "api.arcavale.com", admin: "admin.arcavale.com" },
+  production: { api: "api.arcavale.com", admin: "dbdadmin.arcavale.com" },
 };
 
 /** The DNS record that belongs to another service and must never change (A, DNS only). */

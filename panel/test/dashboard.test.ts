@@ -123,7 +123,7 @@ describe("Settings", () => {
     expect(definitions(cardTitled(root, "Environment"))).toEqual({
       "This panel": "Production",
       "The service says": "Production",
-      "Owner Panel address": "admin.arcavale.com",
+      "Owner Panel address": "dbdadmin.arcavale.com",
       "App service address": "api.arcavale.com",
       "Pictures and downloads address": "cdn.arcavale.com",
     });

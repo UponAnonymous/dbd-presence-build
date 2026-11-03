@@ -14,7 +14,7 @@ export interface Env {
   ENVIRONMENT: string;
   /** Host of the public API, for example `api.arcavale.com`. */
   API_HOST: string;
-  /** Host of the Owner Panel and its `/api/*`, for example `admin.arcavale.com`. */
+  /** Host of the Owner Panel and its `/api/*`, for example `dbdadmin.arcavale.com`. */
   ADMIN_HOST: string;
   /** Host of the content files, for example `cdn.arcavale.com` (src/routes/cdn.ts). */
   CDN_HOST: string;

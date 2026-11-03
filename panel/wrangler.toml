@@ -2,7 +2,7 @@
 # created and deployed by .github/workflows/deploy-service.yml, or by hand (docs/owner/cloudflare-setup.md §12).
 #
 # Two separate Pages projects, like the two Workers (FR-ADM-06):
-#   production  dbd-presence-panel          -> https://admin.arcavale.com
+#   production  dbd-presence-panel          -> https://dbdadmin.arcavale.com
 #   staging     dbd-presence-panel-staging  -> https://admin-staging.arcavale.com
 # Deploy the built site (npm ci && npm run build here; npm ci in service/ provides wrangler), always to the production
 # branch so that no preview URL is created:

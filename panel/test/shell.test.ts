@@ -16,11 +16,11 @@ describe("shell", () => {
 
   it("shows the staging banner only on a -staging host", async () => {
     expect(environmentFor("admin-staging.arcavale.com")).toBe("staging");
-    expect(environmentFor("admin.arcavale.com")).toBe("production");
+    expect(environmentFor("dbdadmin.arcavale.com")).toBe("production");
     const staging = await mount("invites", { hostname: "admin-staging.arcavale.com" });
     expect(staging.root.querySelector(".env-banner")?.textContent).toContain("Staging");
     expect(staging.root.querySelector(".env-badge")?.textContent).toBe("Staging");
-    const production = await mount("invites", { hostname: "admin.arcavale.com" });
+    const production = await mount("invites", { hostname: "dbdadmin.arcavale.com" });
     expect(production.root.querySelector(".env-banner")).toBeNull();
     expect(production.root.querySelector(".env-badge")?.textContent).toBe("Production");
   });

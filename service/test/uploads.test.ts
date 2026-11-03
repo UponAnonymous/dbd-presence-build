@@ -532,7 +532,7 @@ describe("owner: uploads list, takedown, per-user block, storage", () => {
   it("guards the admin upload routes like every admin call (Access, header, Origin)", async () => {
     const who = await account();
     const stored = await uploaded(await upload(who, png()));
-    expect((await h.call("GET", `https://admin.arcavale.com/api/uploads`)).status).toBe(401);
+    expect((await h.call("GET", `https://dbdadmin.arcavale.com/api/uploads`)).status).toBe(401);
     expect((await h.admin("POST", `/api/uploads/${stored.id}/takedown`, {}, { Origin: "https://evil.example" })).status).toBe(403);
     expect((await h.admin("POST", `/api/uploads/${stored.id}/takedown`, {}, { "X-DBDP-Admin": null })).status).toBe(403);
     expect((await h.admin("POST", `/api/users/${who.userId}/uploads`, { blocked: true }, { "Sec-Fetch-Site": "cross-site" })).status).toBe(403);
@@ -836,7 +836,7 @@ describe("a failed R2 delete (security review M2, L2)", () => {
     const broken = failingDeletes(env.UPLOADS);
     const brokenEnv = { ...env, UPLOADS: broken };
     const headers = await h.adminHeaders();
-    const response = await handleRequest(new Request(`https://admin.arcavale.com/api/uploads/${stored.id}/takedown`, { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: "{}" }), brokenEnv, h.deps);
+    const response = await handleRequest(new Request(`https://dbdadmin.arcavale.com/api/uploads/${stored.id}/takedown`, { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: "{}" }), brokenEnv, h.deps);
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ takenDown: true, fileRemoved: false, storage: { pendingDeleteBytes: stored.size } });
     expect(broken.attempts).toBe(2);

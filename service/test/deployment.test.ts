@@ -29,16 +29,16 @@ describe("wrangler.toml", () => {
     }
   });
 
-  it("routes production to api.arcavale.com, admin.arcavale.com/api/* and the whole cdn.arcavale.com host", () => {
+  it("routes production to api.arcavale.com, dbdadmin.arcavale.com/api/* and the whole cdn.arcavale.com host", () => {
     expect(production.routes).toEqual([
       { pattern: "api.arcavale.com", custom_domain: true },
-      { pattern: "admin.arcavale.com/api/*", zone_name: "arcavale.com" },
+      { pattern: "dbdadmin.arcavale.com/api/*", zone_name: "arcavale.com" },
       { pattern: "cdn.arcavale.com", custom_domain: true },
     ]);
     expect(production.vars).toMatchObject({
       ENVIRONMENT: "production",
       API_HOST: "api.arcavale.com",
-      ADMIN_HOST: "admin.arcavale.com",
+      ADMIN_HOST: "dbdadmin.arcavale.com",
       CDN_HOST: "cdn.arcavale.com",
       DISCORD_CLIENT_ID: "1563291325107937340",
     });

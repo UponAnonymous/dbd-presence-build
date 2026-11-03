@@ -14,7 +14,7 @@ process.env.TZ = "UTC";
 export default defineConfig({
   test: {
     environment: "jsdom",
-    environmentOptions: { jsdom: { url: "https://admin.arcavale.com/" } },
+    environmentOptions: { jsdom: { url: "https://dbdadmin.arcavale.com/" } },
     include: ["test/**/*.test.ts"],
     setupFiles: ["./test/setup.ts"],
     provide: {

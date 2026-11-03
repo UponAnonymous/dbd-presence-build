@@ -10,11 +10,11 @@ The panel manages invites, users, uploads, packs, Discord applications, access m
 
 ## Decision
 
-- **Layout**: a separate static web app. Its admin API is on the same origin, `https://admin.arcavale.com/api/*`. The user app contains no panel code.
-- **Authentication**: Cloudflare Access (passkey or authenticator app) in front of `admin.arcavale.com`. The Worker verifies `Cf-Access-Jwt-Assertion` on every admin call: signature against the team JWKS, `aud`, `iss`, `exp`, and an owner email allow-list.
+- **Layout**: a separate static web app. Its admin API is on the same origin, `https://dbdadmin.arcavale.com/api/*`. The user app contains no panel code.
+- **Authentication**: Cloudflare Access (passkey or authenticator app) in front of `dbdadmin.arcavale.com`. The Worker verifies `Cf-Access-Jwt-Assertion` on every admin call: signature against the team JWKS, `aud`, `iss`, `exp`, and an owner email allow-list.
 - **No bypass routes**: the `workers.dev` route and Pages preview domains are switched off. A staging test asserts that a direct unauthenticated call returns 401.
 - **Request protection** on every state-changing call:
-  - `Origin` must equal exactly `https://admin.arcavale.com`;
+  - `Origin` must equal exactly `https://dbdadmin.arcavale.com`;
   - `Sec-Fetch-Site` values other than `same-origin` are rejected;
   - a custom header is required, so a cross-origin call fails its preflight;
   - no CORS.

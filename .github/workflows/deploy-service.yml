@@ -132,7 +132,7 @@ jobs:
       PROVISION: ${{ inputs.provision && 'true' || 'false' }}
       ROTATE: ${{ inputs.rotate && 'true' || 'false' }}
       API_HOST: ${{ inputs.environment == 'production' && 'api.arcavale.com' || 'api-staging.arcavale.com' }}
-      ADMIN_HOST: ${{ inputs.environment == 'production' && 'admin.arcavale.com' || 'admin-staging.arcavale.com' }}
+      ADMIN_HOST: ${{ inputs.environment == 'production' && 'dbdadmin.arcavale.com' || 'admin-staging.arcavale.com' }}
       DEPLOY_ENV: ${{ inputs.environment }}
     # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are GitHub *environment* secrets (staging, production), never
     # repository secrets, so only a run that passes the environment's protection rules (required reviewer and the

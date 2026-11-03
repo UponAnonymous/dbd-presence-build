@@ -95,7 +95,7 @@ keeps the service safe.)
 
 ## 6. Protect the Owner Panel with Zero Trust Access
 
-Do this once for `admin.arcavale.com` (production) and once for `admin-staging.arcavale.com` (staging).
+Do this once for `dbdadmin.arcavale.com` (production) and once for `admin-staging.arcavale.com` (staging).
 
 1. In the Cloudflare dashboard open **Zero Trust**. If asked, pick a team name (for example `arcavale`) and the
    **Free** plan. Your **team domain** is then `https://<team name>.cloudflareaccess.com`. Note it down.
@@ -105,14 +105,14 @@ Do this once for `admin.arcavale.com` (production) and once for `admin-staging.a
    remove One-time PIN from this application (the application's **Login methods** tab: untick it).
 3. Go to **Access** (newer dashboards: **Access controls**) → **Applications** → **Add an application** → **Self-hosted**
    (newer dashboards ask for the kind of destination: choose **Public DNS**).
-4. Name it `Owner Panel` (or `Owner Panel staging`). Under the domain, enter `admin.arcavale.com` (or
+4. Name it `Owner Panel` (or `Owner Panel staging`). Under the domain, enter `dbdadmin.arcavale.com` (or
    `admin-staging.arcavale.com`) and leave the path empty, so the whole site is protected. Check that the
    **Subdomain** box says `admin` (or `admin-staging`): left empty, the application protects `arcavale.com` instead.
 5. Add a policy: name `Owner`, action **Allow**, rule **Include** → **Emails** → your email address. Add nothing else.
    Use an address that is **not** the public contact address in the privacy notice, so nobody can guess which account
    opens the panel. Set the application's **Session duration** to **8 hours** or less.
 6. Save the application. Open it again and copy the **Application Audience (AUD) Tag**. You need it in step 8.
-7. Test it: open `https://admin.arcavale.com` in a private browser window. Cloudflare must ask for your email and a
+7. Test it: open `https://dbdadmin.arcavale.com` in a private browser window. Cloudflare must ask for your email and a
    code (or your GitHub sign-in) before anything else loads.
 
 ## 7. Create the database and file storage
@@ -320,7 +320,7 @@ per account. It covers the whole API host, so `GET /v1/config` and every other r
 7. Click **Deploy**.
 
 The free plan allowed one rate-limiting rule with a 10-second period when this guide was written; check what the
-dashboard offers. If you later have more rules, add a second one for `admin.arcavale.com` with path starting `/api/`,
+dashboard offers. If you later have more rules, add a second one for `dbdadmin.arcavale.com` with path starting `/api/`,
 `30` requests per `10 seconds`, and a stricter one for `POST` to `/v1/auth/discord`, `/v1/auth/refresh` and
 `/v1/invites/redeem` at `5` per `10 seconds`.
 
@@ -356,7 +356,7 @@ there.
    the panel's API calls. Until the developer has deployed the service, the section shows an error instead; repeat
    this check after the first deployment. Also open `https://dbd-presence-panel-staging.pages.dev`: it must ask you
    to sign in.
-6. Repeat steps 2 to 5 for production with the project name `dbd-presence-panel`, the domain `admin.arcavale.com`
+6. Repeat steps 2 to 5 for production with the project name `dbd-presence-panel`, the domain `dbdadmin.arcavale.com`
    and the Access application `Owner Panel`, after building with plain `npm run build` (no `--env`). Production shows
    a **Production** badge and no banner. If pack previews in the production panel show only their file names, the
    staging build was deployed by mistake: build again without `--env` and deploy again.

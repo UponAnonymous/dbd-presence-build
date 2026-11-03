@@ -92,14 +92,14 @@ workers_dev = false
 preview_urls = false
 routes = [
   { pattern = "api.arcavale.com", custom_domain = true },
-  { pattern = "admin.arcavale.com/api/*", zone_name = "arcavale.com" },
+  { pattern = "dbdadmin.arcavale.com/api/*", zone_name = "arcavale.com" },
   { pattern = "cdn.arcavale.com", custom_domain = true },
 ]
 
 [env.production.vars]
 ENVIRONMENT = "production"
 API_HOST = "api.arcavale.com"
-ADMIN_HOST = "admin.arcavale.com"
+ADMIN_HOST = "dbdadmin.arcavale.com"
 CDN_HOST = "cdn.arcavale.com"
 # The official "Dead by Daylight" application (public identifier; src/DbdPresence.Configuration/ApplicationCatalog.cs).
 DISCORD_CLIENT_ID = "1563291325107937340"

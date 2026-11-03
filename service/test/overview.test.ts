@@ -61,7 +61,7 @@ describe("GET /api/overview", () => {
   it("on an empty service: zero counts, empty storage against the 8 GB cap, and backups not recorded (all null)", async () => {
     const body = await overview();
     expect(body["environment"]).toBe("production");
-    expect(body["hosts"]).toEqual({ api: "api.arcavale.com", admin: "admin.arcavale.com", cdn: "cdn.arcavale.com" });
+    expect(body["hosts"]).toEqual({ api: "api.arcavale.com", admin: "dbdadmin.arcavale.com", cdn: "cdn.arcavale.com" });
     expect(body["users"]).toEqual({ total: 0, withAccess: 0, waitingForInvite: 0, revoked: 0, activeThisWeek: 0 });
     expect(body["invites"]).toEqual({ pending: 0 });
     expect(body["uploads"]).toEqual({ total: 0, thisWeek: 0 });

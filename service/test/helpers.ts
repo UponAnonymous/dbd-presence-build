@@ -13,7 +13,7 @@ import { TrustedKeySet } from "../src/signing/document.ts";
 import { inject } from "vitest";
 
 export const API = "https://api.arcavale.com";
-export const ADMIN = "https://admin.arcavale.com";
+export const ADMIN = "https://dbdadmin.arcavale.com";
 export const CDN = "https://cdn.arcavale.com";
 export const OWNER = "owner@example.com";
 export const TEAM = "https://dbdp-test.cloudflareaccess.com";

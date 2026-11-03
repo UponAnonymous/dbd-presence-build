@@ -128,8 +128,8 @@ describe("admin request protection", () => {
     const response = await h.admin("POST", "/api/invites", {}, { Origin: "https://evil.example" });
     expect(response.status).toBe(403);
     expect(await response.json()).toEqual({ schemaVersion: 1, error: "bad_origin" });
-    expect((await h.admin("POST", "/api/invites", {}, { Origin: "https://admin.arcavale.com.evil.example" })).status).toBe(403);
-    expect((await h.admin("POST", "/api/invites", {}, { Origin: "http://admin.arcavale.com" })).status).toBe(403);
+    expect((await h.admin("POST", "/api/invites", {}, { Origin: "https://dbdadmin.arcavale.com.evil.example" })).status).toBe(403);
+    expect((await h.admin("POST", "/api/invites", {}, { Origin: "http://dbdadmin.arcavale.com" })).status).toBe(403);
     expect((await h.admin("POST", "/api/invites", {}, { Origin: null })).status).toBe(403);
     expect(await rowCount("invites")).toBe(0);
   });

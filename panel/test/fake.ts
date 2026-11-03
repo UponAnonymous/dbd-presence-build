@@ -273,7 +273,7 @@ export function sampleStorage(
 export function sampleOverview(): Overview {
   return {
     environment: "production",
-    hosts: { api: "api.arcavale.com", admin: "admin.arcavale.com", cdn: "cdn.arcavale.com" },
+    hosts: { api: "api.arcavale.com", admin: "dbdadmin.arcavale.com", cdn: "cdn.arcavale.com" },
     users: { total: 14, withAccess: 11, waitingForInvite: 2, revoked: 1, activeThisWeek: 7 },
     invites: { pending: 3 },
     uploads: { total: 42, thisWeek: 5 },
@@ -340,7 +340,7 @@ export class FakeBackend {
     if (failure === "redirect") return Object.defineProperty(new Response(null, { status: 200 }), "type", { value: "opaqueredirect" });
     if (failure === "html") return new Response("<!doctype html><p>Not the API</p>", { status: 200, headers: { "Content-Type": "text/html" } });
     if (failure) return this.json(failure.status, { ...(failure.error ? { error: failure.error } : {}), ...(failure.reason ? { reason: failure.reason } : {}) }, failure.headers);
-    return this.route(method, path, new URL(input, "https://admin.arcavale.com").searchParams, body as Record<string, unknown> | undefined);
+    return this.route(method, path, new URL(input, "https://dbdadmin.arcavale.com").searchParams, body as Record<string, unknown> | undefined);
   };
 
   readonly uploads: FakeUpload[] = [];
@@ -645,7 +645,7 @@ export async function mount(section: string, options: { hostname?: string; backe
     win: window,
     api: new AdminApi(backend.fetch, () => options.online ?? true),
     storage: null,
-    hostname: options.hostname ?? "admin.arcavale.com",
+    hostname: options.hostname ?? "dbdadmin.arcavale.com",
     now: () => NOW,
     copy: async (text) => {
       if (options.copyWorks === false) return false;
