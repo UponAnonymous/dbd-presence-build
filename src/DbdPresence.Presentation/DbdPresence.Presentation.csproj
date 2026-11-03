@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../DbdPresence.Configuration/DbdPresence.Configuration.csproj" />
+    <ProjectReference Include="../DbdPresence.Discord/DbdPresence.Discord.csproj" />
+    <ProjectReference Include="../DbdPresence.Packs/DbdPresence.Packs.csproj" />
+    <!-- The embedded vocabulary is the baseline character roster (PLAN_V2_S5B §2.4: Presentation is where Vision and Packs meet). -->
+    <ProjectReference Include="../DbdPresence.Vision/DbdPresence.Vision.csproj" />
+    <!-- The owner-only Study page (FR-LAB-04) uses only the library's public surface (IStudyWorkbench and its records); Study has no network or process code. -->
+    <ProjectReference Include="../DbdPresence.Study/DbdPresence.Study.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DbdPresence.Presentation.Tests" />
+  </ItemGroup>
+</Project>

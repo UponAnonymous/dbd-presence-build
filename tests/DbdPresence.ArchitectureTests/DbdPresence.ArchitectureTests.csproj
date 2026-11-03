@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Static architecture checks over the *built* product assemblies (read with System.Reflection.Metadata,
+    never loaded). Runs on Linux and Windows. Covers NFR-SEC-01, NFR-SEC-02 and the dependency rule in
+    ARCHITECTURE §2.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>BuildConfiguration</_Parameter1>
+      <_Parameter2>$(Configuration)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Build-order only: the product assemblies are inspected from their output folders. -->
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.Configuration/DbdPresence.Configuration.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.Discord/DbdPresence.Discord.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.Vision/DbdPresence.Vision.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.Study/DbdPresence.Study.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.Online/DbdPresence.Online.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.ImageHelper/DbdPresence.ImageHelper.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.Presentation/DbdPresence.Presentation.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.Platform.Windows/DbdPresence.Platform.Windows.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/DbdPresence.App/DbdPresence.App.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <!-- The unshipped study tool is inspected too (StudyToolBoundaryTests). -->
+    <ProjectReference Include="../../tools/DbdPresence.StudyCapture/DbdPresence.StudyCapture.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <!-- So is the unshipped evaluator tool (EvalToolBoundaryTests). -->
+    <ProjectReference Include="../../tools/DbdPresence.Eval/DbdPresence.Eval.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <!-- And the owner-run spike tool and the signing-vector generator (SpikeToolBoundaryTests, VectorGenToolBoundaryTests). -->
+    <ProjectReference Include="../../tools/DbdPresence.Spikes/DbdPresence.Spikes.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../tools/DbdPresence.Packs.VectorGen/DbdPresence.Packs.VectorGen.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+    <!-- The owner's local CI program (LocalCiToolBoundaryTests). -->
+    <ProjectReference Include="../../tools/DbdPresence.LocalCi/DbdPresence.LocalCi.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <!-- Only for the self-test of the UpdateManager construction rule (a never-run subclass sample); already pinned for the App. -->
+    <PackageReference Include="Velopack" />
+    <!-- So XamlBindingRulesTests can reflect over the Presentation view models (their base types live in this package); already pinned for Presentation. -->
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+</Project>

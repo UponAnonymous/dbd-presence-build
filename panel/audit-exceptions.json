@@ -1,0 +1,4 @@
+{
+  "policy": "npm audit at level high must pass. A high or critical advisory may be listed here only when its fix is younger than the repository's 14-day minimum package age, the affected package is a development tool that is not in the built panel (dist/), and an expiry date forces the upgrade. docs/DEPENDENCIES.md records each entry.",
+  "exceptions": []
+}

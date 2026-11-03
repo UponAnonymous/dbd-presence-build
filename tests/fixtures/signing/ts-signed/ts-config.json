@@ -1,0 +1,33 @@
+{
+  "name": "ts-config",
+  "description": "A config document as GET /v1/config signs it (default settings), full 14-day lifetime.",
+  "expectedPurpose": "config",
+  "expectedChannel": "stable",
+  "now": "2026-01-02T00:00:00.000Z",
+  "storedVersions": [],
+  "expected": "Valid",
+  "expectedVersion": 1767225600,
+  "expectedIssuedAt": "2026-01-01T00:00:00.000Z",
+  "expectedExpiresAt": "2026-01-15T00:00:00.000Z",
+  "expectedPayload": {
+    "schemaVersion": 1,
+    "accessMode": "invite-only",
+    "applications": [
+      {
+        "key": "dbd",
+        "applicationId": "1563291325107937340",
+        "name": "Dead by Daylight",
+        "description": "Unofficial fan-made presence — not affiliated with Behaviour Interactive"
+      }
+    ],
+    "defaultApplication": "dbd",
+    "disable": {
+      "capture": false,
+      "detection": false
+    },
+    "emergencyStop": false,
+    "minimumVersion": "0.1.0",
+    "banner": null
+  },
+  "documentText": "{\"kid\":\"test-content-1\",\"signed\":\"eyJraWQiOiJ0ZXN0LWNvbnRlbnQtMSIsInB1cnBvc2UiOiJjb25maWciLCJjaGFubmVsIjoic3RhYmxlIiwidmVyc2lvbiI6MTc2NzIyNTYwMCwiaXNzdWVkQXQiOiIyMDI2LTAxLTAxVDAwOjAwOjAwLjAwMFoiLCJleHBpcmVzQXQiOiIyMDI2LTAxLTE1VDAwOjAwOjAwLjAwMFoiLCJwYXlsb2FkIjp7InNjaGVtYVZlcnNpb24iOjEsImFjY2Vzc01vZGUiOiJpbnZpdGUtb25seSIsImFwcGxpY2F0aW9ucyI6W3sia2V5IjoiZGJkIiwiYXBwbGljYXRpb25JZCI6IjE1NjMyOTEzMjUxMDc5MzczNDAiLCJuYW1lIjoiRGVhZCBieSBEYXlsaWdodCIsImRlc2NyaXB0aW9uIjoiVW5vZmZpY2lhbCBmYW4tbWFkZSBwcmVzZW5jZSDigJQgbm90IGFmZmlsaWF0ZWQgd2l0aCBCZWhhdmlvdXIgSW50ZXJhY3RpdmUifV0sImRlZmF1bHRBcHBsaWNhdGlvbiI6ImRiZCIsImRpc2FibGUiOnsiY2FwdHVyZSI6ZmFsc2UsImRldGVjdGlvbiI6ZmFsc2V9LCJlbWVyZ2VuY3lTdG9wIjpmYWxzZSwibWluaW11bVZlcnNpb24iOiIwLjEuMCIsImJhbm5lciI6bnVsbH19\",\"sig\":\"z_hEV_3mh2N2zanE6Okg3Sx1q_WeL_13O0RRXLo9N9-KUX7rUcwY_BR6W_K0nDwI-ZyW5JUOrtHHi_AGd3Ig0A\"}"
+}

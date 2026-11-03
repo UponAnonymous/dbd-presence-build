@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "language": "en",
+  "version": 1,
+  "dated": "2026-10-25",
+  "provenance": "Each prompt was read from the owner's own screen (power prompts at the bottom centre of the killer HUD) and is listed with where and when. No website or wiki was read for this list: the publishers' terms forbid automated access (D31, D35). A prompt that has not been seen on screen is not in this file. Prompts the owner's app learns later are kept apart from this list on the owner's PC.",
+  "prompts": [
+    {
+      "id": "the-lich/vile-darkness",
+      "text": "VILE DARKNESS",
+      "killer": "the-lich",
+      "seenOnScreen": "2026-10-24, owner screenshots of a custom match with bots, killer HUD, bottom centre; the scoreboard and TAB rows of the same match named The Lich"
+    },
+    {
+      "id": "the-lich/cast-flight-of-the-damned",
+      "text": "CAST FLIGHT OF THE DAMNED",
+      "killer": "the-lich",
+      "seenOnScreen": "2026-10-24, owner screenshots of a custom match with bots, killer HUD, bottom centre; the scoreboard and TAB rows of the same match named The Lich"
+    },
+    {
+      "id": "the-lich/cast-fly",
+      "text": "CAST FLY",
+      "killer": "the-lich",
+      "seenOnScreen": "2026-10-24, owner screenshots of a custom match with bots, killer HUD, bottom centre; the scoreboard and TAB rows of the same match named The Lich"
+    }
+  ]
+}

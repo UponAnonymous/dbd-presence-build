@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "about": "Shared fold cases for character names (PLAN_V2_S5B section 2.2 check 4, D35). fold is the folded name the app reports and the service compares (service/src/roster/fold.ts foldName, src/DbdPresence.Core/Roster/RosterNameFold.cs); null means a letter or digit does not fold to a-z or 0-9. skeleton is the OCR skeleton the app's vocabulary uses to keep names apart (src/DbdPresence.Vision/Text/TextNormalizer.cs Skeleton; service skeleton). Checked by the service, Core and Vision suites.",
+  "cases": [
+    {
+      "input": "The Trapper",
+      "fold": "the trapper",
+      "skeleton": "the trapper"
+    },
+    {
+      "input": "The Onryō",
+      "fold": "the onryo",
+      "skeleton": "the onryo"
+    },
+    {
+      "input": "Élodie Rakoto",
+      "fold": "elodie rakoto",
+      "skeleton": "elodle rakoto"
+    },
+    {
+      "input": "Leon S. Kennedy",
+      "fold": "leon s kennedy",
+      "skeleton": "leon s kennedy"
+    },
+    {
+      "input": "William \"Bill\" Overbeck",
+      "fold": "william bill overbeck",
+      "skeleton": "wllllam blll overbeck"
+    },
+    {
+      "input": "The Good Guy - Chucky",
+      "fold": "the good guy chucky",
+      "skeleton": "the good guy chucky"
+    },
+    {
+      "input": "The Onryō – Sadako",
+      "fold": "the onryo sadako",
+      "skeleton": "the onryo sadako"
+    },
+    {
+      "input": "Ø Ł Đ ß",
+      "fold": "o l d s",
+      "skeleton": "o l d s"
+    },
+    {
+      "input": "  Mixed   CASE  ",
+      "fold": "mixed case",
+      "skeleton": "mlxed case"
+    },
+    {
+      "input": "Jill Valentine’s",
+      "fold": "jill valentines",
+      "skeleton": "jlll valentlnes"
+    },
+    {
+      "input": "Kate's Song",
+      "fold": "kates song",
+      "skeleton": "kates song"
+    },
+    {
+      "input": "THE NURSE 2",
+      "fold": "the nurse 2",
+      "skeleton": "the nurse z"
+    },
+    {
+      "input": "Rain",
+      "fold": "rain",
+      "skeleton": "raln"
+    },
+    {
+      "input": "Corn",
+      "fold": "corn",
+      "skeleton": "com"
+    },
+    {
+      "input": "Vvalter",
+      "fold": "vvalter",
+      "skeleton": "walter"
+    },
+    {
+      "input": "Zarina Kassir",
+      "fold": "zarina kassir",
+      "skeleton": "zarlna kasslr"
+    },
+    {
+      "input": "Ŀuna",
+      "fold": "l una",
+      "skeleton": "l una"
+    },
+    {
+      "input": "１２３ ＡＢＣ",
+      "fold": "123 abc",
+      "skeleton": "lz3 abc"
+    },
+    {
+      "input": "K-pop & Co: Tour",
+      "fold": "k pop co tour",
+      "skeleton": "k pop co tour"
+    },
+    {
+      "input": "Dwight\tFairfield",
+      "fold": "dwight fairfield",
+      "skeleton": "dwlght falrfleld"
+    },
+    {
+      "input": "🎃 Pumpkin",
+      "fold": "pumpkin",
+      "skeleton": "pumpkln"
+    },
+    {
+      "input": "The Lich",
+      "fold": "the lich",
+      "skeleton": "the llch"
+    },
+    {
+      "input": "東京",
+      "fold": null,
+      "skeleton": null
+    },
+    {
+      "input": "Æsir",
+      "fold": null,
+      "skeleton": null
+    },
+    {
+      "input": "",
+      "fold": "",
+      "skeleton": ""
+    }
+  ]
+}

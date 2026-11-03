@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Configuration/DbdPresence.Configuration.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Presentation/DbdPresence.Presentation.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Vision/DbdPresence.Vision.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The drawn-text scenes and the exact fake recogniser of the Vision tests (mechanics only), so the live loop runs here on synthetic game screens. -->
+    <Compile Include="../DbdPresence.Vision.Tests/Support/*.cs" Link="Support/Vision/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Test fakes shared across projects: in-memory stores that ignore the path separator style. -->
+    <Compile Include="../Shared/VirtualPaths.cs" Link="Shared/VirtualPaths.cs" />
+    <Compile Include="../Shared/InMemoryLocalStorage.cs" Link="Shared/InMemoryLocalStorage.cs" />
+    <Using Include="DbdPresence.TestSupport" />
+  </ItemGroup>
+</Project>

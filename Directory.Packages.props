@@ -1,0 +1,30 @@
+<Project>
+  <!--
+    Central package management. Every version is exact.
+    Versions use NuGet's exact-match syntax [x.y.z], so restore can never float upward.
+    Policy (docs/SAFETY_AND_PRIVACY.md R-10): third-party versions must be at least 14 days old when adopted;
+    Microsoft servicing packages may follow the SDK's patch band. New dependencies need licence + vulnerability review.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Product -->
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="[8.4.2]" />
+    <PackageVersion Include="H.NotifyIcon.Wpf" Version="[2.4.1]" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="[10.0.13]" />
+    <PackageVersion Include="Serilog" Version="[4.4.0]" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="[10.0.0]" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="[7.0.0]" />
+    <!-- Installer startup hook only (V2-S2e, ADR-0006/0016). Never use UpdateManager before V2-S6. See docs/DEPENDENCIES.md. -->
+    <PackageVersion Include="Velopack" Version="[1.2.161]" />
+    <!-- Tests -->
+    <!-- Tests run on Microsoft.Testing.Platform (xunit.v3 4.x; .NET 10 `dotnet test` MTP mode via global.json). -->
+    <PackageVersion Include="xunit.v3" Version="[4.0.1]" />
+    <PackageVersion Include="coverlet.MTP" Version="[10.1.0]" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="[2.4.1]" />
+    <PackageVersion Include="FlaUI.UIA3" Version="[5.0.0]" />
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="[10.10.0]" />
+  </ItemGroup>
+</Project>

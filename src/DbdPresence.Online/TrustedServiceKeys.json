@@ -1,0 +1,41 @@
+{
+  "staging": [
+    {
+      "kid": "licence-staging-1",
+      "purposes": [
+        "licence"
+      ],
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1vnr3SBAkPOSWbYkfJzv_aKi8rJMaRBAAvf3XYyeBNl4xvEovtfFg0p_kjjelLeyHOFwGNM9JfvT0Zuo5Ya7Ww"
+    },
+    {
+      "kid": "config-staging-1",
+      "purposes": [
+        "config"
+      ],
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYsHC9YbCqMSkdMhqNhQzasn5hy2H5cg8w42ZcmTRdegvktaPNpmNOd99mQjGLODGVyF0jiFcMhHM_rVxGJP6dA"
+    },
+    {
+      "kid": "pack-index-staging-1",
+      "purposes": [
+        "pack-index",
+        "roster"
+      ],
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvyTICgAFHHHTWpUJgcTDiLKlzfOoL1ycXs2DfEcD21YwErOpgi4BerHGOGAyOt5PVul1K1HGVGL-gVLKwLrJbg"
+    },
+    {
+      "kid": "release-staging-1",
+      "purposes": [
+        "releases"
+      ],
+      "awaitingKey": true
+    },
+    {
+      "kid": "recovery-staging-1",
+      "purposes": [
+        "key-replacement"
+      ],
+      "awaitingKey": true
+    }
+  ],
+  "production": []
+}

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Package manifest template for the Microsoft Store (MSIX) build of DBD Presence. build/pack-msix.ps1 fills the four {{...}} values and writes
+  the result as AppxManifest.xml next to the published files. Nothing here is a real identity: the owner takes Name, Publisher and
+  PublisherDisplayName from Partner Center (docs/owner). The Store signs the package; the test certificate in pack-msix.ps1 is for CI only.
+
+  Declared on purpose, and nothing else (tests/DbdPresence.ArchitectureTests/MsixManifestTests.cs):
+    runFullTrust                  the app is a normal desktop program (restricted capability the Store approves for desktop apps).
+    graphicsCaptureWithoutBorder  lets the screen-reading option ask Windows to leave out the yellow capture border (WgcWindowCaptureSource).
+  No network capability is needed for a full-trust app. The app still reaches only the hosts in docs/SAFETY_AND_PRIVACY.md.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap11="http://schemas.microsoft.com/appx/manifest/uap/windows10/11"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap11 desktop rescap">
+
+  <Identity Name="{{IDENTITY_NAME}}" Publisher="{{PUBLISHER}}" Version="{{VERSION}}" ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>DBD Presence</DisplayName>
+    <PublisherDisplayName>{{PUBLISHER_DISPLAY_NAME}}</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Applications>
+    <Application Id="DbdPresence" Executable="DBD-Presence.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="DBD Presence"
+        Description="Shows your Dead by Daylight activity on your Discord profile. Unofficial fan-made app."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+      </uap:VisualElements>
+      <Extensions>
+        <desktop:Extension Category="windows.startupTask" Executable="DBD-Presence.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="DbdPresenceStartup" Enabled="false" DisplayName="DBD Presence" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <uap11:Capability Name="graphicsCaptureWithoutBorder" />
+  </Capabilities>
+</Package>

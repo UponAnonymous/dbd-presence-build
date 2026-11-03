@@ -1,0 +1,26 @@
+{
+  "name": "ts-pack-index",
+  "description": "A pack index with non-ASCII text and escapes, to prove the signed bytes survive exactly.",
+  "expectedPurpose": "pack-index",
+  "expectedChannel": "stable",
+  "now": "2026-01-02T00:00:00.000Z",
+  "storedVersions": [],
+  "expected": "Valid",
+  "expectedVersion": 7,
+  "expectedIssuedAt": "2026-01-01T00:00:00.000Z",
+  "expectedExpiresAt": "2026-01-31T00:00:00.000Z",
+  "expectedPayload": {
+    "packs": [
+      {
+        "id": "original",
+        "name": "Original — “quoted” \\ é 🎃",
+        "version": 1,
+        "author": "Test author",
+        "licenceNote": "Test vector content",
+        "credit": null
+      }
+    ],
+    "entries": []
+  },
+  "documentText": "{\"kid\":\"test-content-1\",\"signed\":\"eyJraWQiOiJ0ZXN0LWNvbnRlbnQtMSIsInB1cnBvc2UiOiJwYWNrLWluZGV4IiwiY2hhbm5lbCI6InN0YWJsZSIsInZlcnNpb24iOjcsImlzc3VlZEF0IjoiMjAyNi0wMS0wMVQwMDowMDowMC4wMDBaIiwiZXhwaXJlc0F0IjoiMjAyNi0wMS0zMVQwMDowMDowMC4wMDBaIiwicGF5bG9hZCI6eyJwYWNrcyI6W3siaWQiOiJvcmlnaW5hbCIsIm5hbWUiOiJPcmlnaW5hbCDigJQg4oCccXVvdGVk4oCdIFxcIMOpIPCfjoMiLCJ2ZXJzaW9uIjoxLCJhdXRob3IiOiJUZXN0IGF1dGhvciIsImxpY2VuY2VOb3RlIjoiVGVzdCB2ZWN0b3IgY29udGVudCIsImNyZWRpdCI6bnVsbH1dLCJlbnRyaWVzIjpbXX19\",\"sig\":\"poq_r7iSLBlo9EfovF336CRxiH7YRrVAy2v3o2vYzHKTQroNOrR_FsoMOCHwYP46g5Ie4qEshVNrZEaDqQ07fg\"}"
+}

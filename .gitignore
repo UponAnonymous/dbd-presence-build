@@ -1,0 +1,25 @@
+# Build output
+bin/
+obj/
+artifacts/
+publish/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage/
+*.trx
+
+# Local datasets / fixtures containing game imagery (never commit; see docs/DETECTION_VALIDATION.md §3)
+tests/fixtures/local/
+datasets/
+
+.graph-indexer/
+
+# Agent worktrees (isolated working copies, never part of the repo)
+
+
+# Offline signing keys (release and recovery; docs/owner/release-keys.md) are kept off the repository. Only the published test keys
+# under tests/fixtures are committed (security review 2026-10-25, L6).
+*.private.pem
+!tests/fixtures/**/*.private.pem

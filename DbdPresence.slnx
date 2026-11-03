@@ -1,0 +1,39 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DbdPresence.App/DbdPresence.App.csproj" />
+    <Project Path="src/DbdPresence.Configuration/DbdPresence.Configuration.csproj" />
+    <Project Path="src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <Project Path="src/DbdPresence.Discord/DbdPresence.Discord.csproj" />
+    <Project Path="src/DbdPresence.ImageHelper/DbdPresence.ImageHelper.csproj" />
+    <Project Path="src/DbdPresence.Online/DbdPresence.Online.csproj" />
+    <Project Path="src/DbdPresence.Packs/DbdPresence.Packs.csproj" />
+    <Project Path="src/DbdPresence.Platform.Windows/DbdPresence.Platform.Windows.csproj" />
+    <Project Path="src/DbdPresence.Presentation/DbdPresence.Presentation.csproj" />
+    <Project Path="src/DbdPresence.Study/DbdPresence.Study.csproj" />
+    <Project Path="src/DbdPresence.Vision/DbdPresence.Vision.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/DbdPresence.Eval/DbdPresence.Eval.csproj" />
+    <Project Path="tools/DbdPresence.LocalCi/DbdPresence.LocalCi.csproj" />
+    <Project Path="tools/DbdPresence.Packs.VectorGen/DbdPresence.Packs.VectorGen.csproj" />
+    <Project Path="tools/DbdPresence.ReleaseSigner/DbdPresence.ReleaseSigner.csproj" />
+    <Project Path="tools/DbdPresence.Spikes/DbdPresence.Spikes.csproj" />
+    <Project Path="tools/DbdPresence.StudyCapture/DbdPresence.StudyCapture.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DbdPresence.AppLogging.Tests/DbdPresence.AppLogging.Tests.csproj" />
+    <Project Path="tests/DbdPresence.ArchitectureTests/DbdPresence.ArchitectureTests.csproj" />
+    <Project Path="tests/DbdPresence.Configuration.Tests/DbdPresence.Configuration.Tests.csproj" />
+    <Project Path="tests/DbdPresence.Core.Tests/DbdPresence.Core.Tests.csproj" />
+    <Project Path="tests/DbdPresence.Discord.Tests/DbdPresence.Discord.Tests.csproj" />
+    <Project Path="tests/DbdPresence.LocalCi.Tests/DbdPresence.LocalCi.Tests.csproj" />
+    <Project Path="tests/DbdPresence.Online.Tests/DbdPresence.Online.Tests.csproj" />
+    <Project Path="tests/DbdPresence.Packs.Tests/DbdPresence.Packs.Tests.csproj" />
+    <Project Path="tests/DbdPresence.Platform.Windows.Tests/DbdPresence.Platform.Windows.Tests.csproj" />
+    <Project Path="tests/DbdPresence.Presentation.Tests/DbdPresence.Presentation.Tests.csproj" />
+    <Project Path="tests/DbdPresence.ReleaseSigner.Tests/DbdPresence.ReleaseSigner.Tests.csproj" />
+    <Project Path="tests/DbdPresence.UiTests/DbdPresence.UiTests.csproj" />
+    <Project Path="tests/DbdPresence.Updates.Tests/DbdPresence.Updates.Tests.csproj" />
+    <Project Path="tests/DbdPresence.Vision.Tests/DbdPresence.Vision.Tests.csproj" />
+  </Folder>
+</Solution>

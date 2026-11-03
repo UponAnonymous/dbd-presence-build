@@ -1,0 +1,227 @@
+# Daily encrypted backup of the online service's database, and the restore drill (docs/owner/backups.md).
+#
+# Every day (and when run by hand) for each environment: export the D1 database (`wrangler d1 export --remote`),
+# compress it, encrypt it with gpg (AES-256, passphrase from the GitHub environment secret BACKUP_KEY, given to gpg on
+# standard input only), check that it decrypts again, and upload it to the R2 bucket dbd-presence-<env>-backups as
+# d1/<UTC date>T<time>Z.sql.gz.gpg. The bucket and its 30-day expiry rule are made by the Deploy service workflow
+# (scripts/provision.mjs resources); the Worker has no binding to it. A backup larger than 25 MB, or one that would take
+# the environment's backups past its budget (800 MB production, 200 MB staging), is refused: staying inside the free
+# storage tier (D18; worst case 8 + 0.75 + 0.8 + 0.2 = 9.75 GB for both environments) matters more than a backup,
+# and D1 Time Travel still covers the last 7 days. Each run is recorded in the database table backup_runs.
+#
+# Restore drill (run by hand, tick "drill"): download the newest backup, decrypt it and check its integrity, load it into
+# a NEW temporary database dbd-presence-<env>-restore-drill-<run id>, compare every table's row count with the backup and
+# the migrations list with the backup and the code, report table names and counts only, and always delete the temporary
+# database. The live database is only read (the backup list) and given one line in backup_runs; it is never restored into.
+# A drill that stops before its clean-up (cancelled, timed out) leaves that database behind with decrypted data, so the
+# daily job and every drill first delete restore-drill databases of the environment older than a day (TM-14).
+#
+# The backups bucket also has a 29-day lock rule (set by Deploy service with provision ticked): no backup can be deleted
+# or overwritten before it is 29 days old (TM-03).
+#
+# Environments: staging runs in the GitHub environment `staging`. Production runs in `production-backups`, which has the
+# same main-only branch rule as `production` but no required reviewer (a scheduled backup cannot wait for an approval
+# every day) and its own Cloudflare token limited to D1 and R2, so it cannot deploy anything. Scheduled runs always use
+# the default branch (main); a run by hand of production is refused from any other branch, as in deploy-service.yml.
+#
+# NFR-SVC-10 / gate V7.2 (backup and restore drill), PLAN_V2 §6 (encrypted exports kept 30 days), NFR-SVC-11 / D18
+# (storage cap), FR-ADM-06 (separate environments).
+name: Back up service data
+
+on:
+  schedule:
+    # 04:41 UTC daily, after the Worker's 03:23 audit export and retention job (wrangler.toml crons).
+    - cron: '41 4 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Which copy to back up'
+        type: choice
+        options: [staging, production]
+        default: staging
+        required: true
+      drill:
+        description: 'Also run the restore drill on the newest backup (into a temporary copy, never the live database)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  export:
+    name: Encrypted backup (${{ matrix.environment }})
+    runs-on: ${{ vars.SECRETS_LINUX_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ${{ github.event_name == 'schedule' && fromJSON('["staging","production"]') || fromJSON(format('["{0}"]', inputs.environment)) }}
+    concurrency:
+      group: backup-service-${{ matrix.environment }}
+      cancel-in-progress: false
+    environment:
+      name: ${{ matrix.environment == 'production' && 'production-backups' || 'staging' }}
+    env:
+      DEPLOY_ENV: ${{ matrix.environment }}
+    steps:
+      - name: Production backups only from main
+        run: |
+          set -euo pipefail
+          if [ "$DEPLOY_ENV" = production ] && [ "$GITHUB_REF" != refs/heads/main ]; then
+            echo "::error title=Wrong branch::Production is backed up only from main. Choose 'Use workflow from: main'."
+            exit 1
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Until the owner has made BACKUP_KEY for this environment, a scheduled run is skipped (green, with a notice)
+      # instead of failing every day; a run started by hand always needs the key.
+      - name: The backup key exists (its value is never shown)
+        id: key
+        working-directory: service
+        env:
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+          SKIP_FLAG: ${{ github.event_name == 'schedule' && '--skip-if-missing' || '' }}
+        run: node scripts/backup.mjs check-key --env "$DEPLOY_ENV" $SKIP_FLAG
+
+      - if: steps.key.outputs.ready == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.22.0'
+          # No dependency cache in this workflow: it holds the backup secrets, and the Actions cache is shared with jobs that run third-party code, so a poisoned entry
+          # could be restored here (red-team round 4, F4/F10; build/check-workflows.py). `package-manager-cache: false` keeps setup-node from switching one on by itself.
+          package-manager-cache: false
+
+      - name: Install (exact versions from the lock file)
+        if: steps.key.outputs.ready == 'true'
+        working-directory: service
+        run: |
+          set -euo pipefail
+          echo "STATE_DIR=$RUNNER_TEMP/backup-state" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/backup-state"
+          npm ci
+
+      - name: Find the database and check the backup storage (read only)
+        if: steps.key.outputs.ready == 'true'
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/provision.mjs resources --env "$DEPLOY_ENV" --state "$STATE_DIR"
+
+      - name: Export, encrypt, check and upload
+        if: steps.key.outputs.ready == 'true'
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+        run: node scripts/backup.mjs export --env "$DEPLOY_ENV" --state "$STATE_DIR"
+
+      # A drill that was cancelled or timed out before its clean-up leaves a temporary copy of the data (TM-14).
+      - name: Delete leftover restore-drill databases older than a day
+        if: ${{ !cancelled() && steps.key.outputs.ready == 'true' }}
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/backup.mjs sweep-drills --env "$DEPLOY_ENV" --state "$STATE_DIR"
+
+      - name: Report for the owner
+        if: always() && steps.key.outputs.ready != 'false'
+        working-directory: service
+        run: |
+          node scripts/backup.mjs summary --env "$DEPLOY_ENV" --state "${STATE_DIR:-$RUNNER_TEMP/backup-state}" >> "$GITHUB_STEP_SUMMARY" \
+          || echo "**The report could not be written.** Open the red step above to see what failed." >> "$GITHUB_STEP_SUMMARY"
+
+  drill:
+    name: Restore drill (${{ inputs.environment }})
+    needs: export
+    # Runs after the export, even a failed one (it then tests the newest earlier backup), but never when cancelled.
+    if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && inputs.drill }}
+    runs-on: ${{ vars.SECRETS_LINUX_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 30
+    concurrency:
+      group: backup-service-${{ inputs.environment }}
+      cancel-in-progress: false
+    environment:
+      name: ${{ inputs.environment == 'production' && 'production-backups' || 'staging' }}
+    env:
+      DEPLOY_ENV: ${{ inputs.environment }}
+      DRILL_RUN: ${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Production drills only from main
+        run: |
+          set -euo pipefail
+          if [ "$DEPLOY_ENV" = production ] && [ "$GITHUB_REF" != refs/heads/main ]; then
+            echo "::error title=Wrong branch::The production drill runs only from main. Choose 'Use workflow from: main'."
+            exit 1
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: The backup key exists (its value is never shown)
+        working-directory: service
+        env:
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+        run: node scripts/backup.mjs check-key --env "$DEPLOY_ENV"
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.22.0'
+          # No dependency cache in this workflow: it holds the backup secrets, and the Actions cache is shared with jobs that run third-party code, so a poisoned entry
+          # could be restored here (red-team round 4, F4/F10; build/check-workflows.py). `package-manager-cache: false` keeps setup-node from switching one on by itself.
+          package-manager-cache: false
+
+      - name: Install (exact versions from the lock file)
+        working-directory: service
+        run: |
+          set -euo pipefail
+          echo "STATE_DIR=$RUNNER_TEMP/backup-state" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/backup-state"
+          npm ci
+
+      - name: Find the live database (read only)
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/provision.mjs resources --env "$DEPLOY_ENV" --state "$STATE_DIR"
+
+      - name: Delete leftover restore-drill databases older than a day (from drills that stopped early)
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/backup.mjs sweep-drills --env "$DEPLOY_ENV" --state "$STATE_DIR"
+
+      - name: Download, decrypt, check, load into a temporary database and compare
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+        run: node scripts/backup.mjs drill --env "$DEPLOY_ENV" --state "$STATE_DIR" --run-id "$DRILL_RUN"
+
+      - name: Delete the temporary database (always)
+        if: always()
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/backup.mjs drill-cleanup --env "$DEPLOY_ENV" --state "${STATE_DIR:-$RUNNER_TEMP/backup-state}" --run-id "$DRILL_RUN"
+
+      - name: Report for the owner (table names and row counts only)
+        if: always()
+        working-directory: service
+        run: |
+          node scripts/backup.mjs summary --env "$DEPLOY_ENV" --state "${STATE_DIR:-$RUNNER_TEMP/backup-state}" >> "$GITHUB_STEP_SUMMARY" \
+          || echo "**The report could not be written.** Open the red step above to see what failed." >> "$GITHUB_STEP_SUMMARY"

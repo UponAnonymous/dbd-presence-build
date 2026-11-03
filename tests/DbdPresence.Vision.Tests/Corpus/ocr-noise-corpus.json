@@ -1,0 +1,1970 @@
+{
+ "schemaVersion": 1,
+ "description": "Realistic OCR errors for the closed-vocabulary matcher (C2, FR-DET-04). Text only: no game imagery. 'match' = accepted as expectedId; 'group' = only the realm is known; 'ambiguous' = abstain because candidates are too close; 'nomatch', 'empty' and 'tooshort' = abstain. These cases test the matcher's mechanics on invented noise. They are not a measurement of how well Windows OCR reads the game (UNKNOWN until the owner's study session).",
+ "cases": [
+  {
+   "id": "map-001",
+   "kind": "Map",
+   "ocr": "COAL TOWER",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/coal-tower"
+  },
+  {
+   "id": "map-002",
+   "kind": "Map",
+   "ocr": "coal tower",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/coal-tower"
+  },
+  {
+   "id": "map-003",
+   "kind": "Map",
+   "ocr": "Coa1 Tower",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/coal-tower"
+  },
+  {
+   "id": "map-004",
+   "kind": "Map",
+   "ocr": "C0al T0wer",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/coal-tower"
+  },
+  {
+   "id": "map-005",
+   "kind": "Map",
+   "ocr": "Coal Tovver",
+   "category": "vv/w",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/coal-tower"
+  },
+  {
+   "id": "map-006",
+   "kind": "Map",
+   "ocr": "Coal Towe",
+   "category": "truncation",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/coal-tower"
+  },
+  {
+   "id": "map-007",
+   "kind": "Map",
+   "ocr": "Groaning Storehouse.",
+   "category": "punctuation",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/groaning-storehouse"
+  },
+  {
+   "id": "map-008",
+   "kind": "Map",
+   "ocr": "GROANING   STOREHOUSE",
+   "category": "whitespace",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/groaning-storehouse"
+  },
+  {
+   "id": "map-009",
+   "kind": "Map",
+   "ocr": "Groaning St0rehouse",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/groaning-storehouse"
+  },
+  {
+   "id": "map-010",
+   "kind": "Map",
+   "ocr": "lronworks of Misery",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/ironworks-of-misery"
+  },
+  {
+   "id": "map-011",
+   "kind": "Map",
+   "ocr": "Ironworks of Mlsery",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/ironworks-of-misery"
+  },
+  {
+   "id": "map-012",
+   "kind": "Map",
+   "ocr": "Ironvvorks of Misery",
+   "category": "vv/w",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/ironworks-of-misery"
+  },
+  {
+   "id": "map-013",
+   "kind": "Map",
+   "ocr": "|ronworks of Misery",
+   "category": "bar for I",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/ironworks-of-misery"
+  },
+  {
+   "id": "map-014",
+   "kind": "Map",
+   "ocr": "The Pa!e Rose",
+   "category": "exclamation mark for l",
+   "expect": "match",
+   "expectedId": "backwater-swamp/the-pale-rose"
+  },
+  {
+   "id": "map-015",
+   "kind": "Map",
+   "ocr": "She1ter Woods",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/shelter-woods"
+  },
+  {
+   "id": "map-016",
+   "kind": "Map",
+   "ocr": "Shelter W00ds",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/shelter-woods"
+  },
+  {
+   "id": "map-017",
+   "kind": "Map",
+   "ocr": "Shelter Wood",
+   "category": "truncation",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/shelter-woods"
+  },
+  {
+   "id": "map-018",
+   "kind": "Map",
+   "ocr": "Suffocation Plt",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/suffocation-pit"
+  },
+  {
+   "id": "map-019",
+   "kind": "Map",
+   "ocr": "Suffocatlon Pit",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate/suffocation-pit"
+  },
+  {
+   "id": "map-020",
+   "kind": "Map",
+   "ocr": "Azarovs Resting Place",
+   "category": "dropped apostrophe",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/azarovs-resting-place"
+  },
+  {
+   "id": "map-021",
+   "kind": "Map",
+   "ocr": "Azarov’s Resting Place",
+   "category": "curly apostrophe",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/azarovs-resting-place"
+  },
+  {
+   "id": "map-022",
+   "kind": "Map",
+   "ocr": "Azarov's Resting P1ace",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/azarovs-resting-place"
+  },
+  {
+   "id": "map-023",
+   "kind": "Map",
+   "ocr": "Azarov's Restinq Place",
+   "category": "g/q",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/azarovs-resting-place"
+  },
+  {
+   "id": "map-024",
+   "kind": "Map",
+   "ocr": "Bl00d Lodge",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/blood-lodge"
+  },
+  {
+   "id": "map-025",
+   "kind": "Map",
+   "ocr": "B1ood Lodge",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/blood-lodge"
+  },
+  {
+   "id": "map-026",
+   "kind": "Map",
+   "ocr": "Gas Heavcn",
+   "category": "e/c",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/gas-heaven"
+  },
+  {
+   "id": "map-027",
+   "kind": "Map",
+   "ocr": "| Gas Heaven",
+   "category": "border bar",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/gas-heaven"
+  },
+  {
+   "id": "map-028",
+   "kind": "Map",
+   "ocr": "Wreckers Yard",
+   "category": "dropped apostrophe",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/wreckers-yard"
+  },
+  {
+   "id": "map-029",
+   "kind": "Map",
+   "ocr": "Wreckers’ Yard",
+   "category": "curly apostrophe",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/wreckers-yard"
+  },
+  {
+   "id": "map-030",
+   "kind": "Map",
+   "ocr": "Wretched Sh0p",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers/wretched-shop"
+  },
+  {
+   "id": "map-031",
+   "kind": "Map",
+   "ocr": "Fractured Cowshcd",
+   "category": "e/c",
+   "expect": "match",
+   "expectedId": "coldwind-farm/fractured-cowshed"
+  },
+  {
+   "id": "map-032",
+   "kind": "Map",
+   "ocr": "Fractured Cowsh",
+   "category": "truncation",
+   "expect": "match",
+   "expectedId": "coldwind-farm/fractured-cowshed"
+  },
+  {
+   "id": "map-033",
+   "kind": "Map",
+   "ocr": "Rancid Abatt0ir",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "coldwind-farm/rancid-abattoir"
+  },
+  {
+   "id": "map-034",
+   "kind": "Map",
+   "ocr": "Rancld Abattoir",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "coldwind-farm/rancid-abattoir"
+  },
+  {
+   "id": "map-035",
+   "kind": "Map",
+   "ocr": "Rotten Fie1ds",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "coldwind-farm/rotten-fields"
+  },
+  {
+   "id": "map-036",
+   "kind": "Map",
+   "ocr": "R0tten Fields",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "coldwind-farm/rotten-fields"
+  },
+  {
+   "id": "map-037",
+   "kind": "Map",
+   "ocr": "Thompson House",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "coldwind-farm/the-thompson-house"
+  },
+  {
+   "id": "map-038",
+   "kind": "Map",
+   "ocr": "The Thornpson House",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "coldwind-farm/the-thompson-house"
+  },
+  {
+   "id": "map-039",
+   "kind": "Map",
+   "ocr": "The Thompson H0use",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "coldwind-farm/the-thompson-house"
+  },
+  {
+   "id": "map-040",
+   "kind": "Map",
+   "ocr": "Torrnent Creek",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "coldwind-farm/torment-creek"
+  },
+  {
+   "id": "map-041",
+   "kind": "Map",
+   "ocr": "T0rment Creek",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "coldwind-farm/torment-creek"
+  },
+  {
+   "id": "map-042",
+   "kind": "Map",
+   "ocr": "Torment Cree",
+   "category": "truncation",
+   "expect": "match",
+   "expectedId": "coldwind-farm/torment-creek"
+  },
+  {
+   "id": "map-043",
+   "kind": "Map",
+   "ocr": "Disturbed Wand",
+   "category": "r/n",
+   "expect": "match",
+   "expectedId": "crotus-prenn-asylum/disturbed-ward"
+  },
+  {
+   "id": "map-044",
+   "kind": "Map",
+   "ocr": "D1sturbed Ward",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "crotus-prenn-asylum/disturbed-ward"
+  },
+  {
+   "id": "map-045",
+   "kind": "Map",
+   "ocr": "Father Campbells Chapel",
+   "category": "dropped apostrophe",
+   "expect": "match",
+   "expectedId": "crotus-prenn-asylum/father-campbells-chapel"
+  },
+  {
+   "id": "map-046",
+   "kind": "Map",
+   "ocr": "Father Campbell’s Chape1",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "crotus-prenn-asylum/father-campbells-chapel"
+  },
+  {
+   "id": "map-047",
+   "kind": "Map",
+   "ocr": "Larnpkin Lane",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "haddonfield/lampkin-lane"
+  },
+  {
+   "id": "map-048",
+   "kind": "Map",
+   "ocr": "Lampkin Lanc",
+   "category": "e/c",
+   "expect": "match",
+   "expectedId": "haddonfield/lampkin-lane"
+  },
+  {
+   "id": "map-049",
+   "kind": "Map",
+   "ocr": "Pale Rose",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "backwater-swamp/the-pale-rose"
+  },
+  {
+   "id": "map-050",
+   "kind": "Map",
+   "ocr": "The Pa1e Rose",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "backwater-swamp/the-pale-rose"
+  },
+  {
+   "id": "map-051",
+   "kind": "Map",
+   "ocr": "Grirn Pantry",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "backwater-swamp/grim-pantry"
+  },
+  {
+   "id": "map-052",
+   "kind": "Map",
+   "ocr": "Gr1m Pantry",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "backwater-swamp/grim-pantry"
+  },
+  {
+   "id": "map-053",
+   "kind": "Map",
+   "ocr": "Treatrnent Theatre",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "lerys-memorial-institute/treatment-theatre"
+  },
+  {
+   "id": "map-054",
+   "kind": "Map",
+   "ocr": "Treatment Theater",
+   "category": "spelling",
+   "expect": "match",
+   "expectedId": "lerys-memorial-institute/treatment-theatre"
+  },
+  {
+   "id": "map-055",
+   "kind": "Map",
+   "ocr": "Mothers Dwelling",
+   "category": "dropped apostrophe",
+   "expect": "match",
+   "expectedId": "red-forest/mothers-dwelling"
+  },
+  {
+   "id": "map-056",
+   "kind": "Map",
+   "ocr": "Mother’s Dwe11ing",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "red-forest/mothers-dwelling"
+  },
+  {
+   "id": "map-057",
+   "kind": "Map",
+   "ocr": "Temple of Purgation",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "red-forest/the-temple-of-purgation"
+  },
+  {
+   "id": "map-058",
+   "kind": "Map",
+   "ocr": "The Temple of Purgat1on",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "red-forest/the-temple-of-purgation"
+  },
+  {
+   "id": "map-059",
+   "kind": "Map",
+   "ocr": "Badharn Preschool",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "springwood/badham-preschool"
+  },
+  {
+   "id": "map-060",
+   "kind": "Map",
+   "ocr": "Badham Pre-school",
+   "category": "hyphen",
+   "expect": "match",
+   "expectedId": "springwood/badham-preschool"
+  },
+  {
+   "id": "map-061",
+   "kind": "Map",
+   "ocr": "THE GAME",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "gideon-meat-plant/the-game"
+  },
+  {
+   "id": "map-062",
+   "kind": "Map",
+   "ocr": "Famlly Residence",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "yamaoka-estate/family-residence"
+  },
+  {
+   "id": "map-063",
+   "kind": "Map",
+   "ocr": "Sanctum 0f Wrath",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "yamaoka-estate/sanctum-of-wrath"
+  },
+  {
+   "id": "map-064",
+   "kind": "Map",
+   "ocr": "Mount Ormand Resort",
+   "category": "vowel",
+   "expect": "match",
+   "expectedId": "ormond/mount-ormond-resort"
+  },
+  {
+   "id": "map-065",
+   "kind": "Map",
+   "ocr": "M0unt Orrnond Resort",
+   "category": "O/0 + rn/m",
+   "expect": "match",
+   "expectedId": "ormond/mount-ormond-resort"
+  },
+  {
+   "id": "map-066",
+   "kind": "Map",
+   "ocr": "Ormond Lake Mlne",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "ormond/ormond-lake-mine"
+  },
+  {
+   "id": "map-067",
+   "kind": "Map",
+   "ocr": "Orrnond Lake Mine",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "ormond/ormond-lake-mine"
+  },
+  {
+   "id": "map-068",
+   "kind": "Map",
+   "ocr": "Underground Complex",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "hawkins-national-laboratory/the-underground-complex"
+  },
+  {
+   "id": "map-069",
+   "kind": "Map",
+   "ocr": "The Underground Cornplex",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "hawkins-national-laboratory/the-underground-complex"
+  },
+  {
+   "id": "map-070",
+   "kind": "Map",
+   "ocr": "Dead Dawq Saloon",
+   "category": "g/q",
+   "expect": "match",
+   "expectedId": "grave-of-glenvale/dead-dawg-saloon"
+  },
+  {
+   "id": "map-071",
+   "kind": "Map",
+   "ocr": "Dead Dawg Sal00n |",
+   "category": "O/0 + border bar",
+   "expect": "match",
+   "expectedId": "grave-of-glenvale/dead-dawg-saloon"
+  },
+  {
+   "id": "map-072",
+   "kind": "Map",
+   "ocr": "Midwich E1ementary School",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "silent-hill/midwich-elementary-school"
+  },
+  {
+   "id": "map-073",
+   "kind": "Map",
+   "ocr": "Midwich Elementary Scho",
+   "category": "truncation",
+   "expect": "match",
+   "expectedId": "silent-hill/midwich-elementary-school"
+  },
+  {
+   "id": "map-074",
+   "kind": "Map",
+   "ocr": "Raccoon City Police Station",
+   "category": "exact, shortest of three",
+   "expect": "match",
+   "expectedId": "raccoon-city/raccoon-city-police-station"
+  },
+  {
+   "id": "map-075",
+   "kind": "Map",
+   "ocr": "Raccoon City Police Station East Wing",
+   "category": "exact, two edits from West Wing",
+   "expect": "match",
+   "expectedId": "raccoon-city/raccoon-city-police-station-east-wing"
+  },
+  {
+   "id": "map-076",
+   "kind": "Map",
+   "ocr": "Raccoon City Police Station West Wing",
+   "category": "exact, two edits from East Wing",
+   "expect": "match",
+   "expectedId": "raccoon-city/raccoon-city-police-station-west-wing"
+  },
+  {
+   "id": "map-077",
+   "kind": "Map",
+   "ocr": "Raccoon City Pollce Station East Wing",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "raccoon-city/raccoon-city-police-station-east-wing"
+  },
+  {
+   "id": "map-078",
+   "kind": "Map",
+   "ocr": "Raccoon City Police Statlon",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "raccoon-city/raccoon-city-police-station"
+  },
+  {
+   "id": "map-079",
+   "kind": "Map",
+   "ocr": "Eyrie 0f Crows",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "forsaken-boneyard/eyrie-of-crows"
+  },
+  {
+   "id": "map-080",
+   "kind": "Map",
+   "ocr": "Eyrle of Crows",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "forsaken-boneyard/eyrie-of-crows"
+  },
+  {
+   "id": "map-081",
+   "kind": "Map",
+   "ocr": "EYRIE OF CROWS",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "forsaken-boneyard/eyrie-of-crows"
+  },
+  {
+   "id": "map-082",
+   "kind": "Map",
+   "ocr": "Dead 5ands",
+   "category": "S/5",
+   "expect": "match",
+   "expectedId": "forsaken-boneyard/dead-sands"
+  },
+  {
+   "id": "map-083",
+   "kind": "Map",
+   "ocr": "Garden 0f Joy",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "withered-isle/garden-of-joy"
+  },
+  {
+   "id": "map-084",
+   "kind": "Map",
+   "ocr": "Greenvi11e Square",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "withered-isle/greenville-square"
+  },
+  {
+   "id": "map-085",
+   "kind": "Map",
+   "ocr": "Freddy Fazbears Pizza",
+   "category": "dropped apostrophe",
+   "expect": "match",
+   "expectedId": "withered-isle/freddy-fazbears-pizza"
+  },
+  {
+   "id": "map-086",
+   "kind": "Map",
+   "ocr": "Freddy Fazbear’s Plzza",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "withered-isle/freddy-fazbears-pizza"
+  },
+  {
+   "id": "map-087",
+   "kind": "Map",
+   "ocr": "Fa11en Refuge",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "withered-isle/fallen-refuge"
+  },
+  {
+   "id": "map-088",
+   "kind": "Map",
+   "ocr": "Shattered Square",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "the-decimated-borgo/the-shattered-square"
+  },
+  {
+   "id": "map-089",
+   "kind": "Map",
+   "ocr": "The Shatterecl Square",
+   "category": "d/cl",
+   "expect": "match",
+   "expectedId": "the-decimated-borgo/the-shattered-square"
+  },
+  {
+   "id": "map-090",
+   "kind": "Map",
+   "ocr": "Forgotten Rulns",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-decimated-borgo/forgotten-ruins"
+  },
+  {
+   "id": "map-091",
+   "kind": "Map",
+   "ocr": "Toba Landlng",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "dvarka-deepwood/toba-landing"
+  },
+  {
+   "id": "map-092",
+   "kind": "Map",
+   "ocr": "Nostrorno Wreckage",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "dvarka-deepwood/nostromo-wreckage"
+  },
+  {
+   "id": "map-093",
+   "kind": "Map",
+   "ocr": "Tricksters Delusion",
+   "category": "dropped apostrophe",
+   "expect": "match",
+   "expectedId": "sleepless-district/tricksters-delusion"
+  },
+  {
+   "id": "map-094",
+   "kind": "Map",
+   "ocr": "Trickster’s De1usion",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "sleepless-district/tricksters-delusion"
+  },
+  {
+   "id": "map-095",
+   "kind": "Map",
+   "ocr": "Raccoon City Police Station Eest Wing",
+   "category": "one damaged letter between two near-identical names",
+   "expect": "group",
+   "expectedGroup": "raccoon-city"
+  },
+  {
+   "id": "map-096",
+   "kind": "Map",
+   "ocr": "Raccoon City Police Station Wing",
+   "category": "word dropped between near-identical names",
+   "expect": "group",
+   "expectedGroup": "raccoon-city"
+  },
+  {
+   "id": "map-097",
+   "kind": "Map",
+   "ocr": "Raccoon City Police",
+   "category": "truncation beyond the threshold",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-098",
+   "kind": "Map",
+   "ocr": "Fractured Cow",
+   "category": "truncation beyond the threshold",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-099",
+   "kind": "Map",
+   "ocr": "Groaning",
+   "category": "truncation beyond the threshold",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-100",
+   "kind": "Map",
+   "ocr": "Shelter",
+   "category": "truncation beyond the threshold",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-101",
+   "kind": "Map",
+   "ocr": "Game",
+   "category": "dropped The from a four-letter name",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-102",
+   "kind": "Map",
+   "ocr": "Coal Mine",
+   "category": "plausible name that is not in the vocabulary",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-103",
+   "kind": "Map",
+   "ocr": "Haunted Hospital",
+   "category": "plausible name that is not in the vocabulary",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-104",
+   "kind": "Map",
+   "ocr": "Play as Survivor",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-105",
+   "kind": "Map",
+   "ocr": "Settings",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-106",
+   "kind": "Map",
+   "ocr": "Quit Game",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-107",
+   "kind": "Map",
+   "ocr": "Press any key to continue",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-108",
+   "kind": "Map",
+   "ocr": "Matchmaking",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-109",
+   "kind": "Map",
+   "ocr": "Dwight Fairfield",
+   "category": "name of another kind",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-110",
+   "kind": "Map",
+   "ocr": "The Trapper",
+   "category": "name of another kind",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-111",
+   "kind": "Map",
+   "ocr": "Hauptmenü",
+   "category": "other language",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-112",
+   "kind": "Map",
+   "ocr": "Zurück",
+   "category": "other language",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-113",
+   "kind": "Map",
+   "ocr": "Paramètres",
+   "category": "other language",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-114",
+   "kind": "Map",
+   "ocr": "選択してください",
+   "category": "other language",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-115",
+   "kind": "Map",
+   "ocr": "xjqz qwv",
+   "category": "garbage",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-116",
+   "kind": "Map",
+   "ocr": "1234567",
+   "category": "garbage",
+   "expect": "nomatch"
+  },
+  {
+   "id": "map-117",
+   "kind": "Map",
+   "ocr": "",
+   "category": "empty",
+   "expect": "empty"
+  },
+  {
+   "id": "map-118",
+   "kind": "Map",
+   "ocr": "   ",
+   "category": "empty",
+   "expect": "empty"
+  },
+  {
+   "id": "map-119",
+   "kind": "Map",
+   "ocr": "...",
+   "category": "empty",
+   "expect": "empty"
+  },
+  {
+   "id": "map-120",
+   "kind": "Map",
+   "ocr": "§§§ ###",
+   "category": "empty",
+   "expect": "empty"
+  },
+  {
+   "id": "map-121",
+   "kind": "Map",
+   "ocr": "|||",
+   "category": "empty",
+   "expect": "empty"
+  },
+  {
+   "id": "map-122",
+   "kind": "Map",
+   "ocr": "Il1",
+   "category": "too short",
+   "expect": "tooshort"
+  },
+  {
+   "id": "map-123",
+   "kind": "Map",
+   "ocr": "Co",
+   "category": "too short",
+   "expect": "tooshort"
+  },
+  {
+   "id": "killer-124",
+   "kind": "Killer",
+   "ocr": "THE TRAPPER",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "the-trapper"
+  },
+  {
+   "id": "killer-125",
+   "kind": "Killer",
+   "ocr": "Trapper",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "the-trapper"
+  },
+  {
+   "id": "killer-126",
+   "kind": "Killer",
+   "ocr": "The Trappcr",
+   "category": "e/c",
+   "expect": "match",
+   "expectedId": "the-trapper"
+  },
+  {
+   "id": "killer-127",
+   "kind": "Killer",
+   "ocr": "The Hi11billy",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-hillbilly"
+  },
+  {
+   "id": "killer-128",
+   "kind": "Killer",
+   "ocr": "The Nursc",
+   "category": "e/c",
+   "expect": "match",
+   "expectedId": "the-nurse"
+  },
+  {
+   "id": "killer-129",
+   "kind": "Killer",
+   "ocr": "Shape",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "the-shape"
+  },
+  {
+   "id": "killer-130",
+   "kind": "Killer",
+   "ocr": "The Onryo",
+   "category": "dropped diacritic",
+   "expect": "match",
+   "expectedId": "the-onryo"
+  },
+  {
+   "id": "killer-131",
+   "kind": "Killer",
+   "ocr": "The Onry0",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "the-onryo"
+  },
+  {
+   "id": "killer-132",
+   "kind": "Killer",
+   "ocr": "The Cen0bite",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "the-cenobite"
+  },
+  {
+   "id": "killer-133",
+   "kind": "Killer",
+   "ocr": "The Sku11 Merchant",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-skull-merchant"
+  },
+  {
+   "id": "killer-134",
+   "kind": "Killer",
+   "ocr": "The Singu1arity",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-singularity"
+  },
+  {
+   "id": "killer-135",
+   "kind": "Killer",
+   "ocr": "The G00d Guy",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "the-good-guy"
+  },
+  {
+   "id": "killer-136",
+   "kind": "Killer",
+   "ocr": "The Xenornorph",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "the-xenomorph"
+  },
+  {
+   "id": "killer-137",
+   "kind": "Killer",
+   "ocr": "The Animatr0nic",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "the-animatronic"
+  },
+  {
+   "id": "killer-138",
+   "kind": "Killer",
+   "ocr": "The Dernogorgon",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "the-demogorgon"
+  },
+  {
+   "id": "killer-139",
+   "kind": "Killer",
+   "ocr": "The Masterrnind",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "the-mastermind"
+  },
+  {
+   "id": "killer-140",
+   "kind": "Killer",
+   "ocr": "The Twlns",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-twins"
+  },
+  {
+   "id": "killer-141",
+   "kind": "Killer",
+   "ocr": "The Dredqe",
+   "category": "g/q",
+   "expect": "match",
+   "expectedId": "the-dredge"
+  },
+  {
+   "id": "killer-142",
+   "kind": "Killer",
+   "ocr": "The Deathsl1nger",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-deathslinger"
+  },
+  {
+   "id": "killer-143",
+   "kind": "Killer",
+   "ocr": "The P1g",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-pig"
+  },
+  {
+   "id": "killer-144",
+   "kind": "Killer",
+   "ocr": "The Executi0ner",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "the-executioner"
+  },
+  {
+   "id": "killer-145",
+   "kind": "Killer",
+   "ocr": "The Hag",
+   "category": "exact short name",
+   "expect": "match",
+   "expectedId": "the-hag"
+  },
+  {
+   "id": "killer-146",
+   "kind": "Killer",
+   "ocr": "The Hague",
+   "category": "name not in the vocabulary, two killers equally close",
+   "expect": "ambiguous"
+  },
+  {
+   "id": "killer-147",
+   "kind": "Killer",
+   "ocr": "The",
+   "category": "too short",
+   "expect": "tooshort"
+  },
+  {
+   "id": "killer-148",
+   "kind": "Killer",
+   "ocr": "The Trapper of Souls",
+   "category": "extra words",
+   "expect": "nomatch"
+  },
+  {
+   "id": "killer-149",
+   "kind": "Killer",
+   "ocr": "Play as Killer",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "killer-150",
+   "kind": "Killer",
+   "ocr": "Der Fallensteller",
+   "category": "other language",
+   "expect": "nomatch"
+  },
+  {
+   "id": "survivor-151",
+   "kind": "Survivor",
+   "ocr": "DWIGHT FAIRFIELD",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "dwight-fairfield"
+  },
+  {
+   "id": "survivor-152",
+   "kind": "Survivor",
+   "ocr": "Dwight Fairfie1d",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "dwight-fairfield"
+  },
+  {
+   "id": "survivor-153",
+   "kind": "Survivor",
+   "ocr": "Dwight Fairfleld",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "dwight-fairfield"
+  },
+  {
+   "id": "survivor-154",
+   "kind": "Survivor",
+   "ocr": "Meg Thornas",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "meg-thomas"
+  },
+  {
+   "id": "survivor-155",
+   "kind": "Survivor",
+   "ocr": "Meg Th0mas",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "meg-thomas"
+  },
+  {
+   "id": "survivor-156",
+   "kind": "Survivor",
+   "ocr": "C1audette Morel",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "claudette-morel"
+  },
+  {
+   "id": "survivor-157",
+   "kind": "Survivor",
+   "ocr": "Nea Kar1sson",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "nea-karlsson"
+  },
+  {
+   "id": "survivor-158",
+   "kind": "Survivor",
+   "ocr": "Laurie Str0de",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "laurie-strode"
+  },
+  {
+   "id": "survivor-159",
+   "kind": "Survivor",
+   "ocr": "Ace Visc0nti",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "ace-visconti"
+  },
+  {
+   "id": "survivor-160",
+   "kind": "Survivor",
+   "ocr": "Feng M1n",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "feng-min"
+  },
+  {
+   "id": "survivor-161",
+   "kind": "Survivor",
+   "ocr": "Elodie Rakoto",
+   "category": "dropped diacritic",
+   "expect": "match",
+   "expectedId": "elodie-rakoto"
+  },
+  {
+   "id": "survivor-162",
+   "kind": "Survivor",
+   "ocr": "Élodie Rak0to",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "elodie-rakoto"
+  },
+  {
+   "id": "survivor-163",
+   "kind": "Survivor",
+   "ocr": "Lee Yun jin",
+   "category": "hyphen",
+   "expect": "match",
+   "expectedId": "lee-yun-jin"
+  },
+  {
+   "id": "survivor-164",
+   "kind": "Survivor",
+   "ocr": "Lee Yunjin",
+   "category": "hyphen",
+   "expect": "match",
+   "expectedId": "lee-yun-jin"
+  },
+  {
+   "id": "survivor-165",
+   "kind": "Survivor",
+   "ocr": "Leon Scott Kennecly",
+   "category": "d/cl",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "survivor-166",
+   "kind": "Survivor",
+   "ocr": "Ada W0ng",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "ada-wong"
+  },
+  {
+   "id": "survivor-167",
+   "kind": "Survivor",
+   "ocr": "Rebecca Charnbers",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "rebecca-chambers"
+  },
+  {
+   "id": "survivor-168",
+   "kind": "Survivor",
+   "ocr": "Thalita Lyra",
+   "category": "exact, shares a surname with another survivor",
+   "expect": "match",
+   "expectedId": "thalita-lyra"
+  },
+  {
+   "id": "survivor-169",
+   "kind": "Survivor",
+   "ocr": "Renato Lyra",
+   "category": "exact, shares a surname with another survivor",
+   "expect": "match",
+   "expectedId": "renato-lyra"
+  },
+  {
+   "id": "survivor-170",
+   "kind": "Survivor",
+   "ocr": "Nlcolas Cage",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "nicolas-cage"
+  },
+  {
+   "id": "survivor-171",
+   "kind": "Survivor",
+   "ocr": "E1len Ripley",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "ellen-ripley"
+  },
+  {
+   "id": "survivor-172",
+   "kind": "Survivor",
+   "ocr": "A1an Wake",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "alan-wake"
+  },
+  {
+   "id": "survivor-173",
+   "kind": "Survivor",
+   "ocr": "Aestri Yazar and Baermar Uraz",
+   "category": "ampersand read as a word",
+   "expect": "match",
+   "expectedId": "aestri-yazar-baermar-uraz"
+  },
+  {
+   "id": "survivor-174",
+   "kind": "Survivor",
+   "ocr": "Rick Grirnes",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "rick-grimes"
+  },
+  {
+   "id": "survivor-175",
+   "kind": "Survivor",
+   "ocr": "Lyra",
+   "category": "surname shared by two survivors",
+   "expect": "nomatch"
+  },
+  {
+   "id": "survivor-176",
+   "kind": "Survivor",
+   "ocr": "Grimes",
+   "category": "surname shared by two survivors",
+   "expect": "nomatch"
+  },
+  {
+   "id": "survivor-177",
+   "kind": "Survivor",
+   "ocr": "Dwight",
+   "category": "first name only",
+   "expect": "nomatch"
+  },
+  {
+   "id": "survivor-178",
+   "kind": "Survivor",
+   "ocr": "Coal Tower",
+   "category": "name of another kind",
+   "expect": "nomatch"
+  },
+  {
+   "id": "survivor-179",
+   "kind": "Survivor",
+   "ocr": "Play as Survivor",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "realm-180",
+   "kind": "Realm",
+   "ocr": "MacMillan Estate",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate"
+  },
+  {
+   "id": "realm-181",
+   "kind": "Realm",
+   "ocr": "The MacMi11an Estate",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "the-macmillan-estate"
+  },
+  {
+   "id": "realm-182",
+   "kind": "Realm",
+   "ocr": "Aut0haven Wreckers",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "autohaven-wreckers"
+  },
+  {
+   "id": "realm-183",
+   "kind": "Realm",
+   "ocr": "C0ldwind Farm",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "coldwind-farm"
+  },
+  {
+   "id": "realm-184",
+   "kind": "Realm",
+   "ocr": "Coldwlnd Farm",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "coldwind-farm"
+  },
+  {
+   "id": "realm-185",
+   "kind": "Realm",
+   "ocr": "Coldwind Farrn",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "coldwind-farm"
+  },
+  {
+   "id": "realm-186",
+   "kind": "Realm",
+   "ocr": "Crotus Prenn Asylurn",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "crotus-prenn-asylum"
+  },
+  {
+   "id": "realm-187",
+   "kind": "Realm",
+   "ocr": "Haddonfie1d",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "haddonfield"
+  },
+  {
+   "id": "realm-188",
+   "kind": "Realm",
+   "ocr": "HADDONFIELD",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "haddonfield"
+  },
+  {
+   "id": "realm-189",
+   "kind": "Realm",
+   "ocr": "0rmond",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "ormond"
+  },
+  {
+   "id": "realm-190",
+   "kind": "Realm",
+   "ocr": "Spr1ngwood",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "springwood"
+  },
+  {
+   "id": "realm-191",
+   "kind": "Realm",
+   "ocr": "Si1ent Hill",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "silent-hill"
+  },
+  {
+   "id": "realm-192",
+   "kind": "Realm",
+   "ocr": "Raccoon C1ty",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "raccoon-city"
+  },
+  {
+   "id": "realm-193",
+   "kind": "Realm",
+   "ocr": "G1deon Meat Plant",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "gideon-meat-plant"
+  },
+  {
+   "id": "realm-194",
+   "kind": "Realm",
+   "ocr": "Yarnaoka Estate",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "yamaoka-estate"
+  },
+  {
+   "id": "realm-195",
+   "kind": "Realm",
+   "ocr": "Hawkins Nationa1 Laboratory",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "hawkins-national-laboratory"
+  },
+  {
+   "id": "realm-196",
+   "kind": "Realm",
+   "ocr": "Grave 0f Glenvale",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "grave-of-glenvale"
+  },
+  {
+   "id": "realm-197",
+   "kind": "Realm",
+   "ocr": "Forsaken Bone yard",
+   "category": "inserted space",
+   "expect": "match",
+   "expectedId": "forsaken-boneyard"
+  },
+  {
+   "id": "realm-198",
+   "kind": "Realm",
+   "ocr": "Withered Is1e",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "withered-isle"
+  },
+  {
+   "id": "realm-199",
+   "kind": "Realm",
+   "ocr": "Decimated Borgo",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "the-decimated-borgo"
+  },
+  {
+   "id": "realm-200",
+   "kind": "Realm",
+   "ocr": "Dvarka Deepwoocl",
+   "category": "d/cl",
+   "expect": "match",
+   "expectedId": "dvarka-deepwood"
+  },
+  {
+   "id": "realm-201",
+   "kind": "Realm",
+   "ocr": "S1eepless District",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "sleepless-district"
+  },
+  {
+   "id": "realm-202",
+   "kind": "Realm",
+   "ocr": "Lery's Memorial Institute",
+   "category": "dropped diacritic",
+   "expect": "match",
+   "expectedId": "lerys-memorial-institute"
+  },
+  {
+   "id": "realm-203",
+   "kind": "Realm",
+   "ocr": "Lerys Memorial lnstitute",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "lerys-memorial-institute"
+  },
+  {
+   "id": "realm-204",
+   "kind": "Realm",
+   "ocr": "Red F0rest",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "red-forest"
+  },
+  {
+   "id": "realm-205",
+   "kind": "Realm",
+   "ocr": "Backwater Swarnp",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "backwater-swamp"
+  },
+  {
+   "id": "realm-206",
+   "kind": "Realm",
+   "ocr": "Crotus Prenn",
+   "category": "truncation beyond the threshold",
+   "expect": "nomatch"
+  },
+  {
+   "id": "realm-207",
+   "kind": "Realm",
+   "ocr": "Coal Tower",
+   "category": "name of another kind",
+   "expect": "nomatch"
+  },
+  {
+   "id": "realm-208",
+   "kind": "Realm",
+   "ocr": "Realm",
+   "category": "word that is not a name",
+   "expect": "nomatch"
+  },
+  {
+   "id": "mode-209",
+   "kind": "Mode",
+   "ocr": "PLAY AS SURVIVOR",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "play-as-survivor"
+  },
+  {
+   "id": "mode-210",
+   "kind": "Mode",
+   "ocr": "Play as Survlvor",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "play-as-survivor"
+  },
+  {
+   "id": "mode-211",
+   "kind": "Mode",
+   "ocr": "P1ay as Killer",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "play-as-killer"
+  },
+  {
+   "id": "mode-212",
+   "kind": "Mode",
+   "ocr": "Custorn Game",
+   "category": "rn/m",
+   "expect": "match",
+   "expectedId": "custom-game"
+  },
+  {
+   "id": "mode-213",
+   "kind": "Mode",
+   "ocr": "2V8",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "2v8"
+  },
+  {
+   "id": "mode-214",
+   "kind": "Mode",
+   "ocr": "2vB",
+   "category": "B/8",
+   "expect": "match",
+   "expectedId": "2v8"
+  },
+  {
+   "id": "mode-215",
+   "kind": "Mode",
+   "ocr": "Lights 0ut",
+   "category": "O/0",
+   "expect": "match",
+   "expectedId": "lights-out"
+  },
+  {
+   "id": "mode-216",
+   "kind": "Mode",
+   "ocr": "Map 5howcase",
+   "category": "S/5",
+   "expect": "match",
+   "expectedId": "map-showcase"
+  },
+  {
+   "id": "mode-217",
+   "kind": "Mode",
+   "ocr": "Play as",
+   "category": "truncation beyond the threshold",
+   "expect": "nomatch"
+  },
+  {
+   "id": "mode-218",
+   "kind": "Mode",
+   "ocr": "Coal Tower",
+   "category": "name of another kind",
+   "expect": "nomatch"
+  },
+  {
+   "id": "alias-001",
+   "kind": "Survivor",
+   "ocr": "LEON S. KENNEDY",
+   "category": "alias as printed by the game",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-002",
+   "kind": "Survivor",
+   "ocr": "Leon S. Kennedy",
+   "category": "alias as printed by the game",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-003",
+   "kind": "Survivor",
+   "ocr": "Leon Scott Kennedy",
+   "category": "wiki name still matches",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-004",
+   "kind": "Survivor",
+   "ocr": "LE0N S. KENNEDY",
+   "category": "alias with O/0",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-005",
+   "kind": "Survivor",
+   "ocr": "LEON S KENNEDY",
+   "category": "alias with dropped punctuation",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-006",
+   "kind": "Survivor",
+   "ocr": "LEON S. KENNEDY.",
+   "category": "alias with trailing punctuation",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-007",
+   "kind": "Survivor",
+   "ocr": "LEON 5. KENNEDY",
+   "category": "alias with S/5",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-008",
+   "kind": "Survivor",
+   "ocr": "LE0N 5 KENNEDY",
+   "category": "alias with O/0 and S/5 and dropped punctuation",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-009",
+   "kind": "Survivor",
+   "ocr": "LEON S. KENNED",
+   "category": "alias truncation within the threshold",
+   "expect": "match",
+   "expectedId": "leon-scott-kennedy"
+  },
+  {
+   "id": "alias-010",
+   "kind": "Survivor",
+   "ocr": "LEON",
+   "category": "partial alias",
+   "expect": "nomatch"
+  },
+  {
+   "id": "alias-011",
+   "kind": "Survivor",
+   "ocr": "S. KENNEDY",
+   "category": "partial alias",
+   "expect": "nomatch"
+  },
+  {
+   "id": "alias-012",
+   "kind": "Survivor",
+   "ocr": "KENNEDY",
+   "category": "partial alias",
+   "expect": "nomatch"
+  },
+  {
+   "id": "alias-013",
+   "kind": "Survivor",
+   "ocr": "LEON S.",
+   "category": "partial alias",
+   "expect": "nomatch"
+  },
+  {
+   "id": "alias-014",
+   "kind": "Killer",
+   "ocr": "LEON S. KENNEDY",
+   "category": "alias of another kind",
+   "expect": "nomatch"
+  },
+  {
+   "id": "event-001",
+   "kind": "EventMode",
+   "ocr": "HAUNTED BY DAYLIGHT",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "event-haunted-by-daylight"
+  },
+  {
+   "id": "event-002",
+   "kind": "EventMode",
+   "ocr": "Haunted by Daylight",
+   "category": "exact",
+   "expect": "match",
+   "expectedId": "event-haunted-by-daylight"
+  },
+  {
+   "id": "event-003",
+   "kind": "EventMode",
+   "ocr": "HAUNTED BY DAYL1GHT",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "event-haunted-by-daylight"
+  },
+  {
+   "id": "event-004",
+   "kind": "EventMode",
+   "ocr": "HAUNTED BY DAYLlGHT",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "event-haunted-by-daylight"
+  },
+  {
+   "id": "event-005",
+   "kind": "EventMode",
+   "ocr": "HAUNTED 8Y DAYLIGHT",
+   "category": "B/8",
+   "expect": "match",
+   "expectedId": "event-haunted-by-daylight"
+  },
+  {
+   "id": "event-006",
+   "kind": "EventMode",
+   "ocr": "HAUNTED BY DAYLIGH",
+   "category": "truncation within the threshold",
+   "expect": "match",
+   "expectedId": "event-haunted-by-daylight"
+  },
+  {
+   "id": "event-007",
+   "kind": "EventMode",
+   "ocr": "PLAY EVENT",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "event-008",
+   "kind": "EventMode",
+   "ocr": "HAUNTED",
+   "category": "truncation beyond the threshold",
+   "expect": "nomatch"
+  },
+  {
+   "id": "event-009",
+   "kind": "EventMode",
+   "ocr": "Lights Out",
+   "category": "name of another kind",
+   "expect": "nomatch"
+  },
+  {
+   "id": "outcome-001",
+   "kind": "ResultOutcome",
+   "ocr": "ESCAPED",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "outcome-escaped"
+  },
+  {
+   "id": "outcome-002",
+   "kind": "ResultOutcome",
+   "ocr": "Escaped",
+   "category": "exact",
+   "expect": "match",
+   "expectedId": "outcome-escaped"
+  },
+  {
+   "id": "outcome-003",
+   "kind": "ResultOutcome",
+   "ocr": "E5CAPED",
+   "category": "S/5",
+   "expect": "match",
+   "expectedId": "outcome-escaped"
+  },
+  {
+   "id": "outcome-004",
+   "kind": "ResultOutcome",
+   "ocr": "ESCAPE",
+   "category": "truncation within the threshold",
+   "expect": "match",
+   "expectedId": "outcome-escaped"
+  },
+  {
+   "id": "outcome-005",
+   "kind": "ResultOutcome",
+   "ocr": "SACRIFICED",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "outcome-sacrificed"
+  },
+  {
+   "id": "outcome-006",
+   "kind": "ResultOutcome",
+   "ocr": "MERCILESS KILLER",
+   "category": "casing",
+   "expect": "match",
+   "expectedId": "outcome-merciless-killer"
+  },
+  {
+   "id": "outcome-007",
+   "kind": "ResultOutcome",
+   "ocr": "MERC1LESS KILLER",
+   "category": "l/1/I",
+   "expect": "match",
+   "expectedId": "outcome-merciless-killer"
+  },
+  {
+   "id": "outcome-008",
+   "kind": "ResultOutcome",
+   "ocr": "THE ENTITY HUNGERS...",
+   "category": "casing and punctuation",
+   "expect": "match",
+   "expectedId": "outcome-entity-hungers"
+  },
+  {
+   "id": "outcome-009",
+   "kind": "ResultOutcome",
+   "ocr": "ENTITY HUNGERS",
+   "category": "dropped The",
+   "expect": "match",
+   "expectedId": "outcome-entity-hungers"
+  },
+  {
+   "id": "outcome-010",
+   "kind": "ResultOutcome",
+   "ocr": "MATCH RESULT",
+   "category": "menu text",
+   "expect": "nomatch"
+  },
+  {
+   "id": "outcome-011",
+   "kind": "ResultOutcome",
+   "ocr": "KILLER",
+   "category": "truncation beyond the threshold",
+   "expect": "nomatch"
+  }
+ ]
+}

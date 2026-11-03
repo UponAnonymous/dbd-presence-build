@@ -1,0 +1,364 @@
+# Sets up and deploys the online service (service/, Cloudflare Worker) and the Owner Panel (panel/, Cloudflare Pages)
+# for one environment. Run by hand only: Actions → Deploy service → Run workflow (docs/owner/cloudflare-setup.md,
+# "Automatic setup from GitHub").
+#
+# Order: the code checks run first, in a job with no Cloudflare credentials; nothing is deployed on red. Then, in the
+# GitHub environment of the same name (production can require the owner's approval), the deploy job creates what is
+# missing (D1 database, R2 buckets, the audit bucket's 90-day lock and expiry, the backup bucket and its 30-day expiry
+# for backup-service.yml, keys, Pages project), applies the D1 migrations, deploys the Worker once every required
+# secret exists, deploys the panel and checks the live hosts.
+# Every provisioning step is idempotent (service/scripts/provision.mjs). The D1 database ID goes into a generated copy
+# of wrangler.toml for this run only; nothing is committed. Secret values are generated in the job, piped straight
+# into Cloudflare, masked and never printed; only public keys are reported. The workflow never edits DNS records.
+#
+# FR-ADM-02 / gate V3.4 (admin API refused without Access, no workers.dev), FR-ADM-05 (audit lock), FR-ADM-06
+# (separate environments), NFR-SVC-05 (keys are Worker secrets), NFR-SVC-06 (forward-only migrations), NFR-SVC-08
+# (branding scan of the deployed bundles).
+name: Deploy service
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Which copy to set up and deploy (always do staging first)'
+        type: choice
+        options: [staging, production]
+        default: staging
+        required: true
+      provision:
+        description: 'Create anything that is missing (database, storage, keys, panel project)'
+        type: boolean
+        default: true
+      rotate:
+        description: 'Replace the existing signing keys (only if the developer asked; never the ban key or the invite key ring)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-service-${{ inputs.environment }}
+  cancel-in-progress: false
+
+env:
+  WRANGLER_SEND_METRICS: 'false'
+  DEPLOY_ENV: ${{ inputs.environment }}
+
+jobs:
+  verify:
+    name: Check the code (no deploy on red)
+    runs-on: ${{ vars.SECRETS_LINUX_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 20
+    steps:
+      - name: Production deploys only from main
+        run: |
+          set -euo pipefail
+          if [ "$DEPLOY_ENV" = production ] && [ "$GITHUB_REF" != refs/heads/main ]; then
+            echo "::error title=Wrong branch::Production is deployed only from main. Choose 'Use workflow from: main'."
+            exit 1
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.22.0'
+          # No dependency cache in this workflow: it holds the Cloudflare secrets, and the Actions cache is shared with jobs that run third-party code, so a poisoned entry
+          # could be restored here (red-team round 4, F4/F10; build/check-workflows.py). `package-manager-cache: false` keeps setup-node from switching one on by itself.
+          package-manager-cache: false
+
+      - name: 'Service: install (exact versions from the lock file)'
+        working-directory: service
+        run: npm ci
+      - name: 'Service: type check (strict)'
+        working-directory: service
+        run: npx tsc --noEmit
+      - name: 'Service: tests (Vitest in the Workers runtime, Miniflare)'
+        working-directory: service
+        run: npx vitest run
+      - name: 'Service: dependency audit (npm audit, level high, dated exceptions)'
+        working-directory: service
+        run: node scripts/audit-gate.mjs
+      - name: 'Service: build the Worker bundle and scan it for branding (RELEASE_CHECKLIST §9)'
+        working-directory: service
+        run: |
+          set -euo pipefail
+          npx wrangler deploy --dry-run --outdir "dist/$DEPLOY_ENV" --env "$DEPLOY_ENV"
+          python3 ../build/check-release-branding.py dist
+
+      - name: 'Panel: install (exact versions from the lock file)'
+        working-directory: panel
+        run: npm ci
+      - name: 'Panel: type check (strict)'
+        working-directory: panel
+        run: npx tsc --noEmit
+      - name: 'Panel: tests (Vitest, jsdom, axe-core)'
+        working-directory: panel
+        run: npx vitest run
+      - name: 'Panel: dependency audit (npm audit, level high, dated exceptions)'
+        working-directory: panel
+        run: node scripts/audit-gate.mjs
+      - name: 'Panel: build, DOM-sink check and branding scan'
+        working-directory: panel
+        run: |
+          set -euo pipefail
+          node scripts/build.mjs
+          node scripts/check-dom-sinks.mjs --self-test
+          node scripts/check-dom-sinks.mjs
+          python3 ../build/check-release-branding.py dist
+
+      - name: Report
+        if: failure()
+        run: |
+          {
+            echo "# Deployment report"
+            echo
+            echo "**Nothing was changed.** The automatic checks of the code did not pass, so the workflow stopped before touching Cloudflare. Ask the developer to look at the red step."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    name: Set up and deploy ${{ inputs.environment }}
+    needs: verify
+    runs-on: ${{ vars.SECRETS_LINUX_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 30
+    # The GitHub environment of the same name: add yourself as a required reviewer on production
+    # (Settings → Environments → production → Required reviewers).
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ inputs.environment == 'production' && 'https://api.arcavale.com/v1/config' || 'https://api-staging.arcavale.com/v1/config' }}
+    env:
+      PROVISION: ${{ inputs.provision && 'true' || 'false' }}
+      ROTATE: ${{ inputs.rotate && 'true' || 'false' }}
+      API_HOST: ${{ inputs.environment == 'production' && 'api.arcavale.com' || 'api-staging.arcavale.com' }}
+      ADMIN_HOST: ${{ inputs.environment == 'production' && 'admin.arcavale.com' || 'admin-staging.arcavale.com' }}
+      DEPLOY_ENV: ${{ inputs.environment }}
+    # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are GitHub *environment* secrets (staging, production), never
+    # repository secrets, so only a run that passes the environment's protection rules (required reviewer and the
+    # main-only branch policy on production) can read the production credential.
+    steps:
+      - name: Production deploys only from main
+        run: |
+          set -euo pipefail
+          if [ "$DEPLOY_ENV" = production ] && [ "$GITHUB_REF" != refs/heads/main ]; then
+            echo "::error title=Wrong branch::Production is deployed only from main."
+            exit 1
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.22.0'
+          # No dependency cache in this workflow: it holds the Cloudflare secrets, and the Actions cache is shared with jobs that run third-party code, so a poisoned entry
+          # could be restored here (red-team round 4, F4/F10; build/check-workflows.py). `package-manager-cache: false` keeps setup-node from switching one on by itself.
+          package-manager-cache: false
+
+      - name: Install (exact versions from the lock files)
+        run: |
+          set -euo pipefail
+          # The run's notes (what was created, public keys, check results); never secret values.
+          echo "STATE_DIR=$RUNNER_TEMP/deploy-state" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/deploy-state"
+          : > "$RUNNER_TEMP/deploy-state/smoke.tsv"
+          (cd service && npm ci)
+          (cd panel && npm ci)
+
+      - name: 'Safety check before any change: appeal.arcavale.com is still A 207.244.229.132'
+        id: dns_before
+        working-directory: service
+        run: node scripts/provision.mjs check-dns
+
+      - name: Database, storage and audit lock rules
+        id: resources
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          create=()
+          if [ "$PROVISION" = true ]; then create=(--create); fi
+          node scripts/provision.mjs resources --env "$DEPLOY_ENV" --state "$STATE_DIR" "${create[@]}"
+
+      - name: Database tables (D1 migrations, forward-only)
+        id: migrations
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler d1 migrations apply DB --remote --env "$DEPLOY_ENV" --config "wrangler.generated.$DEPLOY_ENV.json"
+
+      - name: Keys and secrets (generate only what is missing; values are never shown)
+        id: secrets
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          flags=()
+          if [ "$PROVISION" = true ]; then flags+=(--create); fi
+          if [ "$ROTATE" = true ]; then flags+=(--rotate --run-number "$RUN_NUMBER"); fi
+          node scripts/provision.mjs secrets --env "$DEPLOY_ENV" --state "$STATE_DIR" "${flags[@]}"
+
+      - name: workers.dev address and previews switched off
+        id: workers_dev
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/provision.mjs workers-dev --env "$DEPLOY_ENV" --state "$STATE_DIR"
+
+      - name: Deploy the Worker (routes from wrangler.toml)
+        id: deploy
+        if: steps.secrets.outputs.ready == 'true'
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deploy --env "$DEPLOY_ENV" --config "wrangler.generated.$DEPLOY_ENV.json"
+
+      - name: Owner Panel Pages project
+        id: pages
+        working-directory: service
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          create=()
+          if [ "$PROVISION" = true ]; then create=(--create); fi
+          node scripts/provision.mjs pages --env "$DEPLOY_ENV" --state "$STATE_DIR" "${create[@]}"
+
+      - name: Build and deploy the Owner Panel (production branch only, so no preview address is made)
+        id: panel
+        working-directory: panel
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ steps.pages.outputs.project }}
+        run: |
+          set -euo pipefail
+          # Each environment's panel trusts only its own content host (CSP img-src, ADR-0014):
+          # staging pictures live on cdn-staging.arcavale.com, production ones on cdn.arcavale.com.
+          node scripts/build.mjs --env "$DEPLOY_ENV"
+          expected=$([ "$DEPLOY_ENV" = staging ] && echo "https://cdn-staging.arcavale.com" || echo "https://cdn.arcavale.com")
+          grep -q "img-src 'self' $expected;" dist/index.html || { echo "::error::The panel build does not trust $expected for images"; exit 1; }
+          ../service/node_modules/.bin/wrangler pages deploy dist --project-name "$PROJECT" --branch main --commit-dirty=true
+
+      - name: Checks against the live hosts
+        id: smoke
+        if: always() && steps.resources.outcome == 'success'
+        working-directory: service
+        env:
+          DEPLOYED: ${{ steps.deploy.outcome == 'success' && 'true' || 'false' }}
+          WORKERS_DEV_URL: ${{ steps.workers_dev.outputs.url }}
+          WORKERS_DEV_ACCOUNT: ${{ steps.workers_dev.outputs.account_subdomain }}
+          PROJECT: ${{ steps.pages.outputs.project }}
+        run: |
+          set -uo pipefail
+          smoke="$STATE_DIR/smoke.tsv"
+          failed=0
+          record() { printf '%s\t%s\t%s\n' "$1" "$2" "$3" >> "$smoke"; if [ "$2" = fail ]; then failed=1; echo "::error title=$1::$3"; fi; }
+
+          # 1. GET /v1/config: 200 with a signed config document (verified with this run's public key if it made one).
+          if [ "$DEPLOYED" = true ]; then attempts=12; else attempts=1; fi
+          code=000
+          for i in $(seq 1 "$attempts"); do
+            code=$(curl -sS -o "$STATE_DIR/config.json" -w '%{http_code}' --max-time 20 "https://$API_HOST/v1/config" 2>/dev/null) || code=000
+            [ "$code" = 200 ] && break
+            [ "$i" -lt "$attempts" ] && sleep 15
+          done
+          if [ "$code" = 200 ] && detail=$(node scripts/provision.mjs check-config "$STATE_DIR/config.json" --keys "$STATE_DIR/public-keys-$DEPLOY_ENV.json" 2>/dev/null | tail -n 1); then
+            record "GET https://$API_HOST/v1/config" pass "200, $detail"
+          elif [ "$code" = 200 ]; then
+            record "GET https://$API_HOST/v1/config" fail "200 but not a valid signed config document: $detail"
+          elif [ "$DEPLOYED" = true ]; then
+            record "GET https://$API_HOST/v1/config" fail "HTTP $code after $attempts tries (a new custom domain can take a few minutes; run again later)"
+          else
+            record "GET https://$API_HOST/v1/config" warn "HTTP $code: the service is not deployed yet (it waits for the values listed below)"
+          fi
+
+          # 2. The admin API without Access is refused: 401/403, or Access's sign-in redirect (gate V3.4).
+          out=$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 20 "https://$ADMIN_HOST/api/users" 2>/dev/null) || out="000 "
+          code=${out%% *}; location=${out#* }
+          case "$code" in
+            401|403) record "GET https://$ADMIN_HOST/api/users without sign-in" pass "refused with $code" ;;
+            301|302|303|307|308)
+              if [[ "$location" =~ ^https://[a-z0-9-]+\.cloudflareaccess\.com/ ]]; then
+                record "GET https://$ADMIN_HOST/api/users without sign-in" pass "$code redirect to the Access sign-in page"
+              else
+                record "GET https://$ADMIN_HOST/api/users without sign-in" warn "$code redirect to ${location:-nowhere}, not to Access"
+              fi ;;
+            2*) record "GET https://$ADMIN_HOST/api/users without sign-in" fail "answered $code without sign-in: tell the developer now" ;;
+            000) record "GET https://$ADMIN_HOST/api/users without sign-in" warn "host not reachable yet (attach the panel's custom domain, owner guide step 12.3)" ;;
+            *) if [ "$DEPLOYED" = true ]; then
+                 record "GET https://$ADMIN_HOST/api/users without sign-in" fail "unexpected HTTP $code (expected 401, 403 or the Access redirect)"
+               else
+                 record "GET https://$ADMIN_HOST/api/users without sign-in" warn "HTTP $code: the service is not deployed yet"
+               fi ;;
+          esac
+
+          # 3. The Worker is not served on workers.dev.
+          if [ -n "$WORKERS_DEV_URL" ]; then
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$WORKERS_DEV_URL/v1/config" 2>/dev/null) || code=000
+            case "$code" in
+              2*|3*) record "workers.dev address not served" fail "$WORKERS_DEV_URL answered $code" ;;
+              *) record "workers.dev address not served" pass "$WORKERS_DEV_URL answered ${code/#000/no connection}" ;;
+            esac
+          elif [ "$WORKERS_DEV_ACCOUNT" = none ]; then
+            record "workers.dev address not served" pass "the account has no workers.dev subdomain"
+          else
+            record "workers.dev address not served" skip "could not read the account's workers.dev subdomain"
+          fi
+
+          # 4. The panel's pages.dev address asks for sign-in (owner guide step 12.4; an owner dashboard step).
+          if [ -n "$PROJECT" ]; then
+            out=$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 20 "https://$PROJECT.pages.dev/" 2>/dev/null) || out="000 "
+            code=${out%% *}; location=${out#* }
+            if [[ "$code" =~ ^(401|403)$ ]] || [[ "$location" =~ ^https://[a-z0-9-]+\.cloudflareaccess\.com/ ]]; then
+              record "https://$PROJECT.pages.dev asks for sign-in" pass "HTTP $code"
+            elif [ "$code" = 000 ]; then
+              record "https://$PROJECT.pages.dev asks for sign-in" warn "not reachable (the panel is not deployed yet)"
+            else
+              record "https://$PROJECT.pages.dev asks for sign-in" warn "HTTP $code without sign-in: enable the Access policy (owner guide step 12.4)"
+            fi
+          fi
+          exit "$failed"
+
+      - name: 'Safety check at the end: appeal.arcavale.com is still A 207.244.229.132'
+        if: always() && steps.dns_before.outcome != 'skipped'
+        working-directory: service
+        run: node scripts/provision.mjs check-dns --smoke "$STATE_DIR/smoke.tsv"
+
+      - name: Public keys for the app (not secret)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: public-keys-${{ inputs.environment }}
+          path: ${{ runner.temp }}/deploy-state/public-keys-${{ inputs.environment }}.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Report for the owner
+        if: always()
+        working-directory: service
+        env:
+          MIGRATIONS: ${{ steps.migrations.outcome }}
+          DEPLOY: ${{ steps.deploy.outcome }}
+          PANEL: ${{ steps.panel.outcome }}
+        run: |
+          node scripts/provision.mjs summary --env "$DEPLOY_ENV" --state "$STATE_DIR" --smoke "$STATE_DIR/smoke.tsv" \
+            --outcome verify=success --outcome "migrations=$MIGRATIONS" --outcome "deploy=$DEPLOY" --outcome "panel=$PANEL" \
+            >> "$GITHUB_STEP_SUMMARY" \
+          || echo "**The report could not be written.** Open the red step above to see what failed." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Result
+        if: success() && steps.secrets.outputs.ready != 'true'
+        run: |
+          echo "::error title=Not deployed yet::Everything the workflow can create is ready, but the service is waiting for values only you can enter. The Summary page lists them and says where to enter them. Then run the workflow again."
+          exit 1

@@ -1,0 +1,68 @@
+{
+  "comment": "Upload contract (V2-S5; PLAN_V2 §5; FR-ONL-09, FR-ONL-11; per-person quota S5b-6, FR-ONL-15: usedBytes, usedFiles, limitBytes, limitFiles, and `limit` on 409 upload_limit naming bytes or files; `limit` in uploads is the file cap, kept for older apps). Example answers of the service, checked against the real Worker by service/test/contract-uploads.test.ts (same members, same types) and parsed by the app in tests/DbdPresence.Online.Tests/UploadContractTests.cs. Unknown members must be ignored by the app. Also possible, and tested in service/test/uploads.test.ts: 503 upload_interrupted (the reservation was removed by the sweep while the file was being written; nothing was stored and no quota is held, so the app retries later like any other server error).",
+  "me": {
+    "schemaVersion": 1,
+    "user": {
+      "id": "6b0b3f6e-2f4c-4d7a-9a51-0c8f7a2d1e33",
+      "displayName": "Test Player",
+      "status": "active",
+      "access": "granted",
+      "createdAt": "2026-11-02T10:00:00.000Z",
+      "lastSeenAt": "2026-11-02T10:00:00.000Z",
+      "rosterReporter": false
+    },
+    "devices": [
+      { "id": "0d6a3b0e-5a43-4c34-8f0b-8a3f2b6c9d10", "thumbprint": "Jx0nV9mKcVq1Qm0Lr2a3s4d5f6g7h8j9k0l1z2x3c4v", "createdAt": "2026-11-02T10:00:00.000Z", "lastSeenAt": "2026-11-02T10:00:00.000Z", "current": true }
+    ],
+    "deviceLimit": 3,
+    "uploads": {
+      "items": [
+        {
+          "id": "3f1c2b9a-7d4e-4b8a-9c2d-1e0f3a4b5c6d",
+          "url": "https://cdn.arcavale.com/u/0123456789abcdef0123456789abcdef.png",
+          "sha256": "5f2b1e0c9d8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c",
+          "format": "png",
+          "size": 48213,
+          "width": 512,
+          "height": 512,
+          "createdAt": "2026-11-02T10:00:00.000Z"
+        }
+      ],
+      "limit": 300,
+      "limitBytes": 62914560,
+      "limitFiles": 300,
+      "usedBytes": 48213,
+      "usedFiles": 1,
+      "blocked": null
+    }
+  },
+  "created": {
+    "status": 201,
+    "body": {
+      "schemaVersion": 1,
+      "upload": {
+        "id": "3f1c2b9a-7d4e-4b8a-9c2d-1e0f3a4b5c6d",
+        "url": "https://cdn.arcavale.com/u/0123456789abcdef0123456789abcdef.png",
+        "sha256": "5f2b1e0c9d8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c",
+        "format": "png",
+        "size": 48213,
+        "width": 512,
+        "height": 512,
+        "createdAt": "2026-11-02T10:00:00.000Z"
+      },
+      "existing": false
+    }
+  },
+  "deleted": { "status": 200, "body": { "schemaVersion": 1, "deleted": true, "fileRemoved": true } },
+  "errors": [
+    { "status": 422, "body": { "schemaVersion": 1, "error": "image_rejected", "reason": "metadata_not_allowed" } },
+    { "status": 409, "body": { "schemaVersion": 1, "error": "upload_limit", "limit": "bytes" } },
+    { "status": 403, "body": { "schemaVersion": 1, "error": "uploads_blocked" } },
+    { "status": 403, "body": { "schemaVersion": 1, "error": "online_features_off" } },
+    { "status": 403, "body": { "schemaVersion": 1, "error": "invite_required" } },
+    { "status": 507, "body": { "schemaVersion": 1, "error": "upload_storage_full" } },
+    { "status": 413, "body": { "schemaVersion": 1, "error": "body_too_large" } },
+    { "status": 429, "body": { "schemaVersion": 1, "error": "rate_limited" } },
+    { "status": 404, "body": { "schemaVersion": 1, "error": "not_found" } }
+  ]
+}

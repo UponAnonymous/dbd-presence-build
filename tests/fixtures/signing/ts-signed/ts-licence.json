@@ -1,0 +1,26 @@
+{
+  "name": "ts-licence",
+  "description": "An active licence as sign-in and refresh issue it, full 7-day lifetime.",
+  "expectedPurpose": "licence",
+  "expectedChannel": "stable",
+  "now": "2026-01-02T00:00:00.000Z",
+  "storedVersions": [],
+  "expected": "Valid",
+  "expectedVersion": 1767225600,
+  "expectedIssuedAt": "2026-01-01T00:00:00.000Z",
+  "expectedExpiresAt": "2026-01-08T00:00:00.000Z",
+  "expectedPayload": {
+    "schemaVersion": 1,
+    "sub": "6f1c1e1a-3b0e-4a51-9d7a-2f6f0f5f1a01",
+    "cnf": "Zx9b3hKq0c8mD8w1Qb7yGm3oFv2nLr6tUa5sEe4WjPk",
+    "status": "active",
+    "features": [
+      "online"
+    ],
+    "iat": "2026-01-01T00:00:00.000Z",
+    "nbf": "2026-01-01T00:00:00.000Z",
+    "exp": "2026-01-08T00:00:00.000Z",
+    "serverTime": "2026-01-01T00:00:00.000Z"
+  },
+  "documentText": "{\"kid\":\"test-content-1\",\"signed\":\"eyJraWQiOiJ0ZXN0LWNvbnRlbnQtMSIsInB1cnBvc2UiOiJsaWNlbmNlIiwiY2hhbm5lbCI6InN0YWJsZSIsInZlcnNpb24iOjE3NjcyMjU2MDAsImlzc3VlZEF0IjoiMjAyNi0wMS0wMVQwMDowMDowMC4wMDBaIiwiZXhwaXJlc0F0IjoiMjAyNi0wMS0wOFQwMDowMDowMC4wMDBaIiwicGF5bG9hZCI6eyJzY2hlbWFWZXJzaW9uIjoxLCJzdWIiOiI2ZjFjMWUxYS0zYjBlLTRhNTEtOWQ3YS0yZjZmMGY1ZjFhMDEiLCJjbmYiOiJaeDliM2hLcTBjOG1EOHcxUWI3eUdtM29GdjJuTHI2dFVhNXNFZTRXalBrIiwic3RhdHVzIjoiYWN0aXZlIiwiZmVhdHVyZXMiOlsib25saW5lIl0sImlhdCI6IjIwMjYtMDEtMDFUMDA6MDA6MDAuMDAwWiIsIm5iZiI6IjIwMjYtMDEtMDFUMDA6MDA6MDAuMDAwWiIsImV4cCI6IjIwMjYtMDEtMDhUMDA6MDA6MDAuMDAwWiIsInNlcnZlclRpbWUiOiIyMDI2LTAxLTAxVDAwOjAwOjAwLjAwMFoifX0\",\"sig\":\"a0Qul_Kuju8oJPzyqHNXCzgeqNT52dpJLNXYhqk_sqGoTzYM5CgVKlMFC2F1B7Fgq0kCX3uFP-ib3fSNeiW2mw\"}"
+}

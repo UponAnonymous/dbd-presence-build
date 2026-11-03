@@ -1,0 +1,127 @@
+# Online service (service/, Cloudflare Worker): type check, Miniflare tests, dependency audit and a branding scan of the
+# built Worker bundle (NFR-SVC-08/09, QUALITY_GATES V2-S3). Owner Panel (panel/, static site): type check, jsdom tests,
+# build, dependency audit, the DOM-sink check and a branding scan of the built site (FR-ADM-04/11).
+# No deploy step: deployment needs the owner's Cloudflare account.
+name: CI (service)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'service/**'
+      - 'panel/**'
+      - 'docs/DECISIONS/ADR-0014-owner-panel-and-admin-auth.md'
+      - 'tests/fixtures/signing/**'
+      - 'tests/fixtures/packs/**'
+      - 'tests/fixtures/uploads/**'
+      - 'tests/fixtures/roster/**'
+      # The panel's slot list and file-name matching are checked against these app files (panel/test/catalog.test.ts).
+      - 'src/DbdPresence.Vision/Vocabulary/vocabulary.en.json'
+      - 'src/DbdPresence.Packs/Import/KnownSlugs.cs'
+      - 'src/DbdPresence.Core/Composition/AutomaticIcons.cs'
+      - 'src/DbdPresence.Presentation/ViewModels/PackItemViewModels.cs'
+      - 'build/check-release-branding.py'
+      - '.github/workflows/ci-service.yml'
+      - '.github/workflows/backup-service.yml'
+  workflow_dispatch:
+  # Weekly, so a newly published advisory or an expiring audit exception fails the gate even without a push.
+  schedule:
+    - cron: '17 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-service-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  service:
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: service
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.22.0'
+          # No dependency cache in the jobs of this file: they can run on the owner's PC (vars.LINUX_RUNNER) and the Actions cache is shared with
+          # the deploy and backup jobs, which hold secrets (local CI round 3, red-team L7; build/check-workflows.py). `npm ci` restores from the lock file.
+          # package-manager-cache is off so that setup-node does not switch a cache on by itself once a package.json names a packageManager (red-team round 4, F10).
+          package-manager-cache: false
+
+      - name: Install (exact versions from the lock file)
+        run: npm ci
+
+      - name: Type check (strict)
+        run: npx tsc --noEmit
+
+      - name: Tests (Vitest in the Workers runtime, Miniflare)
+        run: npx vitest run
+
+      - name: Dependency audit (npm audit, level high, dated exceptions in audit-exceptions.json)
+        run: node scripts/audit-gate.mjs
+
+      - name: Build the Worker bundles (dry run, no account needed)
+        run: |
+          set -euo pipefail
+          npx wrangler deploy --dry-run --outdir dist/production --env production
+          npx wrangler deploy --dry-run --outdir dist/staging --env staging
+
+      - name: Branding scan of the Worker bundles (RELEASE_CHECKLIST §9)
+        run: python3 ../build/check-release-branding.py dist
+
+  panel:
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: panel
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.22.0'
+          # No dependency cache (see the service job above).
+          package-manager-cache: false
+
+      - name: Install (exact versions from the lock file)
+        run: npm ci
+
+      - name: Type check (strict)
+        run: npx tsc --noEmit
+
+      - name: Tests (Vitest, jsdom, axe-core)
+        run: npx vitest run
+
+      - name: Build the static site
+        run: node scripts/build.mjs
+
+      - name: Dependency audit (npm audit, level high, dated exceptions in audit-exceptions.json)
+        run: node scripts/audit-gate.mjs
+
+      - name: No HTML-parsing or inline-handler code in sources or the built site (FR-ADM-04)
+        run: |
+          set -euo pipefail
+          node scripts/check-dom-sinks.mjs --self-test
+          node scripts/check-dom-sinks.mjs
+
+      - name: Branding scan of the built site (RELEASE_CHECKLIST §9)
+        run: python3 ../build/check-release-branding.py dist
+
+      - name: Staging build (CSP img-src names the staging content host only; ADR-0014), sink check and branding scan
+        run: |
+          set -euo pipefail
+          node scripts/build.mjs --env staging
+          grep -q "img-src 'self' https://cdn-staging.arcavale.com;" dist/_headers
+          node scripts/check-dom-sinks.mjs
+          python3 ../build/check-release-branding.py dist

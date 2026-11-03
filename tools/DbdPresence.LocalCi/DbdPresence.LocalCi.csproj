@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Owner's local CI program (D40, D41; docs/owner/free-ci.md; FR-CI-01..11). It runs this repository's Linux GitHub Actions jobs on the owner's own PC
+    in throwaway environments (a fresh WSL distribution per job, inside the Linux machine of one dedicated standard Windows account). Unshipped owner
+    tool: it lives outside src/, never ships with the app and no product project references it. It references no product project and no package.
+    tests/DbdPresence.ArchitectureTests/LocalCiToolBoundaryTests.cs scans its source and its built assembly.
+
+    Target is net10.0 (not -windows) so the platform-neutral core is unit-tested on Linux (tests/DbdPresence.LocalCi.Tests); the Windows-only parts
+    (Windows/*.cs: the dedicated account, WSL as that account, the Job Object, scheduled task, DPAPI, notices) are marked [SupportedOSPlatform("windows")]
+    and run only on the owner's PC.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>DbdLocalCi</AssemblyName>
+    <RootNamespace>DbdPresence.LocalCi</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <!-- LibraryImport source generation. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- The loop runs elevated: the runtime must not load code named in environment variables (DOTNET_STARTUP_HOOKS) of the owner's own account (local CI round 2, QA M8).
+         The loop also refuses to start when such a variable, or a profiler variable, is set (ServeStartCheck). -->
+    <StartupHookSupport>false</StartupHookSupport>
+    <!-- The owner gets one self-contained exe (dotnet publish with a win-x64 runtime and self-contained on). The property is declared here, not only on the
+         publish command line, so the single-file analyzer package is in the restore graph for every restore: the committed lock file then matches a
+         locked restore of the solution and a locked restore for the publish alike (a command-line-only property made the two disagree, NU1004).
+         The SDK would then add the build machine's own runtime to the restore list (and so to the lock file); the publish names win-x64 itself. -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <!-- The single-file analyzer comes as the Microsoft.NET.ILLink.Tasks package at the version of the build machine's own SDK, so the lock file broke
+         whenever GitHub's machines had a newer patch of .NET than the one that wrote it (NU1004, 2026-11-01). Without the analyzer nothing of the build
+         machine's SDK version is in the restore graph; the bundling into one file does not need it. The tool reads no assembly location, which is what the analyzer would check. -->
+    <EnableSingleFileAnalyzer>false</EnableSingleFileAnalyzer>
+    <UseDefaultPublishRuntimeIdentifier>false</UseDefaultPublishRuntimeIdentifier>
+    <!-- The program is sent to the owner: keep the build machine's folder names out of the file (the path of its debug information is mapped to /_/). -->
+    <DeterministicSourcePaths>true</DeterministicSourcePaths>
+  </PropertyGroup>
+  <!-- The day the program was built, shown by the status (round 3, L12): the .NET runtime is inside the file, so how old the file is says how old that runtime is.
+       A reproducible build can pass -p:LocalCiBuildDate=yyyy-MM-dd. -->
+  <PropertyGroup>
+    <LocalCiBuildDate Condition="'$(LocalCiBuildDate)' == ''">$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd"))</LocalCiBuildDate>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>BuildDate</_Parameter1>
+      <_Parameter2>$(LocalCiBuildDate)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DbdPresence.LocalCi.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,419 @@
+# Windows evidence: every test suite incl. platform and UI smoke tests, screenshots, self-contained publish.
+# Runs on code pushes to main only. Working branches run it by manual dispatch at milestones (before a merge, a
+# download or a stage gate), because a run costs ~45 of the 2,000 free minutes a month .
+#
+# Three jobs (docs/owner/free-ci.md, local CI rounds 2 to 4, D41), and NO CACHE IN ANY OF THEM (red-team round 4, F4):
+#  * windows         build, the suites that need no screen, publish, installer, update and install tests. It reads its runner
+#                    from vars.WINDOWS_RUNNER. DBD Local CI NEVER sets that variable (D41: only Linux jobs run on the owner's PC),
+#                    so this job runs on GitHub's machine; the variable stays in the workflow only so that a different, fully
+#                    isolated Windows runner could be chosen later. It builds things the owner DOES download and run: the portable
+#                    development build, the development installer (docs/owner/go-live.md, B3) and the spike tool. So it restores every
+#                    package from the lock files and uses no cache.
+#  * windows-desktop the suites that need a real desktop (the app's screen tests with screenshots, the window-capture tests). It reads
+#                    vars.HOSTED_WINDOWS_RUNNER, which no program sets, so it always runs on a GitHub-hosted machine: the owner's PC
+#                    is never used for screen tests (its screen would end up in an artifact). It builds nothing the owner runs, and
+#                    it too uses no cache (one rule for the whole file is simpler to check than a reason for each job).
+#  * owner-tools     the owner's own programs: the release signer, DbdLocalCi.exe (the local CI program), the evaluator and the study
+#                    capture tool. Hosted like windows-desktop (red-team review F11: the owner signs releases with what the signer trusts,
+#                    and DbdLocalCi.exe runs with administrator rights), and with NO cache of any kind. Every package is restored in locked
+#                    mode from nuget.org.
+# Why no cache at all: the Actions cache is shared by every job of the repository under the same key, so a job on the owner's PC that wrote
+# a cache entry (jobs that run attacker-chosen code can) could otherwise put modified packages into a build the owner downloads and runs.
+# build/check-workflows.py fails when a job that publishes one of the owner's tools or runs screen tests is not on the hosted form, and
+# when a job that can run on the owner's PC, any job of release.yml or any job of this file uses a cache.
+# Artifacts: windows-evidence holds the screenshots, the capture evidence and the detection benchmark (from the windows-desktop
+# job, with the results of the screen-test suites); windows-pc-evidence holds the results, coverage and publish information of the
+# windows job; release-signer-win-x64, local-ci-win-x64, eval-win-x64 and study-capture-win-x64 come from the owner-tools job.
+name: CI (Windows)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'tools/**'
+      - 'build/**'
+      - '**/Directory.*.props'
+      - '**/packages.lock.json'
+      - 'global.json'
+      - '.config/**'
+      - '.editorconfig'
+      - 'DbdPresence.slnx'
+      - '.github/workflows/ci-windows.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-windows-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  windows:
+    name: Windows build, tests, installer
+    runs-on: ${{ vars.WINDOWS_RUNNER || 'windows-2025' }}
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No dependency cache in this job (see the header): it builds the development installer and the spike tool the owner runs. Every package is restored from the lock files.
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore (locked, with NuGet audit)
+        run: dotnet restore DbdPresence.slnx --locked-mode
+
+      - name: Build
+        run: dotnet build DbdPresence.slnx -c Release --no-restore
+
+      - name: Publish (self-contained win-x64)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          dotnet publish src/DbdPresence.App/DbdPresence.App.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "publish failed" }
+          New-Item -ItemType Directory -Force TestResults | Out-Null
+          $exe = Get-Item publish/win-x64/DBD-Presence.exe
+          $size = (Get-ChildItem publish/win-x64 -Recurse | Measure-Object Length -Sum).Sum
+          "exe {0} bytes; folder {1:N1} MB; FileVersion {2}; ProductVersion {3}" -f $exe.Length, ($size / 1MB), $exe.VersionInfo.FileVersion, $exe.VersionInfo.ProductVersion | Tee-Object -FilePath TestResults/publish-info.txt
+
+      - name: Test (every suite that needs no screen) with coverage
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Every suite runs even after a failure, so one run gives the evidence of all of them; the step still fails.
+          # The suites that need a real desktop run in the windows-desktop job below.
+          $failed = @()
+          foreach ($p in (python build/list-test-projects.py windows-pc)) {
+            $name = Split-Path $p -Leaf
+            # No coverage for the Vision tests (no NFR-MAINT-02 target; instrumented pixel loops run about 30 times slower). They still all run.
+            $cov = if ($name -eq 'DbdPresence.Vision.Tests') { @() } else { @('--coverlet', '--coverlet-output-format', 'cobertura') }
+            dotnet test --project $p -c Release --no-build --report-trx @cov `
+              --results-directory "TestResults/$name"
+            if ($LASTEXITCODE -ne 0) { $failed += $name }
+          }
+          if ($failed.Count -gt 0) { throw "Tests failed in: $($failed -join ', ')" }
+
+      - name: Stage the portable development build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @(
+            'DBD Presence - portable development build (UNSIGNED)'
+            ''
+            "Commit: $env:GITHUB_SHA"
+            'This build is not code-signed; Windows SmartScreen may warn before it runs.'
+            'Run DBD-Presence.exe from this folder. Settings: %APPDATA%\DBDPresence; logs: %LOCALAPPDATA%\DBDPresence.Data\logs.'
+            'Not a release: no installer and no update channel. Unofficial; not affiliated with Behaviour Interactive or Discord.'
+          ) | Set-Content -Encoding utf8 publish/win-x64/README-DEV-BUILD.txt
+
+      - name: Check the shipped files carry no AI-tooling mentions
+        run: python build/check-release-branding.py publish/win-x64
+
+      - name: Upload portable development build
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dbd-presence-portable-win-x64-unsigned-dev
+          path: publish/win-x64/
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Pack the installer (Velopack, unsigned; updates verified by the release key's signature)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          dotnet tool restore
+          if ($LASTEXITCODE -ne 0) { throw "dotnet tool restore failed" }
+          ./build/pack-installer.ps1 -PublishDir publish/win-x64 -OutputDir installer
+
+      - name: Check the installer output carries no AI-tooling mentions
+        run: python build/check-release-branding.py installer/vpk
+
+      - name: Upload installer development build
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dbd-presence-setup-win-x64-unsigned-dev
+          path: installer/dist/
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Update test with the real package (signed feed through the custom IUpdateSource; V2-S6 gate V6.2)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # The same tests as in the suite step, now with the full package vpk just made: a throw-away release key signs a feed
+          # for it, Velopack downloads it through the app's update source, checks it and extracts its Update.exe.
+          $pkg = Get-ChildItem installer/vpk -Filter 'DbdPresence-*-stable-full.nupkg' | Select-Object -First 1
+          if (-not $pkg) { throw "vpk wrote no full package" }
+          $env:DBDP_UPDATE_TEST_PACKAGE = $pkg.FullName
+          dotnet test --project tests/DbdPresence.Updates.Tests -c Release --no-build --report-trx --results-directory TestResults/DbdPresence.Updates.Tests-real-package
+          if ($LASTEXITCODE -ne 0) { throw "update test with the real package failed" }
+
+      # A staging build: for testing only. The release signer refuses it for production; releases come from release.yml.
+      - name: Upload the update package (staging build, for tests; releases come from the Release workflow)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dbd-presence-update-package
+          path: installer/vpk/DbdPresence-*-stable-full.nupkg
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Install smoke test (silent install, shortcuts, silent uninstall, no residue)
+        shell: pwsh
+        timeout-minutes: 10
+        run: ./build/install-smoke.ps1 -SetupExe installer/dist/DBD-Presence-Setup.exe -TimeoutSeconds 180
+
+      # The Microsoft Store package (docs/owner, Store route). The Store signs the real package; this development package carries a throw-away test
+      # identity and certificate so the runner can install it. It is never a release (release.yml packs the production one, unsigned).
+      - name: Pack the development MSIX (test identity, test-signed)
+        shell: pwsh
+        timeout-minutes: 10
+        run: ./build/pack-msix.ps1 -PublishDir publish/win-x64 -OutputDir msix -IdentityName 'DbdPresence.Test' -Publisher 'CN=DbdPresence Test' -PublisherDisplayName 'DBD Presence Test' -SignWithTestCertificate
+
+      - name: Check the MSIX files carry no AI-tooling mentions
+        run: python build/check-release-branding.py msix/layout
+
+      - name: MSIX smoke test (trust the test certificate, install, startup task, uninstall, no residue)
+        shell: pwsh
+        timeout-minutes: 10
+        run: |
+          $msix = (Get-ChildItem msix/dist -Filter 'DBD-Presence-*.msix' | Select-Object -First 1).FullName
+          ./build/msix-smoke.ps1 -MsixPath $msix -CerPath msix/dist/DBD-Presence-test.cer -IdentityName 'DbdPresence.Test' -TimeoutSeconds 180
+
+      - name: Upload the development MSIX (test-signed; sideload tests only)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dbd-presence-msix-dev
+          path: msix/dist/
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Publish the spike tool (self-contained folder, not part of the app)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          dotnet publish tools/DbdPresence.Spikes/DbdPresence.Spikes.csproj -c Release -r win-x64 --self-contained true -o spike-publish/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "spike publish failed" }
+          @(
+            'DBD Presence spike V2-S1 (test tool, not part of the app, never released)'
+            ''
+            'Needs the Discord desktop app running. Nothing is uploaded; results stay next to the program.'
+            ''
+            '1. Extract the whole zip into a folder (keep all files together).'
+            '2. With Discord open on your main account, double-click DbdPresence.Spikes.exe and answer the questions.'
+            '   SmartScreen may warn: More info, then Run anyway.'
+            '3. Switch Discord to your second account (profile picture, Switch Accounts) and run it again.'
+            '4. Send back both spike-results-*.md files (they appear next to the program).'
+            ''
+            'Update cadence test (how fast Discord accepts and shows presence changes), about 4 minutes:'
+            '1. Open a Command Prompt or PowerShell in this folder and run: DbdPresence.Spikes.exe --cadence'
+            '2. Watch your profile (second account, or your own profile popout) and note which "Update N" numbers appear.'
+            '3. Answer the questions at the end and send back the cadence-results-*.md file.'
+          ) | Set-Content -Encoding utf8 spike-publish/win-x64/README.txt
+
+      - name: Upload spike tool
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: spike-tool-win-x64
+          path: spike-publish/win-x64
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Coverage summary
+        if: always()
+        shell: pwsh
+        run: python build/ci-report.py coverage TestResults >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: windows-pc-evidence
+          path: TestResults/
+          retention-days: 7
+
+  windows-desktop:
+    name: Windows screen tests (GitHub's machine)
+    # Never the owner's PC: the screenshots must not show the owner's screen (check-workflows.py). The owner's tools are not built here (owner-tools job),
+    # and no job of this file uses a cache any more (red-team round 4, F4).
+    runs-on: ${{ vars.HOSTED_WINDOWS_RUNNER || 'windows-2025' }}
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No dependency cache in this job either (see the header).
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore and build the screen-test suites (locked, with NuGet audit)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($p in (python build/list-test-projects.py windows-desktop)) {
+            $project = "$p/$(Split-Path $p -Leaf).csproj"
+            dotnet restore $project --locked-mode
+            if ($LASTEXITCODE -ne 0) { throw "restore failed for $project" }
+            dotnet build $project -c Release --no-restore
+            if ($LASTEXITCODE -ne 0) { throw "build failed for $project" }
+          }
+          # The lock-screen tests launch the normal app (src/DbdPresence.App/bin/Release), not the UiTest build; build it here too.
+          dotnet restore src/DbdPresence.App/DbdPresence.App.csproj --locked-mode
+          if ($LASTEXITCODE -ne 0) { throw "restore failed for the app" }
+          dotnet build src/DbdPresence.App/DbdPresence.App.csproj -c Release --no-restore
+          if ($LASTEXITCODE -ne 0) { throw "build failed for the app" }
+
+      - name: Test (screen-test suites) with coverage
+        shell: pwsh
+        env:
+          DBDP_SCREENSHOT_DIR: ${{ github.workspace }}/TestResults/screenshots
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Every suite runs even after a failure, so one run gives the evidence of all of them; the step still fails.
+          $failed = @()
+          foreach ($p in (python build/list-test-projects.py windows-desktop)) {
+            $name = Split-Path $p -Leaf
+            # No coverage for the Vision tests (no NFR-MAINT-02 target; instrumented pixel loops run about 30 times slower). They still all run.
+            $cov = if ($name -eq 'DbdPresence.Vision.Tests') { @() } else { @('--coverlet', '--coverlet-output-format', 'cobertura') }
+            dotnet test --project $p -c Release --no-build --report-trx @cov `
+              --results-directory "TestResults/$name"
+            if ($LASTEXITCODE -ne 0) { $failed += $name }
+          }
+          if ($failed.Count -gt 0) { throw "Tests failed in: $($failed -join ', ')" }
+
+      - name: Detection benchmark (measurement, shown in the job summary)
+        if: always()
+        shell: pwsh
+        run: |
+          # The benchmark tests write detection-benchmark.txt next to capture-evidence.txt (both are in the windows-evidence artifact, as before the split).
+          $file = 'TestResults/screenshots/detection-benchmark.txt'
+          '### Detection benchmark (measurement only, one runner, one run)' >> $env:GITHUB_STEP_SUMMARY
+          if (Test-Path $file) {
+            '```' >> $env:GITHUB_STEP_SUMMARY
+            Get-Content $file >> $env:GITHUB_STEP_SUMMARY
+            '```' >> $env:GITHUB_STEP_SUMMARY
+          } else {
+            'PENDING-ENV: detection-benchmark.txt was not written (the tests did not reach the measurement).' >> $env:GITHUB_STEP_SUMMARY
+          }
+
+      - name: Coverage summary
+        if: always()
+        shell: pwsh
+        run: python build/ci-report.py coverage TestResults >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload screen-test evidence (screenshots, capture evidence, benchmark)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: windows-evidence
+          path: TestResults/
+          retention-days: 7
+
+  owner-tools:
+    name: Owner tools (release signer, local CI program, evaluator, study capture; GitHub's machine, no cache)
+    # The programs the owner trusts and runs with real rights are built here and nowhere else: the release signer (what the owner's release keys trust),
+    # DbdLocalCi.exe (runs with administrator rights on the owner's PC), the evaluator and the study capture tool. The job is on a GitHub-hosted machine that
+    # has run no other job, and it uses NO cache of any kind: the Actions cache is shared by every job of the repository, so a job on the owner's PC that wrote
+    # a cache entry (jobs that run attacker-chosen code can) could otherwise put modified packages into these builds (local CI round 3, red-team L7 and the
+    # commit review that followed). Every package is restored in locked mode from nuget.org, as in release.yml (build/check-workflows.py enforces both).
+    runs-on: ${{ vars.HOSTED_WINDOWS_RUNNER || 'windows-2025' }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No dependency cache in this job (see above): every package is restored from the lock files.
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Publish the release signer (offline owner tool, not part of the app)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          dotnet publish tools/DbdPresence.ReleaseSigner/DbdPresence.ReleaseSigner.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -o signer-publish/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "release signer publish failed" }
+          if (-not (Test-Path signer-publish/win-x64/DbdPresence.ReleaseSigner.exe)) { throw "release signer exe missing" }
+          if (-not (Test-Path signer-publish/win-x64/README.txt)) { throw "release signer README missing" }
+          # The owner compares this value over a second channel before using the signer (docs/owner/release-keys.md step 1).
+          $hash = (Get-FileHash signer-publish/win-x64/DbdPresence.ReleaseSigner.exe -Algorithm SHA256).Hash
+          "Release signer SHA-256 (DbdPresence.ReleaseSigner.exe): ``$hash``" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Upload release signer
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-signer-win-x64
+          path: signer-publish/win-x64
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Publish the owner's local CI program (DbdLocalCi.exe, one file, not part of the app)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # The owner runs this program with administrator rights, so it is built here, on a GitHub-hosted machine that has run no other job, and never on the
+          # machine of the lane that runs the repository's checks (build/check-workflows.py; docs/owner/free-ci.md, "Getting and checking the program").
+          dotnet publish tools/DbdPresence.LocalCi/DbdPresence.LocalCi.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -o local-ci-publish/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "local CI program publish failed" }
+          if (-not (Test-Path local-ci-publish/win-x64/DbdLocalCi.exe)) { throw "DbdLocalCi.exe missing" }
+          if (-not (Test-Path local-ci-publish/win-x64/README.txt)) { throw "local CI README missing" }
+          python build/check-release-branding.py local-ci-publish/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "branding check failed for the local CI program" }
+          # The owner compares this value with the one printed by Get-FileHash before running the program (docs/owner/free-ci.md).
+          $file = Get-Item local-ci-publish/win-x64/DbdLocalCi.exe
+          $hash = (Get-FileHash $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "DbdLocalCi.exe: SHA-256 ``$hash``, $($file.Length) bytes, built from commit ${{ github.sha }}." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Upload the local CI program
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: local-ci-win-x64
+          path: local-ci-publish/win-x64
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Publish the study capture tool (self-contained folder, not part of the app)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # A folder, not single-file: single-file publish breaks the locked restore (see the spike tool).
+          dotnet publish tools/DbdPresence.StudyCapture/DbdPresence.StudyCapture.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -o study-publish/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "study tool publish failed" }
+          if (-not (Test-Path study-publish/win-x64/DbdPresence.StudyCapture.exe)) { throw "study tool exe missing" }
+          if (-not (Test-Path study-publish/win-x64/README.txt)) { throw "study tool README missing" }
+
+      - name: Upload study capture tool
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: study-capture-win-x64
+          path: study-publish/win-x64
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Publish the evaluator and labelling tool (self-contained folder, not part of the app)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # A folder, not single-file: single-file publish breaks the locked restore (see the spike tool).
+          dotnet publish tools/DbdPresence.Eval/DbdPresence.Eval.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -o eval-publish/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "evaluator publish failed" }
+          if (-not (Test-Path eval-publish/win-x64/DbdPresence.Eval.exe)) { throw "evaluator exe missing" }
+          if (-not (Test-Path eval-publish/win-x64/README.txt)) { throw "evaluator README missing" }
+
+      - name: Upload evaluator and labelling tool
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: eval-win-x64
+          path: eval-publish/win-x64
+          retention-days: 7
+          if-no-files-found: error

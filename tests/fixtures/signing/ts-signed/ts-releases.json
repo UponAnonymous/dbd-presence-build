@@ -1,0 +1,32 @@
+{
+  "name": "ts-releases",
+  "description": "A release feed on the beta channel (V2-S6), full 30-day lifetime: two packages with notes; both stacks parse the payload too.",
+  "expectedPurpose": "releases",
+  "expectedChannel": "beta",
+  "now": "2026-01-02T00:00:00.000Z",
+  "storedVersions": [],
+  "expected": "Valid",
+  "expectedVersion": 3,
+  "expectedIssuedAt": "2026-01-01T00:00:00.000Z",
+  "expectedExpiresAt": "2026-01-31T00:00:00.000Z",
+  "expectedPayload": {
+    "schemaVersion": 1,
+    "packageId": "DbdPresence",
+    "releases": [
+      {
+        "version": "1.3.0-beta.2",
+        "fileName": "DbdPresence-1.3.0-beta.2-beta-full.nupkg",
+        "size": 71234567,
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "notes": "Beta — “quoted” notes é"
+      },
+      {
+        "version": "1.2.0",
+        "fileName": "DbdPresence-1.2.0-beta-full.nupkg",
+        "size": 70000000,
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    ]
+  },
+  "documentText": "{\"kid\":\"test-content-1\",\"signed\":\"eyJraWQiOiJ0ZXN0LWNvbnRlbnQtMSIsInB1cnBvc2UiOiJyZWxlYXNlcyIsImNoYW5uZWwiOiJiZXRhIiwidmVyc2lvbiI6MywiaXNzdWVkQXQiOiIyMDI2LTAxLTAxVDAwOjAwOjAwLjAwMFoiLCJleHBpcmVzQXQiOiIyMDI2LTAxLTMxVDAwOjAwOjAwLjAwMFoiLCJwYXlsb2FkIjp7InNjaGVtYVZlcnNpb24iOjEsInBhY2thZ2VJZCI6IkRiZFByZXNlbmNlIiwicmVsZWFzZXMiOlt7InZlcnNpb24iOiIxLjMuMC1iZXRhLjIiLCJmaWxlTmFtZSI6IkRiZFByZXNlbmNlLTEuMy4wLWJldGEuMi1iZXRhLWZ1bGwubnVwa2ciLCJzaXplIjo3MTIzNDU2Nywic2hhMjU2IjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsIm5vdGVzIjoiQmV0YSDigJQg4oCccXVvdGVk4oCdIG5vdGVzIMOpIn0seyJ2ZXJzaW9uIjoiMS4yLjAiLCJmaWxlTmFtZSI6IkRiZFByZXNlbmNlLTEuMi4wLWJldGEtZnVsbC5udXBrZyIsInNpemUiOjcwMDAwMDAwLCJzaGEyNTYiOiJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiIn1dfX0\",\"sig\":\"WYXOcMTu19dIvpNA6BkgbsPAjfmBw6Pnmp_b3viTjY6l6pT5ZXAnvKh3s1e0feA_DV1ZJo-xCGTLSF1zdzChlQ\"}"
+}

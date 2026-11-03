@@ -1,0 +1,180 @@
+<UserControl x:Class="DbdPresence.App.Views.FirstRunView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:DbdPresence.App.Views"
+             xmlns:vm="clr-namespace:DbdPresence.Presentation.ViewModels;assembly=DbdPresence.Presentation"
+             Background="{DynamicResource BgBrush}"
+             KeyboardNavigation.TabNavigation="Cycle"
+             KeyboardNavigation.ControlTabNavigation="Cycle"
+             AutomationProperties.AutomationId="FirstRun">
+  <!-- The startup wizard (design §13): four steps, one card, left-aligned text, one primary button per step. -->
+  <Grid>
+  <Grid.RowDefinitions>
+    <RowDefinition Height="*" />
+    <RowDefinition Height="Auto" />
+  </Grid.RowDefinitions>
+  <ScrollViewer Style="{StaticResource PageScroll}">
+    <StackPanel Width="640" Margin="32" HorizontalAlignment="Center" VerticalAlignment="Top">
+      <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+        <Image Source="/Assets/app.ico" Width="24" Height="24" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" AutomationProperties.Name="DBD Presence logo" />
+        <TextBlock Style="{StaticResource Text.Subtitle}" Text="DBD Presence" VerticalAlignment="Center" />
+      </StackPanel>
+
+      <Border Style="{StaticResource Card}" Padding="32">
+        <StackPanel>
+          <TextBlock Style="{StaticResource Text.Caption}" AutomationProperties.AutomationId="FirstRunStep">
+            <Run Text="Step " /><Run Text="{Binding StepNumber, Mode=OneWay}" /><Run Text=" of " /><Run Text="{Binding StepCount, Mode=OneWay}" />
+          </TextBlock>
+          <ProgressBar Minimum="0" Maximum="{Binding StepCount, Mode=OneWay}" Value="{Binding StepNumber, Mode=OneWay}" Height="4" Margin="0,8,0,24"
+                       AutomationProperties.Name="Setup progress" Foreground="{DynamicResource AccentBrush}" Background="{DynamicResource SurfaceRaisedBrush}" BorderThickness="0" />
+
+          <!-- 1. Welcome -->
+          <StackPanel Visibility="{Binding Step, Converter={StaticResource EnumIs}, ConverterParameter=Welcome}">
+            <TextBlock Style="{StaticResource Text.Display}" Text="Show your Dead by Daylight games on Discord" AutomationProperties.AutomationId="WizardTitle" />
+            <TextBlock Style="{StaticResource Text.Body}" Margin="0,16,0,0" Text="DBD Presence puts what you're doing in the game on your Discord profile, by itself." />
+            <Grid Margin="0,16,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE73E;" Margin="0,0,8,0" VerticalAlignment="Top" />
+              <TextBlock Grid.Column="1" Style="{StaticResource Text.Body}" Text="It never touches the game: no memory, no files, no input." />
+            </Grid>
+            <Grid Margin="0,8,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE946;" Margin="0,0,8,0" VerticalAlignment="Top" />
+              <TextBlock Grid.Column="1" Style="{StaticResource Text.Muted}" Text="Unofficial fan-made presence — not affiliated with or endorsed by Behaviour Interactive or Discord." />
+            </Grid>
+          </StackPanel>
+
+          <!-- 2. Connect Discord: the app checks by itself -->
+          <StackPanel Visibility="{Binding Step, Converter={StaticResource EnumIs}, ConverterParameter=ConnectDiscord}">
+            <TextBlock Style="{StaticResource Text.Title}" Text="Connect to Discord" />
+            <StackPanel Margin="0,16,0,0">
+              <StackPanel Orientation="Horizontal" Visibility="{Binding Discord, Converter={StaticResource EnumIs}, ConverterParameter=Looking}">
+                <ProgressBar IsIndeterminate="True" Width="64" Height="4" Margin="0,0,16,0" VerticalAlignment="Center" AutomationProperties.Name="Looking for Discord" />
+                <TextBlock Style="{StaticResource Text.Label}" Text="Looking for Discord on this PC…" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="DiscordLooking" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Visibility="{Binding Discord, Converter={StaticResource EnumIs}, ConverterParameter=Connected}">
+                <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE73E;" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,8,0" />
+                <TextBlock Style="{StaticResource Text.Label}" Text="Connected to Discord" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="DiscordConnected" />
+              </StackPanel>
+              <StackPanel Visibility="{Binding Discord, Converter={StaticResource EnumIs}, ConverterParameter=NotOpen}">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE839;" Foreground="{DynamicResource WarningBrush}" Margin="0,0,8,0" />
+                  <TextBlock Style="{StaticResource Text.Label}" Text="Discord isn't open" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="DiscordNotOpen" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource Text.Muted}" Margin="0,8,0,0" Text="Open the Discord app. This updates by itself." />
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+
+          <!-- 3. Sign in: the lock screen came first (D32), so this step confirms who the app is unlocked for -->
+          <StackPanel Visibility="{Binding Step, Converter={StaticResource EnumIs}, ConverterParameter=SignIn}">
+            <TextBlock Style="{StaticResource Text.Title}" Text="Sign in with Discord" />
+            <Grid Margin="0,16,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <!-- The icon follows the real state: a tick only for a live session, a warning when it ended or nobody is signed in. -->
+              <TextBlock FontSize="{DynamicResource FontSizeBody}" Margin="0,0,8,0" VerticalAlignment="Top" AutomationProperties.AutomationId="WizardSignedInIcon">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Icon}">
+                    <Setter Property="Text" Value="&#xE7BA;" />
+                    <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding SignedInIsGood}" Value="True">
+                        <Setter Property="Text" Value="&#xE73E;" />
+                        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+              <TextBlock Grid.Column="1" Style="{StaticResource Text.Label}" Text="{Binding SignedInLine}" TextWrapping="Wrap" AutomationProperties.AutomationId="WizardSignedIn" />
+            </Grid>
+            <TextBlock Style="{StaticResource Text.Label}" Text="What the service keeps" Margin="0,24,0,0" />
+            <ItemsControl ItemsSource="{Binding NoticeSummary}" KeyboardNavigation.IsTabStop="False">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid Margin="0,8,0,0">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                      </Grid.ColumnDefinitions>
+                      <TextBlock Style="{StaticResource Text.Muted}" Text="•" />
+                      <TextBlock Grid.Column="1" Style="{StaticResource Text.Muted}" Text="{Binding Mode=OneWay}" />
+                    </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button Style="{StaticResource Button.Subtle}" Content="Read all of it" Command="{Binding ToggleNoticeCommand}" HorizontalAlignment="Left" Margin="0,8,0,0"
+                    Visibility="{Binding ShowFullNotice, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}" AutomationProperties.AutomationId="WizardReadAll" />
+            <StackPanel Visibility="{Binding ShowFullNotice, Converter={StaticResource VisibleWhen}}">
+              <ItemsControl ItemsSource="{Binding NoticeAll}" KeyboardNavigation.IsTabStop="False" AutomationProperties.AutomationId="WizardFullNotice">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid Margin="0,8,0,0">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                      </Grid.ColumnDefinitions>
+                      <TextBlock Style="{StaticResource Text.Muted}" Text="•" />
+                      <TextBlock Grid.Column="1" Style="{StaticResource Text.Muted}" Text="{Binding Mode=OneWay}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{x:Static vm:AppCopy.NetworkStatement}" />
+              <Button Style="{StaticResource Button.Subtle}" Content="Show less" Command="{Binding ToggleNoticeCommand}" HorizontalAlignment="Left" Margin="0,8,0,0" />
+            </StackPanel>
+          </StackPanel>
+
+          <!-- 4. Ready -->
+          <StackPanel Visibility="{Binding Step, Converter={StaticResource EnumIs}, ConverterParameter=Ready}">
+            <TextBlock Style="{StaticResource Text.Title}" Text="You're ready" />
+            <TextBlock Style="{StaticResource Text.Muted}" Margin="0,8,0,16" Text="This is what Discord shows now." />
+            <ContentPresenter Content="{Binding Home.Preview}" HorizontalAlignment="Left" MaxWidth="460" Visibility="{Binding Home.IsCardShown, Converter={StaticResource VisibleWhen}}" />
+            <Border Style="{StaticResource Inset}" MinHeight="64" Visibility="{Binding Home.IsEmpty, Converter={StaticResource VisibleWhen}}">
+              <TextBlock Style="{StaticResource Text.Body}" Text="{Binding Home.EmptyText}" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding Controls.Connection.Text}" />
+
+            <TextBlock Style="{StaticResource Text.Label}" Text="Screen reading" Margin="0,24,0,0" />
+            <RadioButton Style="{StaticResource Choice}" GroupName="WizardReading" Content="Not now" IsChecked="{Binding ChoseNotNow}" AutomationProperties.AutomationId="WizardReadingNotNow" />
+            <TextBlock Style="{StaticResource Text.Caption}" Margin="24,0,0,0" Text="Discord shows that you're playing and for how long." />
+            <RadioButton Style="{StaticResource Choice}" GroupName="WizardReading" Content="Turn it on" IsChecked="{Binding TurnOnScreenReading}" AutomationProperties.AutomationId="WizardReadingOn" />
+            <TextBlock Style="{StaticResource Text.Caption}" Margin="24,0,0,0" Text="Shows your role, character, map and more once the app has learned them." />
+            <TextBlock Style="{StaticResource Text.Muted}" Margin="0,16,0,0" Text="Screen reading looks only at the Dead by Daylight window. Nothing is saved or sent anywhere." />
+            <StackPanel Visibility="{Binding TurnOnScreenReading, Converter={StaticResource VisibleWhen}}">
+              <TextBlock Style="{StaticResource Text.Body}" Margin="0,8,0,0" Text="No anti-cheat system has approved this app. The risk is low, but it isn't zero." />
+              <CheckBox Style="{StaticResource SettingSwitch}" Margin="0,8,0,0" IsChecked="{Binding Understood}" Content="{x:Static vm:ScreenReadingViewModel.UnderstoodLabel}"
+                        AutomationProperties.AutomationId="WizardUnderstood" />
+            </StackPanel>
+            <TextBlock Style="{StaticResource Text.Muted}" Margin="0,16,0,0" Text="DBD Presence keeps running next to the clock. Click its icon to open it." />
+          </StackPanel>
+
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+  <!-- The step buttons sit outside the scrolling card so Next and Finish are always on screen. -->
+  <StackPanel Grid.Row="1" Width="640" Margin="32,0,32,24" HorizontalAlignment="Center">
+          <TextBlock Style="{StaticResource Text.Caption}" Margin="0,0,0,8" Text="{Binding FinishCaption}" Visibility="{Binding FinishCaption, Converter={StaticResource VisibleWhen}}"
+                     AutomationProperties.AutomationId="FirstRunFinishCaption" />
+
+          <DockPanel LastChildFill="False">
+            <Button DockPanel.Dock="Left" Style="{StaticResource Button.Subtle}" Content="{Binding SkipLabel}" Command="{Binding SkipCommand}" HorizontalAlignment="Left"
+                    Visibility="{Binding CanSkip, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="FirstRunSkip" />
+            <Button x:Name="NextButton" DockPanel.Dock="Right" Style="{StaticResource Button.Primary}" Content="{Binding NextLabel}" Command="{Binding NextCommand}" MinWidth="128"
+                    IsDefault="True" AutomationProperties.AutomationId="FirstRunNext" />
+            <Button DockPanel.Dock="Right" Content="Back" Command="{Binding BackCommand}" Margin="0,0,8,0" Visibility="{Binding CanGoBack, Converter={StaticResource VisibleWhen}}"
+                    AutomationProperties.AutomationId="FirstRunBack" />
+          </DockPanel>
+  </StackPanel>
+  </Grid>
+</UserControl>

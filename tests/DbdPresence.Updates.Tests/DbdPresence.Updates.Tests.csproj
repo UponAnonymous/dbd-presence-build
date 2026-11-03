@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    The update test (V2-S6 gate V6.1/V6.2; FR-ONL-10). It drives Velopack's real UpdateManager through the app's custom update source with a
+    Velopack test locator, so it runs on Linux and on Windows CI (where Velopack also extracts Update.exe from the package). The update source and
+    the updater are compiled here from src/DbdPresence.App/Updates (those files use no WPF); the shipped app compiles the same files.
+    Feeds are signed per test run with throw-away keys made by the offline signing tool's own code; no key is stored.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Packs/DbdPresence.Packs.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Online/DbdPresence.Online.csproj" />
+    <!-- The Settings "Updates" view-model over the real updater (NotInstalledTests). -->
+    <ProjectReference Include="../../src/DbdPresence.Presentation/DbdPresence.Presentation.csproj" />
+    <ProjectReference Include="../../tools/DbdPresence.ReleaseSigner/DbdPresence.ReleaseSigner.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Velopack" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../src/DbdPresence.App/Updates/*.cs" Link="App/Updates/%(Filename)%(Extension)" />
+    <Compile Include="../Shared/TestPackages.cs" Link="Shared/TestPackages.cs" />
+    <Using Include="DbdPresence.TestSupport" />
+    <!-- As in the WPF app, System.IO is not an implicit using, so the linked app and shared files compile the same way here. -->
+    <Using Remove="System.IO" />
+  </ItemGroup>
+</Project>

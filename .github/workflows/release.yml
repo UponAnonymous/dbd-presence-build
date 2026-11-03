@@ -1,0 +1,273 @@
+# Production release build (threat-model review 2026-10-25, TM-02; RELEASE_CHECKLIST, PLAN_V2 §4.1, R-19).
+#
+# Builds the app for the PRODUCTION service (-p:OnlineEnvironment=Production) from a release tag vX.Y.Z whose commit is
+# on main, and uploads the update package the owner signs offline (docs/owner/release-keys.md step 6). It refuses to
+# run for a tag that is not on main, a tag that does not match the version in Directory.Build.props, or production keys
+# that are missing or shared with staging (build/check-online-keys.py --release; the build also refuses).
+#
+# It needs no secret: nothing is signed here. The release key stays offline with the owner, and the release signer
+# refuses a package that is not a production build (tools/DbdPresence.ReleaseSigner, BuildCheck). The job summary
+# shows the tag, the commit and the SHA-256 of every file in the artifact, so the owner can compare them before signing.
+#
+# The job runs in the GitHub environment `release`. The owner gives it a required reviewer (themselves) and limits it
+# to the main branch and v* tags (docs/owner/release-keys.md, "Set up the Release workflow (once)").
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The release tag to build, for example v0.2.0. It must exist already and point at a commit on main.'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  release:
+    name: Production build
+    # Always a GitHub-hosted machine: this job runs the screen tests (which need a real desktop) and holds the release environment, and the owner signs what it makes,
+    # so DBD Local CI does not take it (docs/owner/free-ci.md; check-workflows.py).
+    runs-on: ${{ vars.HOSTED_WINDOWS_RUNNER || 'windows-2025' }}
+    timeout-minutes: 60
+    environment:
+      name: release
+    steps:
+      - name: Which tag (vX.Y.Z only)
+        id: tag
+        shell: pwsh
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:EVENT -eq 'workflow_dispatch') { $tag = $env:INPUT_TAG }
+          elseif ($env:REF_TYPE -eq 'tag') { $tag = $env:REF_NAME }
+          else { Write-Host "::error title=Not a tag::The Release workflow builds release tags only."; exit 1 }
+          if ($tag -cnotmatch '^v[0-9]{1,4}\.[0-9]{1,4}\.[0-9]{1,6}(-[0-9a-z][0-9a-z.]{0,31})?$') {
+            Write-Host "::error title=Not a release tag::'$tag' is not a release tag such as v0.2.0."
+            exit 1
+          }
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ steps.tag.outputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: The tag is on main and matches the app version
+        id: commit
+        shell: pwsh
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $sha = (git rev-parse "refs/tags/$env:TAG^{commit}").Trim()
+          if ($LASTEXITCODE -ne 0 -or $sha -notmatch '^[0-9a-f]{40}$') { throw "the tag $env:TAG does not name a commit" }
+          $head = (git rev-parse HEAD).Trim()
+          if ($head -ne $sha) { throw "the checked-out commit $head is not the tagged commit $sha" }
+          git merge-base --is-ancestor $sha refs/remotes/origin/main
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error title=Not on main::The tagged commit $sha is not on main. Release only commits that are on main."
+            exit 1
+          }
+          $props = [xml](Get-Content -Raw 'Directory.Build.props')
+          $version = ($props.Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1).Trim()
+          if ("v$version" -cne $env:TAG) {
+            Write-Host "::error title=Version mismatch::The tag is $env:TAG but Directory.Build.props says $version. Raise <Version> on main first, then tag that commit."
+            exit 1
+          }
+          "sha=$sha" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          @(
+            "## Release $env:TAG (production build)"
+            ''
+            "- Tag: ``$env:TAG``"
+            "- Commit: ``$sha`` (on main)"
+            "- App version: ``$version``"
+            ''
+          ) | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      # No dependency cache in the release job: every package is restored from the lock files.
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Production service keys are complete and differ from staging
+        run: |
+          python build/check-online-keys.py --self-test
+          python build/check-online-keys.py --release
+
+      - name: Workflow rules (SHA pins, permissions, triggers)
+        run: python build/check-workflows.py
+
+      - name: Restore (locked, with NuGet audit)
+        run: dotnet restore DbdPresence.slnx --locked-mode
+
+      - name: Build (production service)
+        run: dotnet build DbdPresence.slnx -c Release --no-restore -p:OnlineEnvironment=Production
+
+      - name: Publish (self-contained win-x64, production service)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          dotnet publish src/DbdPresence.App/DbdPresence.App.csproj -c Release -r win-x64 --self-contained true -p:OnlineEnvironment=Production -o publish/win-x64
+          if ($LASTEXITCODE -ne 0) { throw "publish failed" }
+          $exe = Get-Item publish/win-x64/DBD-Presence.exe
+          "exe {0} bytes; FileVersion {1}; ProductVersion {2}" -f $exe.Length, $exe.VersionInfo.FileVersion, $exe.VersionInfo.ProductVersion
+
+      - name: Check the shipped files carry no AI-tooling mentions
+        run: python build/check-release-branding.py publish/win-x64
+
+      - name: Test (all suites, production build)
+        shell: pwsh
+        env:
+          DBDP_SCREENSHOT_DIR: ${{ github.workspace }}/TestResults/screenshots
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $failed = @()
+          foreach ($p in (python build/list-test-projects.py windows)) {
+            $name = Split-Path $p -Leaf
+            dotnet test --project $p -c Release --no-build --report-trx --results-directory "TestResults/$name"
+            if ($LASTEXITCODE -ne 0) { $failed += $name }
+          }
+          if ($failed.Count -gt 0) { throw "Tests failed in: $($failed -join ', ')" }
+
+      - name: Pack the installer and the update package (Velopack)
+        shell: pwsh
+        env:
+          RELEASE_SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          dotnet tool restore
+          if ($LASTEXITCODE -ne 0) { throw "dotnet tool restore failed" }
+          ./build/pack-installer.ps1 -PublishDir publish/win-x64 -OutputDir installer -Commit $env:RELEASE_SHA -BuildKind release
+
+      - name: Check the installer output carries no AI-tooling mentions
+        run: python build/check-release-branding.py installer/vpk
+
+      - name: The update package is a production build (the same check the release signer makes)
+        run: dotnet run --project tools/DbdPresence.ReleaseSigner/DbdPresence.ReleaseSigner.csproj -c Release --no-build -- check-build --packages installer/vpk --channel stable --set production
+
+      - name: Update test with the real package (signed feed through the custom IUpdateSource)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pkg = Get-ChildItem installer/vpk -Filter 'DbdPresence-*-stable-full.nupkg' | Select-Object -First 1
+          if (-not $pkg) { throw "vpk wrote no full package" }
+          $env:DBDP_UPDATE_TEST_PACKAGE = $pkg.FullName
+          dotnet test --project tests/DbdPresence.Updates.Tests -c Release --no-build --report-trx --results-directory TestResults/DbdPresence.Updates.Tests-real-package
+          if ($LASTEXITCODE -ne 0) { throw "update test with the real package failed" }
+
+      - name: Install smoke test (silent install, shortcuts, silent uninstall, no residue)
+        shell: pwsh
+        timeout-minutes: 10
+        run: ./build/install-smoke.ps1 -SetupExe installer/dist/DBD-Presence-Setup.exe -TimeoutSeconds 180
+
+      # The Microsoft Store package: UNSIGNED on purpose, the Store signs what it publishes. The identity is the owner's, from Partner Center
+      # (Product identity), kept in repository variables (docs/owner). It is built from the same publish folder, so it is the same production build.
+      - name: Pack the Store package (MSIX, unsigned, owner's Partner Center identity)
+        shell: pwsh
+        timeout-minutes: 10
+        env:
+          STORE_IDENTITY_NAME: ${{ vars.STORE_IDENTITY_NAME }}
+          STORE_PUBLISHER: ${{ vars.STORE_PUBLISHER }}
+          STORE_PUBLISHER_DISPLAY_NAME: ${{ vars.STORE_PUBLISHER_DISPLAY_NAME }}
+          RELEASE_SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($name in 'STORE_IDENTITY_NAME', 'STORE_PUBLISHER', 'STORE_PUBLISHER_DISPLAY_NAME') {
+            if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
+              Write-Host "::error title=Missing repository variable::The repository variable $name is not set. Copy it from Partner Center (Product identity) into Settings > Secrets and variables > Actions > Variables (docs/owner)."
+              exit 1
+            }
+          }
+          ./build/pack-msix.ps1 -PublishDir publish/win-x64 -OutputDir msix -IdentityName $env:STORE_IDENTITY_NAME -Publisher $env:STORE_PUBLISHER -PublisherDisplayName $env:STORE_PUBLISHER_DISPLAY_NAME -Commit $env:RELEASE_SHA
+
+      - name: Check the Store package files carry no AI-tooling mentions
+        run: python build/check-release-branding.py msix/layout
+
+      - name: Print the Store package's SHA-256
+        shell: pwsh
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msix = @(Get-ChildItem msix/dist -Filter '*.msix')
+          if ($msix.Count -ne 1) { throw "expected exactly one .msix, found $($msix.Count)" }
+          $sha = (Get-FileHash $msix[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          @(
+            "### Store package ($env:TAG)"
+            ''
+            '| File | Bytes | SHA-256 |'
+            '| --- | ---: | --- |'
+            ('| {0} | {1} | `{2}` |' -f $msix[0].Name, $msix[0].Length, $sha)
+            ''
+            'Unsigned on purpose: upload it to Partner Center, which signs it. Never install it on a PC.'
+          ) | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Upload the Store package (for Partner Center; the Store signs it)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: store-package
+          path: msix/dist/*.msix
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Collect the release files and print their SHA-256
+        shell: pwsh
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+          RELEASE_SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force release-out | Out-Null
+          $pkg = @(Get-ChildItem installer/vpk -Filter 'DbdPresence-*-stable-full.nupkg')
+          if ($pkg.Count -ne 1) { throw "expected exactly one full package, found $($pkg.Count)" }
+          Copy-Item $pkg[0].FullName release-out/
+          Copy-Item installer/dist/* release-out/
+          @(
+            "DBD Presence $env:TAG - production build"
+            "Commit: $env:RELEASE_SHA"
+            "Workflow run: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+            'Sign the .nupkg offline with the release signer (docs/owner/release-keys.md step 6).'
+          ) | Set-Content -Encoding utf8 release-out/RELEASE-INFO.txt
+          $rows = Get-ChildItem release-out -File | Where-Object { $_.Name -ne 'RELEASE-SHA256SUMS.txt' } | Sort-Object Name | ForEach-Object {
+            [pscustomobject]@{ Name = $_.Name; Size = $_.Length; Sha = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
+          }
+          $rows | ForEach-Object { '{0}  {1}' -f $_.Sha, $_.Name } | Set-Content -Encoding ascii release-out/RELEASE-SHA256SUMS.txt
+          $summary = @('### Files in the artifact', '', '| File | Bytes | SHA-256 |', '| --- | ---: | --- |')
+          $summary += $rows | ForEach-Object { '| {0} | {1} | `{2}` |' -f $_.Name, $_.Size, $_.Sha }
+          $summary += @('', "Compare the .nupkg's SHA-256 with ``certutil -hashfile <file> SHA256`` on your PC before you sign it.")
+          $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Upload the release package (for the owner to sign offline)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dbd-presence-release-${{ steps.tag.outputs.tag }}
+          path: release-out/
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-evidence
+          path: TestResults/
+          retention-days: 7
+          if-no-files-found: ignore

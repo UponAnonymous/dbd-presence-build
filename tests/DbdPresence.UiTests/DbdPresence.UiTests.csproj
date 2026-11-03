@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- FlaUI (UIA3) tests that drive the real DBD-Presence.exe. Windows only (CI windows job). -->
+  <PropertyGroup>
+    <TargetFramework>$(WindowsTfm)</TargetFramework>
+    <SupportedOSPlatformVersion>$(WindowsMinVersion)</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- Drives the app's windows and takes screenshots, so it needs a real desktop: build/list-test-projects.py lists it for the GitHub-hosted job only (docs/owner/free-ci.md). -->
+    <RequiresInteractiveDesktop>true</RequiresInteractiveDesktop>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>BuildConfiguration</_Parameter1>
+      <_Parameter2>$(Configuration)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The UI-test build of the app (D32): defines DBDP_UITEST and builds into bin/UiTest, so the Release output never trusts the test key. -->
+    <ProjectReference Include="../../src/DbdPresence.App/DbdPresence.App.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" AdditionalProperties="DbdUiTestBuild=true" />
+    <!-- For the device key store and the protected secret store the fixture uses to start the app unlocked. -->
+    <ProjectReference Include="../../src/DbdPresence.Platform.Windows/DbdPresence.Platform.Windows.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <!-- For the fixture that writes a reviewer-labelled recording into the test data root (the Study page tests). -->
+    <ProjectReference Include="../../src/DbdPresence.Study/DbdPresence.Study.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Vision/DbdPresence.Vision.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/StudyRecordingFixture.cs" Link="Shared/StudyRecordingFixture.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="FlaUI.UIA3" />
+  </ItemGroup>
+</Project>

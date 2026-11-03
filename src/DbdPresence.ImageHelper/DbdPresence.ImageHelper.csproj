@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Short-lived helper process that decodes one untrusted image and writes a clean PNG (FR-PACK-10, ADR-0013).
+    It has no networking code and references no other product project; architecture tests enforce both.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(WindowsTfm)</TargetFramework>
+    <SupportedOSPlatformVersion>$(WindowsMinVersion)</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>DbdPresence.ImageHelper</RootNamespace>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Description>Image decoding helper for DBD Presence</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DbdPresence.Platform.Windows.Tests" />
+  </ItemGroup>
+</Project>

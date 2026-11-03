@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Packs/DbdPresence.Packs.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The committed vectors shared with the TypeScript suite. -->
+    <None Include="../fixtures/signing/**" Link="Fixtures/signing/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- A pack index as the service publishes it (service/scripts/make-published-index-fixture.mjs). -->
+    <None Include="../fixtures/packs/**" Link="Fixtures/packs/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The reviewed roster seed and the import file names (PLAN_V2_S5B §2.1, §2.7). -->
+    <None Include="../fixtures/roster/**" Link="Fixtures/roster/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The embedded vocabulary, read as data: the shipped roster is built from it (Packs never references Vision). -->
+    <None Include="../../src/DbdPresence.Vision/Vocabulary/vocabulary.en.json" Link="Fixtures/vocabulary.en.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Test fakes shared across projects: in-memory stores that ignore the path separator style. -->
+    <Compile Include="../Shared/VirtualPaths.cs" Link="Shared/VirtualPaths.cs" />
+    <Compile Include="../Shared/InMemoryLocalStorage.cs" Link="Shared/InMemoryLocalStorage.cs" />
+    <Using Include="DbdPresence.TestSupport" />
+  </ItemGroup>
+</Project>

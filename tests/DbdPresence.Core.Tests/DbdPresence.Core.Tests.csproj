@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The study tool's pure logic (PNG writer, frame schedule) is compiled into this test assembly so Linux tests cover it;
+         the tool itself is Windows-only and unshipped. -->
+    <Compile Include="../../src/DbdPresence.Study/Recording/PngEncoder.cs" Link="Study/Linked/PngEncoder.cs" />
+    <Compile Include="../../src/DbdPresence.Study/Recording/StudyCapturePolicy.cs" Link="Study/Linked/StudyCapturePolicy.cs" />
+    <Compile Include="../../src/DbdPresence.Study/Recording/SessionRetention.cs" Link="Study/Linked/SessionRetention.cs" />
+    <Compile Include="../../src/DbdPresence.Study/Recording/SessionMetadata.cs" Link="Study/Linked/SessionMetadata.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Fold cases shared with the service (service/src/roster/fold.ts) and the Vision suite (D35). -->
+    <None Include="../fixtures/roster/fold-cases.json" Link="Fixtures/roster/fold-cases.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+</Project>

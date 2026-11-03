@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Unshipped owner-run evaluator and labelling helper (DETECTION_VALIDATION sections 4, 6, 12 and 16; QUALITY_GATES C5/C6; FR-DET-16, FR-DET-24).
+    It lives outside src/, so the app's publish output never includes it. It has no network code and starts no process:
+    tests/DbdPresence.ArchitectureTests/EvalToolBoundaryTests.cs scans its source and its built assembly. It is Windows-only because the text
+    recogniser that gets measured is Windows.Media.Ocr; the labelling pipeline now lives in src/DbdPresence.Study; the rest of the files except Program.cs are platform-neutral and are also compiled into
+    tests/DbdPresence.Vision.Tests, which runs them on Linux with a fake recogniser and synthetic frames (mechanics only, never accuracy).
+  -->
+  <PropertyGroup>
+    <TargetFramework>$(WindowsTfm)</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>DbdPresence.Eval</AssemblyName>
+    <RootNamespace>DbdPresence.Eval</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Vision/DbdPresence.Vision.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Study/DbdPresence.Study.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Platform.Windows/DbdPresence.Platform.Windows.csproj" />
+  </ItemGroup>
+</Project>

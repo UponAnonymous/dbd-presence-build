@@ -1,0 +1,34 @@
+{
+  "name": "dbd-presence-owner-panel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "node scripts/build.mjs",
+    "check:sinks": "node scripts/check-dom-sinks.mjs",
+    "audit-gate": "node scripts/audit-gate.mjs",
+    "serve:mock": "node scripts/mock-server.mjs",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "axe-core": "4.14.0",
+    "esbuild": "0.28.2",
+    "jsdom": "29.1.1",
+    "playwright-core": "1.56.1",
+    "typescript": "6.0.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
+  },
+  "overrides": {
+    "rolldown": "1.2.13",
+    "postcss": "8.5.29",
+    "undici": "7.30.1",
+    "tldts": "7.4.18",
+    "tldts-core": "7.4.18"
+  }
+}

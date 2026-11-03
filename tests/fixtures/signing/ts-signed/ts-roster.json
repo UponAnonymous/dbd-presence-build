@@ -1,0 +1,55 @@
+{
+  "name": "ts-roster",
+  "description": "A character roster as GET /v1/roster signs it (PLAN_V2_S5B section 2.3): non-ASCII names, an alias, a licensed and a withdrawn character.",
+  "expectedPurpose": "roster",
+  "expectedChannel": "stable",
+  "now": "2026-01-02T00:00:00.000Z",
+  "storedVersions": [],
+  "expected": "Valid",
+  "expectedVersion": 1767225600,
+  "expectedIssuedAt": "2026-01-01T00:00:00.000Z",
+  "expectedExpiresAt": "2026-01-31T00:00:00.000Z",
+  "expectedPayload": {
+    "schemaVersion": 1,
+    "characters": [
+      {
+        "code": "K27",
+        "id": "the-onryo",
+        "role": "killer",
+        "displayName": "The Onryō",
+        "screenName": "The Onryō",
+        "aliases": [],
+        "licensed": {
+          "holder": "Example Rights Holder"
+        },
+        "withdrawn": false
+      },
+      {
+        "code": "K45",
+        "id": "the-test-killer",
+        "role": "killer",
+        "displayName": "The Test Killer",
+        "screenName": "The Test Killer",
+        "aliases": [],
+        "licensed": null,
+        "withdrawn": true
+      },
+      {
+        "code": "S27",
+        "id": "leon-scott-kennedy",
+        "role": "survivor",
+        "displayName": "Leon Scott Kennedy",
+        "screenName": "Leon Scott Kennedy",
+        "aliases": [
+          {
+            "name": "Leon S. Kennedy",
+            "seenOnScreen": "2026-10-24, owner screenshot"
+          }
+        ],
+        "licensed": null,
+        "withdrawn": false
+      }
+    ]
+  },
+  "documentText": "{\"kid\":\"test-content-1\",\"signed\":\"eyJraWQiOiJ0ZXN0LWNvbnRlbnQtMSIsInB1cnBvc2UiOiJyb3N0ZXIiLCJjaGFubmVsIjoic3RhYmxlIiwidmVyc2lvbiI6MTc2NzIyNTYwMCwiaXNzdWVkQXQiOiIyMDI2LTAxLTAxVDAwOjAwOjAwLjAwMFoiLCJleHBpcmVzQXQiOiIyMDI2LTAxLTMxVDAwOjAwOjAwLjAwMFoiLCJwYXlsb2FkIjp7InNjaGVtYVZlcnNpb24iOjEsImNoYXJhY3RlcnMiOlt7ImNvZGUiOiJLMjciLCJpZCI6InRoZS1vbnJ5byIsInJvbGUiOiJraWxsZXIiLCJkaXNwbGF5TmFtZSI6IlRoZSBPbnJ5xY0iLCJzY3JlZW5OYW1lIjoiVGhlIE9ucnnFjSIsImFsaWFzZXMiOltdLCJsaWNlbnNlZCI6eyJob2xkZXIiOiJFeGFtcGxlIFJpZ2h0cyBIb2xkZXIifSwid2l0aGRyYXduIjpmYWxzZX0seyJjb2RlIjoiSzQ1IiwiaWQiOiJ0aGUtdGVzdC1raWxsZXIiLCJyb2xlIjoia2lsbGVyIiwiZGlzcGxheU5hbWUiOiJUaGUgVGVzdCBLaWxsZXIiLCJzY3JlZW5OYW1lIjoiVGhlIFRlc3QgS2lsbGVyIiwiYWxpYXNlcyI6W10sImxpY2Vuc2VkIjpudWxsLCJ3aXRoZHJhd24iOnRydWV9LHsiY29kZSI6IlMyNyIsImlkIjoibGVvbi1zY290dC1rZW5uZWR5Iiwicm9sZSI6InN1cnZpdm9yIiwiZGlzcGxheU5hbWUiOiJMZW9uIFNjb3R0IEtlbm5lZHkiLCJzY3JlZW5OYW1lIjoiTGVvbiBTY290dCBLZW5uZWR5IiwiYWxpYXNlcyI6W3sibmFtZSI6Ikxlb24gUy4gS2VubmVkeSIsInNlZW5PblNjcmVlbiI6IjIwMjYtMTAtMjQsIG93bmVyIHNjcmVlbnNob3QifV0sImxpY2Vuc2VkIjpudWxsLCJ3aXRoZHJhd24iOmZhbHNlfV19fQ\",\"sig\":\"LDEoDljD2a0ckgG5wMluxYcW2y8sYSan43RbnA1Ag2-8M6QZLB9hDADi4mWsoexURqGTrWgdsXr0KKcmEPAAqA\"}"
+}

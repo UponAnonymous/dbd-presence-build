@@ -1,0 +1,15 @@
+{
+  "about": "Portrait file names from the owner's NightLight packs (names only, no images), as the owner listed them on 2026-10-24: the ten whose name alone does not identify the character, so they need their code (PLAN_V2_S5B section 2.7, FR-PACK-07). The full list of 88 names is not in the repository (docs/evidence/s5b-0-spike.md section 6). Each stem is tested as given, with '.png', with '_Portrait.png' and with the 'T_UI_' prefix.",
+  "files": [
+    { "stem": "K27_TheOnryo", "id": "the-onryo" },
+    { "stem": "K34_TheYerkes", "id": "the-good-guy" },
+    { "stem": "K37_TheDracula", "id": "the-dark-lord" },
+    { "stem": "S08_WilliamBillOverbeck", "id": "bill-overbeck" },
+    { "stem": "S12_DetectiveDavidTapp", "id": "david-tapp" },
+    { "stem": "S17_AshleyJWilliams", "id": "ash-williams" },
+    { "stem": "S24_ElodieRakoto", "id": "elodie-rakoto" },
+    { "stem": "S25_YunJinLee", "id": "lee-yun-jin" },
+    { "stem": "S27_LeonSKennedy", "id": "leon-scott-kennedy" },
+    { "stem": "S42_TheTroupe", "id": "aestri-yazar-baermar-uraz" }
+  ]
+}

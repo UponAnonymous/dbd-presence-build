@@ -1,0 +1,14 @@
+# Response headers for the Owner Panel's static files on Cloudflare Pages (ADR-0014, FR-ADM-04).
+# The Content-Security-Policy is ADR-0014's policy, verbatim; a test compares it with the ADR and with the meta tag in
+# index.html. The admin API under /api/* is served by the Worker, which sets its own headers.
+/*
+  Content-Security-Policy: default-src 'self'; img-src 'self' https://cdn.arcavale.com; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-cache

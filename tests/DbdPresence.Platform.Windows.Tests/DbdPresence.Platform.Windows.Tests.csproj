@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Windows-only integration tests for OS adapters (runs in the CI Windows job). -->
+  <PropertyGroup>
+    <TargetFramework>$(WindowsTfm)</TargetFramework>
+    <SupportedOSPlatformVersion>$(WindowsMinVersion)</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- Its window-capture tests capture a test window and write evidence files and screenshots, so it needs a real desktop: build/list-test-projects.py lists it for the GitHub-hosted job only (docs/owner/free-ci.md). -->
+    <RequiresInteractiveDesktop>true</RequiresInteractiveDesktop>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Platform.Windows/DbdPresence.Platform.Windows.csproj" />
+    <!-- The real helper is run by the SafeImageLoader tests. Referencing the executable project makes the SDK copy
+         DbdPresence.ImageHelper.exe, its dll, runtimeconfig and deps next to the tests. -->
+    <ProjectReference Include="../../src/DbdPresence.ImageHelper/DbdPresence.ImageHelper.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../fixtures/images/**" Link="Fixtures/images/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,907 @@
+{
+  "schemaVersion": 1,
+  "language": "en",
+  "retrievedOn": "2026-10-24",
+  "source": {
+    "name": "Dead by Daylight Wiki (wiki.gg)",
+    "urls": [
+      "https://deadbydaylight.wiki.gg/wiki/Killers",
+      "https://deadbydaylight.wiki.gg/wiki/Survivors",
+      "https://deadbydaylight.wiki.gg/wiki/Realms",
+      "https://deadbydaylight.wiki.gg/wiki/Game_Modes",
+      "https://deadbydaylight.wiki.gg/wiki/Tally_Screen"
+    ],
+    "licence": "CC BY-NC-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+    "attribution": "Names compiled from the Dead by Daylight Wiki (https://deadbydaylight.wiki.gg), (c) its contributors, licensed CC BY-NC-SA 3.0. Only factual display names are used; no wiki prose, images or layout are included. Dead by Daylight and its names are trademarks of Behaviour Interactive Inc."
+  },
+  "counts": {
+    "killers": 44,
+    "survivors": 54,
+    "realms": 21,
+    "maps": 46
+  },
+  "verification": "Counts match the wiki's own statements on the retrieval date (44 killers, 54 survivors, 21 realms, 46 maps). Names are the wiki's English page titles. The game does not always print the page title: an entry may carry 'aliases', on-screen spellings that map to the same id. An alias is listed only after it was seen in the game and records where in 'seenOnScreen'; so far one is known (survivor 'Leon S. Kennedy' for 'Leon Scott Kennedy', 2026-10-24, owner screenshot). Whether other names are printed differently is UNKNOWN until seen. An entry's own 'seenOnScreen' means its name was read from the game screen; an entry without it has not yet been seen on screen. 'eventModes' holds limited-time event names (read from the second line of the PLAY EVENT header) and is expected to grow; only 'Haunted by Daylight' (seen 2026-10-24) is listed, and it is not on the wiki's Game Modes page. 'resultOutcomes' holds the result-screen texts: 'Escaped' was seen on screen on 2026-10-24; 'Sacrificed', 'Dead' and the four killer results are taken from the wiki's Tally Screen page (Match Result section) and are NOT yet seen on screen, so their on-screen wording is UNKNOWN. How each remaining name is rendered on screen in the game (casing, punctuation, line breaks) is UNKNOWN until checked against the owner's captures. The roster changes with every chapter, so this list is dated and must be refreshed; the wiki announces one further realm and map that is not yet released and is not listed. Every killer and survivor carries 'code', the game's character code (K for killers, S for survivors) that prefixes its portrait file names, for example K27_TheOnryo_Portrait.png in imported packs; codes are facts, not wiki content. Each code maps to one id and never changes; they were reviewed on 2026-10-24 (docs/evidence/s5b-0-spike.md section 4, with K06, K25 and S06 INFERRED) and equal tests/fixtures/roster/seed.json. The wiki's own portrait file names number some characters differently (K05/K06 and S18/S19 are swapped there), so wiki file names are not a source for codes.",
+  "killers": [
+    {
+      "id": "the-trapper",
+      "code": "K01",
+      "name": "The Trapper"
+    },
+    {
+      "id": "the-wraith",
+      "code": "K02",
+      "name": "The Wraith"
+    },
+    {
+      "id": "the-hillbilly",
+      "code": "K03",
+      "name": "The Hillbilly"
+    },
+    {
+      "id": "the-nurse",
+      "code": "K04",
+      "name": "The Nurse"
+    },
+    {
+      "id": "the-shape",
+      "code": "K06",
+      "name": "The Shape"
+    },
+    {
+      "id": "the-hag",
+      "code": "K05",
+      "name": "The Hag"
+    },
+    {
+      "id": "the-doctor",
+      "code": "K07",
+      "name": "The Doctor"
+    },
+    {
+      "id": "the-huntress",
+      "code": "K08",
+      "name": "The Huntress"
+    },
+    {
+      "id": "the-cannibal",
+      "code": "K09",
+      "name": "The Cannibal"
+    },
+    {
+      "id": "the-nightmare",
+      "code": "K10",
+      "name": "The Nightmare"
+    },
+    {
+      "id": "the-pig",
+      "code": "K11",
+      "name": "The Pig"
+    },
+    {
+      "id": "the-clown",
+      "code": "K12",
+      "name": "The Clown"
+    },
+    {
+      "id": "the-spirit",
+      "code": "K13",
+      "name": "The Spirit"
+    },
+    {
+      "id": "the-legion",
+      "code": "K14",
+      "name": "The Legion"
+    },
+    {
+      "id": "the-plague",
+      "code": "K15",
+      "name": "The Plague"
+    },
+    {
+      "id": "the-ghost-face",
+      "code": "K16",
+      "name": "The Ghost Face"
+    },
+    {
+      "id": "the-demogorgon",
+      "code": "K17",
+      "name": "The Demogorgon"
+    },
+    {
+      "id": "the-oni",
+      "code": "K18",
+      "name": "The Oni"
+    },
+    {
+      "id": "the-deathslinger",
+      "code": "K19",
+      "name": "The Deathslinger"
+    },
+    {
+      "id": "the-executioner",
+      "code": "K20",
+      "name": "The Executioner"
+    },
+    {
+      "id": "the-blight",
+      "code": "K21",
+      "name": "The Blight"
+    },
+    {
+      "id": "the-twins",
+      "code": "K22",
+      "name": "The Twins"
+    },
+    {
+      "id": "the-trickster",
+      "code": "K23",
+      "name": "The Trickster"
+    },
+    {
+      "id": "the-nemesis",
+      "code": "K24",
+      "name": "The Nemesis"
+    },
+    {
+      "id": "the-cenobite",
+      "code": "K25",
+      "name": "The Cenobite"
+    },
+    {
+      "id": "the-artist",
+      "code": "K26",
+      "name": "The Artist"
+    },
+    {
+      "id": "the-onryo",
+      "code": "K27",
+      "name": "The Onryō"
+    },
+    {
+      "id": "the-dredge",
+      "code": "K28",
+      "name": "The Dredge"
+    },
+    {
+      "id": "the-mastermind",
+      "code": "K29",
+      "name": "The Mastermind"
+    },
+    {
+      "id": "the-knight",
+      "code": "K30",
+      "name": "The Knight"
+    },
+    {
+      "id": "the-skull-merchant",
+      "code": "K31",
+      "name": "The Skull Merchant"
+    },
+    {
+      "id": "the-singularity",
+      "code": "K32",
+      "name": "The Singularity"
+    },
+    {
+      "id": "the-xenomorph",
+      "code": "K33",
+      "name": "The Xenomorph"
+    },
+    {
+      "id": "the-good-guy",
+      "code": "K34",
+      "name": "The Good Guy"
+    },
+    {
+      "id": "the-unknown",
+      "code": "K35",
+      "name": "The Unknown"
+    },
+    {
+      "id": "the-lich",
+      "code": "K36",
+      "name": "The Lich"
+    },
+    {
+      "id": "the-dark-lord",
+      "code": "K37",
+      "name": "The Dark Lord"
+    },
+    {
+      "id": "the-houndmaster",
+      "code": "K38",
+      "name": "The Houndmaster"
+    },
+    {
+      "id": "the-ghoul",
+      "code": "K39",
+      "name": "The Ghoul"
+    },
+    {
+      "id": "the-animatronic",
+      "code": "K40",
+      "name": "The Animatronic"
+    },
+    {
+      "id": "the-krasue",
+      "code": "K41",
+      "name": "The Krasue"
+    },
+    {
+      "id": "the-first",
+      "code": "K42",
+      "name": "The First"
+    },
+    {
+      "id": "the-slasher",
+      "code": "K43",
+      "name": "The Slasher"
+    },
+    {
+      "id": "the-judgment",
+      "code": "K44",
+      "name": "The Judgment"
+    }
+  ],
+  "survivors": [
+    {
+      "id": "dwight-fairfield",
+      "code": "S01",
+      "name": "Dwight Fairfield"
+    },
+    {
+      "id": "meg-thomas",
+      "code": "S02",
+      "name": "Meg Thomas"
+    },
+    {
+      "id": "claudette-morel",
+      "code": "S03",
+      "name": "Claudette Morel"
+    },
+    {
+      "id": "jake-park",
+      "code": "S04",
+      "name": "Jake Park"
+    },
+    {
+      "id": "nea-karlsson",
+      "code": "S05",
+      "name": "Nea Karlsson"
+    },
+    {
+      "id": "laurie-strode",
+      "code": "S06",
+      "name": "Laurie Strode"
+    },
+    {
+      "id": "ace-visconti",
+      "code": "S07",
+      "name": "Ace Visconti"
+    },
+    {
+      "id": "bill-overbeck",
+      "code": "S08",
+      "name": "Bill Overbeck"
+    },
+    {
+      "id": "feng-min",
+      "code": "S09",
+      "name": "Feng Min"
+    },
+    {
+      "id": "david-king",
+      "code": "S10",
+      "name": "David King"
+    },
+    {
+      "id": "quentin-smith",
+      "code": "S11",
+      "name": "Quentin Smith"
+    },
+    {
+      "id": "david-tapp",
+      "code": "S12",
+      "name": "David Tapp"
+    },
+    {
+      "id": "kate-denson",
+      "code": "S13",
+      "name": "Kate Denson"
+    },
+    {
+      "id": "adam-francis",
+      "code": "S14",
+      "name": "Adam Francis"
+    },
+    {
+      "id": "jeff-johansen",
+      "code": "S15",
+      "name": "Jeff Johansen"
+    },
+    {
+      "id": "jane-romero",
+      "code": "S16",
+      "name": "Jane Romero"
+    },
+    {
+      "id": "ash-williams",
+      "code": "S17",
+      "name": "Ash Williams"
+    },
+    {
+      "id": "nancy-wheeler",
+      "code": "S19",
+      "name": "Nancy Wheeler"
+    },
+    {
+      "id": "steve-harrington",
+      "code": "S18",
+      "name": "Steve Harrington"
+    },
+    {
+      "id": "yui-kimura",
+      "code": "S20",
+      "name": "Yui Kimura"
+    },
+    {
+      "id": "zarina-kassir",
+      "code": "S21",
+      "name": "Zarina Kassir"
+    },
+    {
+      "id": "cheryl-mason",
+      "code": "S22",
+      "name": "Cheryl Mason"
+    },
+    {
+      "id": "felix-richter",
+      "code": "S23",
+      "name": "Felix Richter"
+    },
+    {
+      "id": "elodie-rakoto",
+      "code": "S24",
+      "name": "Élodie Rakoto"
+    },
+    {
+      "id": "lee-yun-jin",
+      "code": "S25",
+      "name": "Lee Yun-jin"
+    },
+    {
+      "id": "jill-valentine",
+      "code": "S26",
+      "name": "Jill Valentine"
+    },
+    {
+      "id": "leon-scott-kennedy",
+      "code": "S27",
+      "name": "Leon Scott Kennedy",
+      "aliases": [
+        {
+          "name": "Leon S. Kennedy",
+          "seenOnScreen": "2026-10-24, owner screenshot, pre-match lobby and scoreboard"
+        }
+      ]
+    },
+    {
+      "id": "mikaela-reid",
+      "code": "S28",
+      "name": "Mikaela Reid"
+    },
+    {
+      "id": "jonah-vasquez",
+      "code": "S29",
+      "name": "Jonah Vasquez"
+    },
+    {
+      "id": "yoichi-asakawa",
+      "code": "S30",
+      "name": "Yoichi Asakawa"
+    },
+    {
+      "id": "haddie-kaur",
+      "code": "S31",
+      "name": "Haddie Kaur"
+    },
+    {
+      "id": "ada-wong",
+      "code": "S32",
+      "name": "Ada Wong"
+    },
+    {
+      "id": "rebecca-chambers",
+      "code": "S33",
+      "name": "Rebecca Chambers"
+    },
+    {
+      "id": "vittorio-toscano",
+      "code": "S34",
+      "name": "Vittorio Toscano"
+    },
+    {
+      "id": "thalita-lyra",
+      "code": "S35",
+      "name": "Thalita Lyra"
+    },
+    {
+      "id": "renato-lyra",
+      "code": "S36",
+      "name": "Renato Lyra"
+    },
+    {
+      "id": "gabriel-soma",
+      "code": "S37",
+      "name": "Gabriel Soma"
+    },
+    {
+      "id": "nicolas-cage",
+      "code": "S38",
+      "name": "Nicolas Cage"
+    },
+    {
+      "id": "ellen-ripley",
+      "code": "S39",
+      "name": "Ellen Ripley"
+    },
+    {
+      "id": "alan-wake",
+      "code": "S40",
+      "name": "Alan Wake"
+    },
+    {
+      "id": "sable-ward",
+      "code": "S41",
+      "name": "Sable Ward"
+    },
+    {
+      "id": "aestri-yazar-baermar-uraz",
+      "code": "S42",
+      "name": "Aestri Yazar & Baermar Uraz"
+    },
+    {
+      "id": "lara-croft",
+      "code": "S43",
+      "name": "Lara Croft"
+    },
+    {
+      "id": "trevor-belmont",
+      "code": "S44",
+      "name": "Trevor Belmont"
+    },
+    {
+      "id": "taurie-cain",
+      "code": "S45",
+      "name": "Taurie Cain"
+    },
+    {
+      "id": "orela-rose",
+      "code": "S46",
+      "name": "Orela Rose"
+    },
+    {
+      "id": "rick-grimes",
+      "code": "S47",
+      "name": "Rick Grimes"
+    },
+    {
+      "id": "michonne-grimes",
+      "code": "S48",
+      "name": "Michonne Grimes"
+    },
+    {
+      "id": "vee-boonyasak",
+      "code": "S49",
+      "name": "Vee Boonyasak"
+    },
+    {
+      "id": "dustin-henderson",
+      "code": "S50",
+      "name": "Dustin Henderson"
+    },
+    {
+      "id": "eleven",
+      "code": "S51",
+      "name": "Eleven"
+    },
+    {
+      "id": "kwon-tae-young",
+      "code": "S52",
+      "name": "Kwon Tae-young"
+    },
+    {
+      "id": "shane-wiigwaas",
+      "code": "S53",
+      "name": "Shane Wiigwaas"
+    },
+    {
+      "id": "aurora-stardotter",
+      "code": "S54",
+      "name": "Aurora Stardotter"
+    }
+  ],
+  "realms": [
+    {
+      "id": "the-macmillan-estate",
+      "name": "The MacMillan Estate"
+    },
+    {
+      "id": "autohaven-wreckers",
+      "name": "Autohaven Wreckers"
+    },
+    {
+      "id": "coldwind-farm",
+      "name": "Coldwind Farm"
+    },
+    {
+      "id": "crotus-prenn-asylum",
+      "name": "Crotus Prenn Asylum"
+    },
+    {
+      "id": "haddonfield",
+      "name": "Haddonfield"
+    },
+    {
+      "id": "backwater-swamp",
+      "name": "Backwater Swamp"
+    },
+    {
+      "id": "lerys-memorial-institute",
+      "name": "Léry's Memorial Institute"
+    },
+    {
+      "id": "red-forest",
+      "name": "Red Forest"
+    },
+    {
+      "id": "springwood",
+      "name": "Springwood"
+    },
+    {
+      "id": "gideon-meat-plant",
+      "name": "Gideon Meat Plant"
+    },
+    {
+      "id": "yamaoka-estate",
+      "name": "Yamaoka Estate"
+    },
+    {
+      "id": "ormond",
+      "name": "Ormond"
+    },
+    {
+      "id": "hawkins-national-laboratory",
+      "name": "Hawkins National Laboratory"
+    },
+    {
+      "id": "grave-of-glenvale",
+      "name": "Grave of Glenvale"
+    },
+    {
+      "id": "silent-hill",
+      "name": "Silent Hill"
+    },
+    {
+      "id": "raccoon-city",
+      "name": "Raccoon City"
+    },
+    {
+      "id": "forsaken-boneyard",
+      "name": "Forsaken Boneyard"
+    },
+    {
+      "id": "withered-isle",
+      "name": "Withered Isle"
+    },
+    {
+      "id": "the-decimated-borgo",
+      "name": "The Decimated Borgo"
+    },
+    {
+      "id": "dvarka-deepwood",
+      "name": "Dvarka Deepwood"
+    },
+    {
+      "id": "sleepless-district",
+      "name": "Sleepless District"
+    }
+  ],
+  "maps": [
+    {
+      "id": "the-macmillan-estate/coal-tower",
+      "name": "Coal Tower",
+      "realm": "the-macmillan-estate"
+    },
+    {
+      "id": "the-macmillan-estate/groaning-storehouse",
+      "name": "Groaning Storehouse",
+      "realm": "the-macmillan-estate"
+    },
+    {
+      "id": "the-macmillan-estate/ironworks-of-misery",
+      "name": "Ironworks of Misery",
+      "realm": "the-macmillan-estate"
+    },
+    {
+      "id": "the-macmillan-estate/shelter-woods",
+      "name": "Shelter Woods",
+      "realm": "the-macmillan-estate"
+    },
+    {
+      "id": "the-macmillan-estate/suffocation-pit",
+      "name": "Suffocation Pit",
+      "realm": "the-macmillan-estate"
+    },
+    {
+      "id": "autohaven-wreckers/azarovs-resting-place",
+      "name": "Azarov's Resting Place",
+      "realm": "autohaven-wreckers"
+    },
+    {
+      "id": "autohaven-wreckers/blood-lodge",
+      "name": "Blood Lodge",
+      "realm": "autohaven-wreckers"
+    },
+    {
+      "id": "autohaven-wreckers/gas-heaven",
+      "name": "Gas Heaven",
+      "realm": "autohaven-wreckers"
+    },
+    {
+      "id": "autohaven-wreckers/wreckers-yard",
+      "name": "Wreckers' Yard",
+      "realm": "autohaven-wreckers"
+    },
+    {
+      "id": "autohaven-wreckers/wretched-shop",
+      "name": "Wretched Shop",
+      "realm": "autohaven-wreckers"
+    },
+    {
+      "id": "coldwind-farm/fractured-cowshed",
+      "name": "Fractured Cowshed",
+      "realm": "coldwind-farm"
+    },
+    {
+      "id": "coldwind-farm/rancid-abattoir",
+      "name": "Rancid Abattoir",
+      "realm": "coldwind-farm"
+    },
+    {
+      "id": "coldwind-farm/rotten-fields",
+      "name": "Rotten Fields",
+      "realm": "coldwind-farm"
+    },
+    {
+      "id": "coldwind-farm/the-thompson-house",
+      "name": "The Thompson House",
+      "realm": "coldwind-farm"
+    },
+    {
+      "id": "coldwind-farm/torment-creek",
+      "name": "Torment Creek",
+      "realm": "coldwind-farm"
+    },
+    {
+      "id": "crotus-prenn-asylum/disturbed-ward",
+      "name": "Disturbed Ward",
+      "realm": "crotus-prenn-asylum"
+    },
+    {
+      "id": "crotus-prenn-asylum/father-campbells-chapel",
+      "name": "Father Campbell's Chapel",
+      "realm": "crotus-prenn-asylum"
+    },
+    {
+      "id": "haddonfield/lampkin-lane",
+      "name": "Lampkin Lane",
+      "realm": "haddonfield"
+    },
+    {
+      "id": "backwater-swamp/the-pale-rose",
+      "name": "The Pale Rose",
+      "realm": "backwater-swamp"
+    },
+    {
+      "id": "backwater-swamp/grim-pantry",
+      "name": "Grim Pantry",
+      "realm": "backwater-swamp"
+    },
+    {
+      "id": "lerys-memorial-institute/treatment-theatre",
+      "name": "Treatment Theatre",
+      "realm": "lerys-memorial-institute"
+    },
+    {
+      "id": "red-forest/mothers-dwelling",
+      "name": "Mother's Dwelling",
+      "realm": "red-forest"
+    },
+    {
+      "id": "red-forest/the-temple-of-purgation",
+      "name": "The Temple of Purgation",
+      "realm": "red-forest"
+    },
+    {
+      "id": "springwood/badham-preschool",
+      "name": "Badham Preschool",
+      "realm": "springwood"
+    },
+    {
+      "id": "gideon-meat-plant/the-game",
+      "name": "The Game",
+      "realm": "gideon-meat-plant"
+    },
+    {
+      "id": "yamaoka-estate/family-residence",
+      "name": "Family Residence",
+      "realm": "yamaoka-estate"
+    },
+    {
+      "id": "yamaoka-estate/sanctum-of-wrath",
+      "name": "Sanctum of Wrath",
+      "realm": "yamaoka-estate"
+    },
+    {
+      "id": "ormond/mount-ormond-resort",
+      "name": "Mount Ormond Resort",
+      "realm": "ormond"
+    },
+    {
+      "id": "ormond/ormond-lake-mine",
+      "name": "Ormond Lake Mine",
+      "realm": "ormond"
+    },
+    {
+      "id": "hawkins-national-laboratory/the-underground-complex",
+      "name": "The Underground Complex",
+      "realm": "hawkins-national-laboratory"
+    },
+    {
+      "id": "grave-of-glenvale/dead-dawg-saloon",
+      "name": "Dead Dawg Saloon",
+      "realm": "grave-of-glenvale"
+    },
+    {
+      "id": "silent-hill/midwich-elementary-school",
+      "name": "Midwich Elementary School",
+      "realm": "silent-hill"
+    },
+    {
+      "id": "raccoon-city/raccoon-city-police-station",
+      "name": "Raccoon City Police Station",
+      "realm": "raccoon-city"
+    },
+    {
+      "id": "raccoon-city/raccoon-city-police-station-east-wing",
+      "name": "Raccoon City Police Station East Wing",
+      "realm": "raccoon-city"
+    },
+    {
+      "id": "raccoon-city/raccoon-city-police-station-west-wing",
+      "name": "Raccoon City Police Station West Wing",
+      "realm": "raccoon-city"
+    },
+    {
+      "id": "forsaken-boneyard/eyrie-of-crows",
+      "name": "Eyrie of Crows",
+      "realm": "forsaken-boneyard"
+    },
+    {
+      "id": "forsaken-boneyard/dead-sands",
+      "name": "Dead Sands",
+      "realm": "forsaken-boneyard"
+    },
+    {
+      "id": "withered-isle/garden-of-joy",
+      "name": "Garden of Joy",
+      "realm": "withered-isle"
+    },
+    {
+      "id": "withered-isle/greenville-square",
+      "name": "Greenville Square",
+      "realm": "withered-isle"
+    },
+    {
+      "id": "withered-isle/freddy-fazbears-pizza",
+      "name": "Freddy Fazbear's Pizza",
+      "realm": "withered-isle"
+    },
+    {
+      "id": "withered-isle/fallen-refuge",
+      "name": "Fallen Refuge",
+      "realm": "withered-isle"
+    },
+    {
+      "id": "the-decimated-borgo/the-shattered-square",
+      "name": "The Shattered Square",
+      "realm": "the-decimated-borgo"
+    },
+    {
+      "id": "the-decimated-borgo/forgotten-ruins",
+      "name": "Forgotten Ruins",
+      "realm": "the-decimated-borgo"
+    },
+    {
+      "id": "dvarka-deepwood/toba-landing",
+      "name": "Toba Landing",
+      "realm": "dvarka-deepwood"
+    },
+    {
+      "id": "dvarka-deepwood/nostromo-wreckage",
+      "name": "Nostromo Wreckage",
+      "realm": "dvarka-deepwood"
+    },
+    {
+      "id": "sleepless-district/tricksters-delusion",
+      "name": "Trickster's Delusion",
+      "realm": "sleepless-district"
+    }
+  ],
+  "modes": [
+    {
+      "id": "play-as-survivor",
+      "name": "Play as Survivor"
+    },
+    {
+      "id": "play-as-killer",
+      "name": "Play as Killer"
+    },
+    {
+      "id": "custom-game",
+      "name": "Custom Game"
+    },
+    {
+      "id": "2v8",
+      "name": "2v8"
+    },
+    {
+      "id": "map-showcase",
+      "name": "Map Showcase"
+    },
+    {
+      "id": "lights-out",
+      "name": "Lights Out"
+    }
+  ],
+  "eventModes": [
+    {
+      "id": "event-haunted-by-daylight",
+      "name": "Haunted by Daylight",
+      "seenOnScreen": "2026-10-24, owner screenshot, PLAY EVENT mode list"
+    }
+  ],
+  "resultOutcomes": [
+    {
+      "id": "outcome-escaped",
+      "name": "Escaped",
+      "seenOnScreen": "2026-10-24, owner screenshot, match result screen"
+    },
+    {
+      "id": "outcome-sacrificed",
+      "name": "Sacrificed"
+    },
+    {
+      "id": "outcome-dead",
+      "name": "Dead"
+    },
+    {
+      "id": "outcome-entity-hungers",
+      "name": "The Entity Hungers..."
+    },
+    {
+      "id": "outcome-brutal-killer",
+      "name": "Brutal Killer"
+    },
+    {
+      "id": "outcome-ruthless-killer",
+      "name": "Ruthless Killer"
+    },
+    {
+      "id": "outcome-merciless-killer",
+      "name": "Merciless Killer"
+    }
+  ]
+}

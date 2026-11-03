@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    The study-recording labelling pipeline (PLAN_AUTO_LABELLING AL-3; DETECTION_VALIDATION sections 16 and 16.1; FR-DET-16): session preparation, scene-range proposals,
+    frame compaction, the compact review file, reviewer-label import and the blind spot-check. It was extracted from the Eval tool with no change in behaviour so the app
+    can reuse it. It is a product assembly: no network, no process start, no native code. It is also independent of the detectors under test, so it may not
+    reference a detector, the recogniser, the change gate, an observation or a HUD threshold (the HUD profile's positions are used only by ExportCrops):
+    tests/DbdPresence.ArchitectureTests/EvalToolBoundaryTests.cs scans its source and its built assembly. Dependencies: Core and Vision only.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../DbdPresence.Vision/DbdPresence.Vision.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DbdPresence.Eval" />
+    <InternalsVisibleTo Include="DbdPresence.Vision.Tests" />
+    <InternalsVisibleTo Include="DbdPresence.App" />
+    <!-- The app's assembly is named DBD-Presence; it builds the workbench and the relay adapter. -->
+    <InternalsVisibleTo Include="DBD-Presence" />
+    <!-- The Windows UI tests write a reviewer-labelled recording with the same fixture the Linux tests prove (tests/Shared/StudyRecordingFixture.cs). -->
+    <InternalsVisibleTo Include="DbdPresence.UiTests" />
+  </ItemGroup>
+</Project>

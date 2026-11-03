@@ -1,0 +1,28 @@
+{
+  "name": "ts-key-replacement",
+  "description": "A key replacement (V2-S6, PLAN_V2 section 6.2): revokes one key and adds its successor; 3650-day lifetime.",
+  "expectedPurpose": "key-replacement",
+  "expectedChannel": "all",
+  "now": "2026-01-02T00:00:00.000Z",
+  "storedVersions": [],
+  "expected": "Valid",
+  "expectedVersion": 2,
+  "expectedIssuedAt": "2026-01-01T00:00:00.000Z",
+  "expectedExpiresAt": "2035-12-30T00:00:00.000Z",
+  "expectedPayload": {
+    "schemaVersion": 1,
+    "revoke": [
+      "release-prod-1"
+    ],
+    "add": [
+      {
+        "kid": "release-prod-2",
+        "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERCPQPvUJpBBcAQq9_BPoXB_TdGL-7PsZ3y4OOjAqHqqOryKO43rYL9fgF-ZMF5cjiObeYXLnahTljaOxOAhQPQ",
+        "purposes": [
+          "releases"
+        ]
+      }
+    ]
+  },
+  "documentText": "{\"kid\":\"test-content-1\",\"signed\":\"eyJraWQiOiJ0ZXN0LWNvbnRlbnQtMSIsInB1cnBvc2UiOiJrZXktcmVwbGFjZW1lbnQiLCJjaGFubmVsIjoiYWxsIiwidmVyc2lvbiI6MiwiaXNzdWVkQXQiOiIyMDI2LTAxLTAxVDAwOjAwOjAwLjAwMFoiLCJleHBpcmVzQXQiOiIyMDM1LTEyLTMwVDAwOjAwOjAwLjAwMFoiLCJwYXlsb2FkIjp7InNjaGVtYVZlcnNpb24iOjEsInJldm9rZSI6WyJyZWxlYXNlLXByb2QtMSJdLCJhZGQiOlt7ImtpZCI6InJlbGVhc2UtcHJvZC0yIiwic3BraSI6Ik1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRVJDUFFQdlVKcEJCY0FRcTlfQlBvWEJfVGRHTC03UHNaM3k0T09qQXFIcXFPcnlLTzQzcllMOWZnRi1aTUY1Y2ppT2JlWVhMbmFoVGxqYU94T0FoUVBRIiwicHVycG9zZXMiOlsicmVsZWFzZXMiXX1dfX0\",\"sig\":\"8KPfFPBjs5wm1bdYl4tr1Vxclt_7RCNS5t9c8vHMQWJ2qpdZ12LGPIIbERrnU4cOQxDp71yf94Z8tXE5FCnLiw\"}"
+}

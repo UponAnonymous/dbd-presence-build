@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(OnlineEnvironment)' == 'Production'">
+    <!-- Release CI builds with -p:OnlineEnvironment=Production; the environment test then asserts the production host and keys. -->
+    <DefineConstants>$(DefineConstants);ONLINE_PRODUCTION</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Packs/DbdPresence.Packs.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Online/DbdPresence.Online.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The refresh-proof vector made by the TypeScript service code (tests/fixtures/auth/make-refresh-proof-vector.mjs). -->
+    <None Include="../fixtures/auth/refresh-proof-vector.json" Link="Fixtures/auth/refresh-proof-vector.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The upload contract (V2-S5), checked against the Worker by service/test/contract-uploads.test.ts. -->
+    <None Include="../fixtures/uploads/contract.json" Link="Fixtures/uploads/contract.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The signed roster as the service serves it (service/scripts/make-roster-fixture.mjs) and the TEST key set that verifies it (S5b-4). -->
+    <None Include="../fixtures/roster/signed-roster.json" Link="Fixtures/roster/signed-roster.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../fixtures/signing/keys/keys.json" Link="Fixtures/signing/keys/keys.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

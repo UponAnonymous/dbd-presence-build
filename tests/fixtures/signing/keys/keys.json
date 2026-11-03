@@ -1,0 +1,23 @@
+{
+  "keys": [
+    {
+      "kid": "test-content-1",
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERCPQPvUJpBBcAQq9_BPoXB_TdGL-7PsZ3y4OOjAqHqqOryKO43rYL9fgF-ZMF5cjiObeYXLnahTljaOxOAhQPQ",
+      "purposes": [
+        "pack-index",
+        "config",
+        "releases",
+        "licence",
+        "roster",
+        "key-replacement"
+      ]
+    },
+    {
+      "kid": "test-config-only-1",
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExWifsQ078gW9KLCJhpUFq-7tDXtrEk6woDLf2UTG0Anlf0Y7tXy0P5QXNF7g31LBcalRcwTmEKQhE190SZjYZA",
+      "purposes": [
+        "config"
+      ]
+    }
+  ]
+}

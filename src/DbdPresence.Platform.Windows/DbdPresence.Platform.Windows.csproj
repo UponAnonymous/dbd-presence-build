@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(WindowsTfm)</TargetFramework>
+    <SupportedOSPlatformVersion>$(WindowsMinVersion)</SupportedOSPlatformVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../DbdPresence.Vision/DbdPresence.Vision.csproj" />
+    <ProjectReference Include="../DbdPresence.Discord/DbdPresence.Discord.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- DPAPI (System.Security.Cryptography.ProtectedData) ships in the Windows desktop shared framework, so no package is added. -->
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DbdPresence.Platform.Windows.Tests" />
+  </ItemGroup>
+</Project>

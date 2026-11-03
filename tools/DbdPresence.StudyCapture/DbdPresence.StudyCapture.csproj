@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Unshipped owner-run study tool (QUALITY_GATES C6 data collection; docs/SAFETY_AND_PRIVACY.md section 3). It lives outside src/, so the
+    app's publish output never includes it. It has no network code: tests/DbdPresence.ArchitectureTests/StudyToolBoundaryTests.cs scans it.
+  -->
+  <PropertyGroup>
+    <TargetFramework>$(WindowsTfm)</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>DbdPresence.StudyCapture</AssemblyName>
+    <RootNamespace>DbdPresence.StudyCapture</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The recorder itself (policy, session folder, metadata, retention, PNG writer, capture loop) is the DbdPresence.Study library's Recording folder, compiled in as source so this tool keeps to its two project references and no packages (StudyToolBoundaryTests) and the app and this tool run the same code. -->
+    <Compile Include="../../src/DbdPresence.Study/Recording/*.cs" Link="Recording/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Platform.Windows/DbdPresence.Platform.Windows.csproj" />
+  </ItemGroup>
+</Project>

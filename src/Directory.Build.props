@@ -1,0 +1,11 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <!-- The app publishes self-contained for win-x64; referenced libraries are restored with the same RID,
+         so their lock files must carry it too (otherwise locked restore fails with NU1004 on publish). -->
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <!-- XML API docs are for development only; they are not part of the shipped app. -->
+    <PublishDocumentationFile>false</PublishDocumentationFile>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+  </PropertyGroup>
+</Project>

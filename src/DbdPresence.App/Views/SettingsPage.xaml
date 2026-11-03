@@ -1,0 +1,300 @@
+<UserControl x:Class="DbdPresence.App.Views.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:DbdPresence.App.Views"
+             xmlns:vm="clr-namespace:DbdPresence.Presentation.ViewModels;assembly=DbdPresence.Presentation"
+             AutomationProperties.AutomationId="SettingsPage">
+  <ScrollViewer Style="{StaticResource PageScroll}">
+    <StackPanel Style="{StaticResource PageBody}">
+      <TextBlock Style="{StaticResource Text.Title}" Text="Settings" />
+
+      <!-- In-page index: a convenience, not navigation (design §7). -->
+      <WrapPanel Margin="0,8,0,16" KeyboardNavigation.TabNavigation="Continue">
+        <Button Style="{StaticResource Button.Subtle}" Content="Screen reading" Tag="ScreenReading" Click="OnIndexClick" AutomationProperties.Name="Go to Screen reading" />
+        <Button Style="{StaticResource Button.Subtle}" Content="Look" Tag="Look" Click="OnIndexClick" AutomationProperties.Name="Go to Look" />
+        <Button Style="{StaticResource Button.Subtle}" Content="Start and close" Tag="StartAndClose" Click="OnIndexClick" AutomationProperties.Name="Go to Start and close" />
+        <Button Style="{StaticResource Button.Subtle}" Content="Discord connection" Tag="DiscordConnection" Click="OnIndexClick" AutomationProperties.Name="Go to Discord connection" />
+        <Button Style="{StaticResource Button.Subtle}" Content="Advanced" Tag="Advanced" Click="OnIndexClick" AutomationProperties.Name="Go to Advanced" />
+        <Button Style="{StaticResource Button.Subtle}" Content="About" Tag="About" Click="OnIndexClick" AutomationProperties.Name="Go to About" />
+      </WrapPanel>
+
+      <!-- Screen reading (design §7.1, §7.2) -->
+      <Border x:Name="SectionScreenReading" Style="{StaticResource SectionCard}" DataContext="{Binding ScreenReading}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="Screen reading" Margin="0,0,0,16" />
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE946;" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,8,0" />
+            <TextBlock Style="{StaticResource Text.Label}" Text="{Binding StatusText}" AutomationProperties.AutomationId="ScreenReadingStatus" />
+          </StackPanel>
+          <TextBlock Style="{StaticResource Text.Muted}" Margin="0,8,0,0" MaxWidth="640" Text="{x:Static vm:ScreenReadingViewModel.Caption}" AutomationProperties.AutomationId="ScreenReadingCaption" />
+          <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+            <Button Content="Turn on screen reading…" Command="{Binding BeginTurnOnCommand}" Margin="0,0,8,0" AutomationProperties.AutomationId="ScreenReadingTurnOn"
+                    Visibility="{Binding IsOn, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}" />
+            <Button Content="Turn off screen reading" Command="{Binding TurnOffCommand}" AutomationProperties.AutomationId="ScreenReadingTurnOff"
+                    Visibility="{Binding IsOn, Converter={StaticResource VisibleWhen}}" />
+          </StackPanel>
+
+          <!-- The confirmation sheet, inline (not a modal stack). Escape cancels. -->
+          <Border Style="{StaticResource Inset}" Visibility="{Binding IsConfirming, Converter={StaticResource VisibleWhen}}"
+                  KeyDown="OnSheetKeyDown">
+            <StackPanel>
+              <TextBlock Style="{StaticResource Text.Subtitle}" Text="{x:Static vm:ScreenReadingViewModel.ConfirmTitle}" AutomationProperties.AutomationId="ScreenReadingSheetTitle" />
+              <ItemsControl ItemsSource="{Binding ConfirmLines}" KeyboardNavigation.IsTabStop="False">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Style="{StaticResource Text.Body}" Text="{Binding}" Margin="0,8,0,0" MaxWidth="640" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding Understood}" Content="{x:Static vm:ScreenReadingViewModel.UnderstoodLabel}" Margin="0,16,0,0"
+                        AutomationProperties.AutomationId="ScreenReadingUnderstood" />
+              <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                <Button Style="{StaticResource Button.Primary}" Content="Turn on" Command="{Binding ConfirmTurnOnCommand}" Margin="0,0,8,0" AutomationProperties.AutomationId="ScreenReadingConfirm" />
+                <Button Content="Cancel" Command="{Binding CancelTurnOnCommand}" AutomationProperties.AutomationId="ScreenReadingCancel" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- Look (design §7.3) -->
+      <Border x:Name="SectionLook" Style="{StaticResource SectionCard}" DataContext="{Binding Appearance}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="Look" Margin="0,0,0,8" />
+          <TextBlock Style="{StaticResource FieldLabel}" Margin="0,8,0,4" Text="Theme" />
+          <ComboBox Style="{StaticResource ChoiceCombo}" ItemsSource="{Binding Themes}" SelectedValue="{Binding Theme}" AutomationProperties.AutomationId="Theme" AutomationProperties.Name="Theme" />
+          <TextBlock Style="{StaticResource FieldLabel}" Text="Accent colour" />
+          <ItemsControl ItemsSource="{Binding AccentPresets}" AutomationProperties.Name="Accent colours" KeyboardNavigation.IsTabStop="False">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Margin="0,0,8,8" Padding="8,0" ToolTip="{Binding Name}"
+                        Command="{Binding DataContext.ChooseAccentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Hex}"
+                        AutomationProperties.Name="{Binding Name}">
+                  <StackPanel Orientation="Horizontal">
+                    <Border Width="16" Height="16" CornerRadius="8" Background="{Binding Hex, Converter={StaticResource HexBrush}}" Margin="0,0,8,0"
+                            BorderBrush="{DynamicResource BorderStrongBrush}" BorderThickness="1" />
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Style="{StaticResource FieldLabel}" Text="Text size" />
+          <ComboBox Style="{StaticResource ChoiceCombo}" ItemsSource="{Binding FontScales}" SelectedValue="{Binding FontScalePercent}"
+                    AutomationProperties.AutomationId="FontScale" AutomationProperties.Name="Text size" />
+          <TextBlock Style="{StaticResource FieldLabel}" Text="Spacing" />
+          <ComboBox Style="{StaticResource ChoiceCombo}" ItemsSource="{Binding Densities}" SelectedValue="{Binding Density}"
+                    AutomationProperties.AutomationId="Density" AutomationProperties.Name="Spacing" />
+          <CheckBox Style="{StaticResource SettingSwitch}" Margin="0,16,0,0" Content="Reduce motion" AutomationProperties.AutomationId="ReduceMotion"
+                    IsChecked="{Binding DataContext.ReduceMotion, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          <TextBlock Style="{StaticResource Text.Caption}" Text="Follows Windows unless you turn this on." />
+          <TextBlock Style="{StaticResource InlineMessage}" Text="{Binding ValidationMessage}" Visibility="{Binding ValidationMessage, Converter={StaticResource VisibleWhen}}" />
+        </StackPanel>
+      </Border>
+
+      <!-- Start and close (design §7.4) -->
+      <Border x:Name="SectionStartAndClose" Style="{StaticResource SectionCard}" DataContext="{Binding AppStartup}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="Start and close" Margin="0,0,0,8" />
+          <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding StartWithWindows}" Content="Start with Windows" AutomationProperties.AutomationId="StartWithWindows" />
+          <TextBlock Style="{StaticResource InlineMessage}" Foreground="{DynamicResource DangerBrush}" Text="{Binding StartWithWindowsError}"
+                     Visibility="{Binding StartWithWindowsError, Converter={StaticResource VisibleWhen}}" />
+          <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding StartWithWindowsCaption, Mode=OneWay}" />
+          <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding StartMinimised}" Content="Start hidden in the notification area" AutomationProperties.AutomationId="StartMinimised" />
+          <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding CloseToTray}" Content="Keep running when I close the window" AutomationProperties.AutomationId="CloseToTray" />
+          <TextBlock Style="{StaticResource FieldLabel}" Text="Notifications" />
+          <ComboBox Style="{StaticResource ChoiceCombo}" ItemsSource="{Binding NotificationLevels}" SelectedValue="{Binding Notifications}"
+                    AutomationProperties.AutomationId="Notifications" AutomationProperties.Name="Notifications" />
+          <TextBlock Style="{StaticResource FieldLabel}" Text="Updates" />
+          <StackPanel DataContext="{Binding DataContext.Updates, RelativeSource={RelativeSource AncestorType=UserControl}}">
+            <TextBlock Style="{StaticResource Text.Muted}" Text="{Binding StatusText}" TextWrapping="Wrap" views:LiveRegion.Announce="True"
+                       AutomationProperties.AutomationId="UpdateStatus" />
+            <ProgressBar Height="4" Margin="0,8,0,0" Minimum="0" Maximum="100" Value="{Binding Progress, Mode=OneWay}" Visibility="{Binding IsBusy, Converter={StaticResource VisibleWhen}}"
+                         AutomationProperties.AutomationId="UpdateProgress" AutomationProperties.Name="Update download progress" />
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+              <Button Content="Check for updates" Command="{Binding CheckCommand}" AutomationProperties.AutomationId="CheckForUpdates" />
+              <Button Content="{Binding RestartLabel}" Command="{Binding RestartCommand}" Margin="8,0,0,0" Style="{StaticResource Button.Primary}"
+                      Visibility="{Binding IsReadyToRestart, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="RestartToUpdate" />
+            </StackPanel>
+          </StackPanel>
+          <TextBlock Style="{StaticResource InlineMessage}" Text="{Binding ValidationMessage}" Visibility="{Binding ValidationMessage, Converter={StaticResource VisibleWhen}}" />
+        </StackPanel>
+      </Border>
+
+      <!-- Discord connection (design §7.5) -->
+      <Border x:Name="SectionDiscordConnection" Style="{StaticResource SectionCard}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="Discord connection" Margin="0,0,0,16" />
+          <ContentPresenter Content="{Binding Controls.Connection}" AutomationProperties.AutomationId="SettingsConnection" />
+          <Button Content="Send a test status" Command="{Binding Controls.TestConnectionCommand}" HorizontalAlignment="Left" Margin="0,16,0,0"
+                  AutomationProperties.AutomationId="TestConnection" AutomationProperties.HelpText="{Binding Controls.TestConnectionHelp}" />
+          <TextBlock Style="{StaticResource Text.Body}" Margin="0,8,0,0" Text="{Binding Controls.ConnectionTestText}" views:LiveRegion.Announce="True"
+                     Visibility="{Binding Controls.ConnectionTestText, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="ConnectionTestResult" />
+        </StackPanel>
+      </Border>
+
+      <!-- Advanced (design §7.6) -->
+      <Border x:Name="SectionAdvanced" Style="{StaticResource SectionCard}">
+        <Expander Header="Advanced" IsExpanded="{Binding AdvancedOpen, Mode=TwoWay}" AutomationProperties.AutomationId="AdvancedExpander" AutomationProperties.Name="Advanced">
+          <StackPanel>
+            <Border Style="{StaticResource Inset}" DataContext="{Binding AppStartup}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource Text.Subtitle}" Text="Use my own Discord app" />
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding UseOwnApplication}" Content="Use my own Discord app" AutomationProperties.AutomationId="UseOwnApplication" />
+                <TextBlock Style="{StaticResource Text.Muted}" TextWrapping="Wrap" Text="Most people should leave this off. Turn it on only if you want your status to come from a Discord app you created yourself." />
+                <ItemsControl ItemsSource="{Binding SetupSteps}" Margin="0,8,0,0" KeyboardNavigation.IsTabStop="False">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Style="{StaticResource Text.Muted}" Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding StringFormat=• {0}}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Style="{StaticResource FieldLabel}" Text="App ID" />
+                <TextBox Text="{Binding ApplicationId, UpdateSourceTrigger=LostFocus}" views:CommitOnEnter.IsEnabled="True" MaxLength="40" MaxWidth="360" HorizontalAlignment="Left" MinWidth="280"
+                         AutomationProperties.AutomationId="ApplicationId" AutomationProperties.Name="Discord Application ID"
+                         AutomationProperties.HelpText="17 to 20 digits from the General Information page of your Discord app. Saved when you press Enter or leave the box." />
+                <TextBlock Style="{StaticResource InlineMessage}" Foreground="{DynamicResource DangerBrush}" Text="{Binding ApplicationIdError}"
+                           Visibility="{Binding ApplicationIdError, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="ApplicationIdError" />
+                <TextBlock Style="{StaticResource FieldLabel}" Text="App name for the preview" />
+                <TextBox Text="{Binding ApplicationName, UpdateSourceTrigger=PropertyChanged}" MaxLength="40" MaxWidth="360" HorizontalAlignment="Left" MinWidth="280"
+                         AutomationProperties.AutomationId="ApplicationName" AutomationProperties.Name="Application name"
+                         AutomationProperties.HelpText="Type the name you gave your Discord app." />
+                <TextBlock Style="{StaticResource InlineMessage}" Foreground="{DynamicResource DangerBrush}" Text="{Binding ApplicationNameError}"
+                           Visibility="{Binding ApplicationNameError, Converter={StaticResource VisibleWhen}}" />
+                <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" TextWrapping="Wrap"
+                           Text="Use a neutral name of your own (for example “DBD Presence”). Do not use the game's name, logos or Behaviour artwork for your app." />
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Inset}" DataContext="{Binding Appearance}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource Text.Subtitle}" Text="Custom colours" />
+                <TextBlock Style="{StaticResource FieldLabel}" Text="Custom accent colour" />
+                <TextBox Text="{Binding AccentHex, UpdateSourceTrigger=PropertyChanged}" Width="144" MaxLength="7" HorizontalAlignment="Left"
+                         AutomationProperties.AutomationId="AccentHex" AutomationProperties.Name="Custom accent colour"
+                         AutomationProperties.HelpText="A colour as #RRGGBB. Low-contrast colours are adjusted so text stays readable." />
+                <TextBlock Style="{StaticResource InlineMessage}" Foreground="{DynamicResource DangerBrush}" Text="{Binding AccentError}"
+                           Visibility="{Binding AccentError, Converter={StaticResource VisibleWhen}}" />
+                <TextBlock Style="{StaticResource FieldLabel}" Text="Surface tint (optional)" />
+                <StackPanel Orientation="Horizontal">
+                  <TextBox Text="{Binding SurfaceTint, UpdateSourceTrigger=PropertyChanged}" Width="144" MaxLength="7"
+                           AutomationProperties.AutomationId="SurfaceTint" AutomationProperties.Name="Surface tint"
+                           AutomationProperties.HelpText="A colour as #RRGGBB blended lightly into panels. Leave empty for none." />
+                  <Button Style="{StaticResource Button.Subtle}" Content="Remove tint" Margin="8,0,0,0" Command="{Binding ClearTintCommand}" AutomationProperties.AutomationId="ClearTint" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource InlineMessage}" Foreground="{DynamicResource DangerBrush}" Text="{Binding TintError}"
+                           Visibility="{Binding TintError, Converter={StaticResource VisibleWhen}}" />
+                <TextBlock Style="{StaticResource FieldLabel}" Text="Motion" />
+                <ComboBox Style="{StaticResource ChoiceCombo}" ItemsSource="{Binding Motions}" SelectedValue="{Binding Motion}"
+                          AutomationProperties.AutomationId="Motion" AutomationProperties.Name="Motion" />
+                <ItemsControl ItemsSource="{Binding ThemeNotes}" Margin="0,8,0,0" AutomationProperties.AutomationId="ThemeNotes" KeyboardNavigation.IsTabStop="False">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Style="{StaticResource Text.Muted}" Margin="0,4,0,0" Text="{Binding}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Inset}">
+              <StackPanel>
+                <TextBlock Style="{StaticResource Text.Subtitle}" Text="Where your data is kept" />
+                <TextBlock Style="{StaticResource Text.Muted}" Margin="0,8,0,0" TextWrapping="Wrap" Text="{x:Static vm:AppCopy.NetworkStatement}" />
+                <TextBlock Style="{StaticResource FieldLabel}" Text="Settings folder" />
+                <TextBox Text="{Binding Privacy.SettingsFolder, Mode=OneWay}" IsReadOnly="True" AutomationProperties.AutomationId="SettingsFolder" AutomationProperties.Name="Settings folder" />
+                <TextBlock Style="{StaticResource FieldLabel}" Text="Logs folder" />
+                <TextBox Text="{Binding Privacy.DataFolder, Mode=OneWay}" IsReadOnly="True" AutomationProperties.AutomationId="DataFolder" AutomationProperties.Name="Logs and data folder" />
+              </StackPanel>
+            </Border>
+
+            <!-- Diagnostics: for the owner only, behind its own expander. Nothing here is sent anywhere (owner decision, 2026-10-24). -->
+            <Border Style="{StaticResource Inset}" Visibility="{Binding Detection, Converter={StaticResource VisibleWhen}}">
+              <Expander Header="Diagnostics" IsExpanded="{Binding DiagnosticsOpen, Mode=TwoWay}" AutomationProperties.AutomationId="DiagnosticsExpander" AutomationProperties.Name="Diagnostics">
+                <StackPanel DataContext="{Binding Detection}">
+                  <TextBlock Style="{StaticResource Text.Muted}" Text="{Binding StatusLine}" AutomationProperties.AutomationId="DetectionStatusLine" />
+                  <ItemsControl ItemsSource="{Binding Rows}" Margin="0,8,0,0" AutomationProperties.AutomationId="DetectionRows" AutomationProperties.Name="What the app has read" KeyboardNavigation.IsTabStop="False">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Grid Margin="0,4,0,0">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="112" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                          </Grid.ColumnDefinitions>
+                          <TextBlock Style="{StaticResource Text.Label}" Text="{Binding Label}" />
+                          <TextBlock Grid.Column="1" Style="{StaticResource Text.Body}" Text="{Binding Value}" />
+                          <TextBlock Grid.Column="2" Style="{StaticResource Text.Caption}" Text="{Binding Mark}" Margin="16,0,0,0" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding ProgressLine}" Visibility="{Binding ProgressLine, Converter={StaticResource VisibleWhen}}" />
+                </StackPanel>
+              </Expander>
+            </Border>
+          </StackPanel>
+        </Expander>
+      </Border>
+
+      <!-- About (design §7.7) -->
+      <Border x:Name="SectionAbout" Style="{StaticResource SectionCard}" DataContext="{Binding About}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="About DBD Presence" Margin="0,0,0,16" />
+          <TextBlock Style="{StaticResource Text.Label}">
+            <Run Text="Version " /><Run Text="{Binding Version, Mode=OneWay}" />
+          </TextBlock>
+          <TextBlock Style="{StaticResource Text.Muted}">
+            <Run Text="Source commit " /><Run Text="{Binding Commit, Mode=OneWay}" />
+          </TextBlock>
+          <Grid Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE7BA;" Foreground="{DynamicResource WarningBrush}" Margin="0,0,8,0" VerticalAlignment="Top" />
+            <TextBlock Grid.Column="1" Style="{StaticResource Text.Body}" Text="{Binding SigningNotice}" AutomationProperties.AutomationId="SigningNotice" />
+          </Grid>
+          <TextBlock Style="{StaticResource Text.Label}" Text="{Binding UnofficialStatement}" TextWrapping="Wrap" MaxWidth="640" Margin="0,16,0,0" AutomationProperties.AutomationId="UnofficialStatement" />
+          <ItemsControl ItemsSource="{Binding Disclaimer}" AutomationProperties.AutomationId="Disclaimer" KeyboardNavigation.IsTabStop="False">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Style="{StaticResource Text.Body}" Text="{Binding}" Margin="0,8,0,0" MaxWidth="640" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Style="{StaticResource Text.Label}" Text="Third-party software" Margin="0,16,0,0" />
+          <ItemsControl ItemsSource="{Binding ThirdParty}" KeyboardNavigation.IsTabStop="False">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Margin="0,8,0,0">
+                  <TextBlock Style="{StaticResource Text.Body}">
+                    <Run Text="{Binding Name, Mode=OneWay}" /><Run Text=": " /><Run Text="{Binding Licence, Mode=OneWay}" />
+                  </TextBlock>
+                  <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding Source}" />
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+            <Button Content="Run setup again" Margin="0,0,8,0" Click="OnRunSetup" AutomationProperties.AutomationId="RunSetupAgain" />
+            <Button Content="Quit DBD Presence" Click="OnQuit" AutomationProperties.AutomationId="QuitApp" />
+          </StackPanel>
+          <TextBlock Style="{StaticResource Text.Label}" Text="Uninstall" Margin="0,24,0,0" />
+          <TextBlock Style="{StaticResource Text.Body}" Text="{x:Static vm:AboutViewModel.UninstallText}" TextWrapping="Wrap" MaxWidth="640" Margin="0,4,0,0"
+                     AutomationProperties.AutomationId="UninstallText" />
+          <Button Content="Uninstall DBD Presence…" Command="{Binding UninstallCommand}" HorizontalAlignment="Left" Margin="0,8,0,0"
+                  Visibility="{Binding CanUninstall, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="UninstallApp"
+                  AutomationProperties.Name="Uninstall DBD Presence" />
+          <TextBlock Style="{StaticResource InlineMessage}" Foreground="{DynamicResource DangerBrush}" Text="{Binding UninstallError}"
+                     Visibility="{Binding UninstallError, Converter={StaticResource VisibleWhen}}" views:LiveRegion.Announce="True" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

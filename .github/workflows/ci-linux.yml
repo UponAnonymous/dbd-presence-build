@@ -1,0 +1,104 @@
+# Fast checks on every code push: build (incl. Windows-targeted projects), format, hygiene, platform-neutral
+# and architecture tests with coverage, dependency vulnerability gate.
+name: CI (Linux)
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Push and pull_request runs of the same branch share a group, so only the newest runs.
+concurrency:
+  group: ci-linux-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  build-test:
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+          # No dependency cache in this job: it can run on the owner's PC (vars.LINUX_RUNNER), and the Actions cache is shared with jobs that hold
+          # secrets, so a job on the PC could hand them modified packages (local CI round 3, red-team L7; build/check-workflows.py). Every package is
+          # restored from the lock files instead.
+
+      - name: Restore (locked, with NuGet audit)
+        run: dotnet restore DbdPresence.slnx --locked-mode
+
+      - name: Build (warnings are errors)
+        run: dotnet build DbdPresence.slnx -c Release --no-restore
+
+      - name: Format check
+        run: dotnet format DbdPresence.slnx --verify-no-changes --no-restore
+
+      - name: Source hygiene (placeholders, swallowed exceptions, empty handlers)
+        run: python3 build/check-source-hygiene.py
+
+      - name: Compiled-in service keys (staging valid; production never equal to staging)
+        run: |
+          python3 build/check-online-keys.py --self-test
+          python3 build/check-online-keys.py
+
+      - name: MSIX version mapping (Directory.Build.props to X.Y.Z.0)
+        run: python3 build/msix_version.py --self-test
+
+      - name: Test (platform-neutral + architecture) with coverage
+        run: |
+          set -euo pipefail
+          for p in $(python3 build/list-test-projects.py linux); do
+            # Coverage is measured everywhere except the Vision tests: NFR-MAINT-02 sets no target for them, and instrumenting their pixel loops made
+            # them run 36 minutes instead of about 1 (2026-11-01). Every Vision test still runs and must pass.
+            cov=(--coverlet --coverlet-output-format cobertura)
+            if [ "$(basename "$p")" = "DbdPresence.Vision.Tests" ]; then cov=(); fi
+            dotnet test --project "$p" -c Release --no-build \
+              --report-trx "${cov[@]}" \
+              --results-directory "TestResults/$(basename "$p")"
+          done
+
+      - name: Coverage summary
+        if: always()
+        run: python3 build/ci-report.py coverage TestResults >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Vulnerability gate
+        run: |
+          set -euo pipefail
+          dotnet list DbdPresence.slnx package --vulnerable --include-transitive --format json > vuln.json
+          python3 build/ci-report.py vulnerable vuln.json
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: linux-test-results
+          path: |
+            TestResults/
+            vuln.json
+          retention-days: 7
+
+  workflows:
+    # Threat-model review TM-13: every action pinned to a commit SHA, top-level permissions, no pull_request_target.
+    # This workflow runs for any change outside docs/, so a change to .github/workflows is always checked.
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Workflow rules (SHA pins, permissions, triggers)
+        run: |
+          python3 build/check-workflows.py --self-test
+          python3 build/check-workflows.py

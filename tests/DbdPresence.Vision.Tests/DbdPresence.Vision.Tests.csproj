@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Vision/DbdPresence.Vision.csproj" />
+    <ProjectReference Include="../../src/DbdPresence.Study/DbdPresence.Study.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--
+      The evaluator tool's platform-neutral code (the labelling pipeline itself is the DbdPresence.Study library, which also carries the study tool's PNG writer and session-folder rules), compiled into the test assembly so it runs on Linux with a fake recogniser and synthetic pictures
+      (mechanics only). Program.cs, the only Windows-specific file, is left out. The study tool's recording metadata and session-folder rules are linked
+      too, so the tests write recordings with the study tool's own writer and check the 30-day clean-up covers the evaluator's files.
+    -->
+    <Compile Include="../../tools/DbdPresence.Eval/*.cs" Exclude="../../tools/DbdPresence.Eval/Program.cs" Link="Eval/Linked/%(Filename)%(Extension)" />
+    <!-- Writes a reviewer-labelled recording without the evaluator tool; the Windows UI tests of the Study page use the same file. -->
+    <Compile Include="../Shared/StudyRecordingFixture.cs" Link="Shared/StudyRecordingFixture.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The committed OCR-noise corpus (text only; no game imagery). -->
+    <None Include="Corpus/**" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The reviewed roster seed (code, id, role), shared with the Packs suite and the service (PLAN_V2_S5B §2.1). -->
+    <None Include="../fixtures/roster/**" Link="Fixtures/roster/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

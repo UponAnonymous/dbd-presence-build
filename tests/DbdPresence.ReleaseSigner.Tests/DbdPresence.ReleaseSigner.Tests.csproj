@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Packs/DbdPresence.Packs.csproj" />
+    <ProjectReference Include="../../tools/DbdPresence.ReleaseSigner/DbdPresence.ReleaseSigner.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The compiled-in key list: no real release or recovery key may be in it before the owner makes them. -->
+    <None Include="../../src/DbdPresence.Online/TrustedServiceKeys.json" Link="Fixtures/TrustedServiceKeys.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/TestPackages.cs" Link="Shared/TestPackages.cs" />
+    <Using Include="DbdPresence.TestSupport" />
+    <!-- As in the WPF app, System.IO is not an implicit using, so the linked app and shared files compile the same way here. -->
+    <Using Remove="System.IO" />
+  </ItemGroup>
+</Project>

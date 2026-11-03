@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DbdPresence.Core/DbdPresence.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Closed English vocabulary with its source and retrieval date (DETECTION_VALIDATION; ADR-0004). -->
+    <EmbeddedResource Include="Vocabulary/vocabulary.en.json" WithCulture="false" LogicalName="DbdPresence.Vision.Vocabulary.vocabulary.en.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Closed prompt-to-killer map: only prompts seen on the owner's screen, with where and when (no website is read: D31, D35). -->
+    <EmbeddedResource Include="Prompts/power-prompts.en.json" WithCulture="false" LogicalName="DbdPresence.Vision.Prompts.power-prompts.en.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DbdPresence.Vision.Tests" />
+  </ItemGroup>
+</Project>

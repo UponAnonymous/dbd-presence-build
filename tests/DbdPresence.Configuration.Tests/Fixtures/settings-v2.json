@@ -1,0 +1,1108 @@
+{
+  "schemaVersion": 2,
+  "firstRunCompleted": true,
+  "discord": {
+    "displayName": "Fog Watcher",
+    "selectedApplication": "dbd",
+    "useOwnApplication": false,
+    "ownApplicationId": "",
+    "applicationName": "DBD Presence"
+  },
+  "activeProfileId": "killer-main",
+  "profiles": [
+    {
+      "id": "default",
+      "name": "Default",
+      "activityKind": "Playing",
+      "statusDisplay": null,
+      "nameOverride": "",
+      "whenNotRunning": "Clear",
+      "whenPaused": "Clear",
+      "templates": {
+        "byState": {
+          "NotRunning": {
+            "details": "Taking a break from the Fog",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}][ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "[{role}][ · {mode}]",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "MainMenu": {
+            "details": "In the main menu",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Matchmaking": {
+            "details": "Searching for a match",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Lobby": {
+            "details": "In a lobby",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "LobbySurvivor": {
+            "details": "In a lobby",
+            "state": "Survivor[ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "LobbyKiller": {
+            "details": "In a lobby",
+            "state": "Killer[ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Loading": {
+            "details": "Entering the Fog",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "InTrial": {
+            "details": "In a trial[ · {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "InTrialSurvivor": {
+            "details": "In a trial[ · {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "MapArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "InTrialKiller": {
+            "details": "Hunting[ on {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "Results": {
+            "details": "Viewing results",
+            "state": "[{result}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "streamerTemplates": {
+        "byState": {
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "visibility": {
+        "showMap": true,
+        "showRole": true,
+        "showCharacter": true,
+        "showTimers": true,
+        "showButtons": true,
+        "showSmallImage": true,
+        "showLiveMatchStats": false,
+        "postMatchDetailsOnly": false,
+        "allowApproximateDurations": false
+      },
+      "artwork": {
+        "appLogo": "app_logo",
+        "roleSurvivor": "role_survivor",
+        "roleKiller": "role_killer",
+        "maps": {},
+        "fallback": "app_logo",
+        "confirmedUploadedKeys": [],
+        "replaceUnconfirmedKeys": false
+      },
+      "manual": {
+        "role": "None",
+        "roleSource": "AutoWithManualFallback",
+        "character": "",
+        "mode": "Unknown"
+      }
+    },
+    {
+      "id": "survivor-main",
+      "name": "Survivor main",
+      "activityKind": "Playing",
+      "statusDisplay": null,
+      "nameOverride": "",
+      "whenNotRunning": "Clear",
+      "whenPaused": "Clear",
+      "templates": {
+        "byState": {
+          "NotRunning": {
+            "details": "Taking a break from the Fog",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}][ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "[{role}][ · {mode}]",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "MainMenu": {
+            "details": "In the main menu",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Matchmaking": {
+            "details": "Searching for a match",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Lobby": {
+            "details": "In a lobby",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "LobbySurvivor": {
+            "details": "In a lobby",
+            "state": "Survivor[ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "LobbyKiller": {
+            "details": "In a lobby",
+            "state": "Killer[ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Loading": {
+            "details": "Entering the Fog",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "InTrial": {
+            "details": "In a trial[ · {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "InTrialSurvivor": {
+            "details": "In a trial[ · {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "MapArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "InTrialKiller": {
+            "details": "Hunting[ on {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "Results": {
+            "details": "Viewing results",
+            "state": "[{result}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "streamerTemplates": {
+        "byState": {
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "visibility": {
+        "showMap": true,
+        "showRole": true,
+        "showCharacter": true,
+        "showTimers": true,
+        "showButtons": true,
+        "showSmallImage": true,
+        "showLiveMatchStats": false,
+        "postMatchDetailsOnly": false,
+        "allowApproximateDurations": false
+      },
+      "artwork": {
+        "appLogo": "app_logo",
+        "roleSurvivor": "role_survivor",
+        "roleKiller": "role_killer",
+        "maps": {},
+        "fallback": "app_logo",
+        "confirmedUploadedKeys": [],
+        "replaceUnconfirmedKeys": false
+      },
+      "manual": {
+        "role": "Survivor",
+        "roleSource": "AutoWithManualFallback",
+        "character": "",
+        "mode": "Unknown"
+      }
+    },
+    {
+      "id": "killer-main",
+      "name": "Killer main",
+      "activityKind": "Playing",
+      "statusDisplay": null,
+      "nameOverride": "",
+      "whenNotRunning": "Clear",
+      "whenPaused": "Clear",
+      "templates": {
+        "byState": {
+          "NotRunning": {
+            "details": "Taking a break from the Fog",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}][ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "[{role}][ · {mode}]",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "MainMenu": {
+            "details": "In the main menu",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Matchmaking": {
+            "details": "Searching for a match",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Lobby": {
+            "details": "In a lobby",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "LobbySurvivor": {
+            "details": "In a lobby",
+            "state": "Survivor[ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "LobbyKiller": {
+            "details": "In a lobby",
+            "state": "Killer[ · {character}]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "Loading": {
+            "details": "Entering the Fog",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          },
+          "InTrial": {
+            "details": "In a trial[ · {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "InTrialSurvivor": {
+            "details": "In a trial[ · {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "MapArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "InTrialKiller": {
+            "details": "Hunting[ on {map}]",
+            "state": "[{generators} gens left]",
+            "largeImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "Match"
+          },
+          "Results": {
+            "details": "Viewing results",
+            "state": "[{result}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "RoleArtwork",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "streamerTemplates": {
+        "byState": {
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "visibility": {
+        "showMap": true,
+        "showRole": true,
+        "showCharacter": true,
+        "showTimers": true,
+        "showButtons": true,
+        "showSmallImage": true,
+        "showLiveMatchStats": false,
+        "postMatchDetailsOnly": false,
+        "allowApproximateDurations": false
+      },
+      "artwork": {
+        "appLogo": "app_logo",
+        "roleSurvivor": "role_survivor",
+        "roleKiller": "role_killer",
+        "maps": {},
+        "fallback": "app_logo",
+        "confirmedUploadedKeys": [],
+        "replaceUnconfirmedKeys": false
+      },
+      "manual": {
+        "role": "Killer",
+        "roleSource": "AutoWithManualFallback",
+        "character": "",
+        "mode": "Unknown"
+      }
+    },
+    {
+      "id": "streamer",
+      "name": "Streamer",
+      "activityKind": "Playing",
+      "statusDisplay": null,
+      "nameOverride": "",
+      "whenNotRunning": "Clear",
+      "whenPaused": "Clear",
+      "templates": {
+        "byState": {
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "streamerTemplates": {
+        "byState": {
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "visibility": {
+        "showMap": false,
+        "showRole": true,
+        "showCharacter": true,
+        "showTimers": false,
+        "showButtons": true,
+        "showSmallImage": true,
+        "showLiveMatchStats": false,
+        "postMatchDetailsOnly": false,
+        "allowApproximateDurations": false
+      },
+      "artwork": {
+        "appLogo": "app_logo",
+        "roleSurvivor": "role_survivor",
+        "roleKiller": "role_killer",
+        "maps": {},
+        "fallback": "app_logo",
+        "confirmedUploadedKeys": [],
+        "replaceUnconfirmedKeys": false
+      },
+      "manual": {
+        "role": "None",
+        "roleSource": "AutoWithManualFallback",
+        "character": "",
+        "mode": "Unknown"
+      }
+    },
+    {
+      "id": "special-mode",
+      "name": "Special mode",
+      "activityKind": "Playing",
+      "statusDisplay": null,
+      "nameOverride": "",
+      "whenNotRunning": "Clear",
+      "whenPaused": "Clear",
+      "templates": {
+        "byState": {
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "GameSession"
+          }
+        }
+      },
+      "streamerTemplates": {
+        "byState": {
+          "Launching": {
+            "details": "Launching Dead by Daylight",
+            "state": "",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          },
+          "Running": {
+            "details": "Playing Dead by Daylight",
+            "state": "[As {role}]",
+            "largeImage": {
+              "source": "AppLogo",
+              "value": null
+            },
+            "largeText": "",
+            "smallImage": {
+              "source": "None",
+              "value": null
+            },
+            "smallText": "",
+            "buttons": [],
+            "timer": "None"
+          }
+        }
+      },
+      "visibility": {
+        "showMap": true,
+        "showRole": true,
+        "showCharacter": true,
+        "showTimers": true,
+        "showButtons": true,
+        "showSmallImage": true,
+        "showLiveMatchStats": false,
+        "postMatchDetailsOnly": false,
+        "allowApproximateDurations": false
+      },
+      "artwork": {
+        "appLogo": "app_logo",
+        "roleSurvivor": "role_survivor",
+        "roleKiller": "role_killer",
+        "maps": {},
+        "fallback": "app_logo",
+        "confirmedUploadedKeys": [],
+        "replaceUnconfirmedKeys": false
+      },
+      "manual": {
+        "role": "None",
+        "roleSource": "AutoWithManualFallback",
+        "character": "",
+        "mode": "Other"
+      }
+    }
+  ],
+  "privacy": {
+    "streamerMode": false,
+    "hideFullActivity": false,
+    "pauseCaptureWhenUnfocused": true
+  },
+  "appearance": {
+    "theme": "Dark",
+    "accent": "#5B9BFF",
+    "surfaceTint": "",
+    "density": "Compact",
+    "fontScalePercent": 110,
+    "reduceMotion": null
+  },
+  "lifecycle": {
+    "startWithWindows": true,
+    "startMinimised": false,
+    "closeToTray": true,
+    "notifications": "CriticalOnly",
+    "extraProcessNames": [
+      "DeadByDaylight-WinGDK-Shipping.exe"
+    ]
+  },
+  "detection": {
+    "enabled": false,
+    "riskAcknowledged": false,
+    "menuScanIntervalMs": 1000,
+    "trialScanIntervalMs": 1000,
+    "lowImpact": false,
+    "locale": "en-US",
+    "useGameVersion": true
+  }
+}

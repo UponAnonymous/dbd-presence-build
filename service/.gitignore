@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env
+*.public.txt
+.vitest/
+wrangler.generated.*.json

@@ -1,0 +1,266 @@
+<UserControl x:Class="DbdPresence.App.Views.DiscordStatusPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:DbdPresence.App.Views"
+             xmlns:vm="clr-namespace:DbdPresence.Presentation.ViewModels;assembly=DbdPresence.Presentation"
+             AutomationProperties.AutomationId="DiscordStatusPage">
+  <ScrollViewer Style="{StaticResource PageScroll}">
+    <StackPanel Style="{StaticResource PageBody}">
+      <TextBlock Style="{StaticResource Text.Title}" Text="Discord status" />
+      <TextBlock Style="{StaticResource Text.Muted}" Margin="0,4,0,16" HorizontalAlignment="Left" MaxWidth="640"
+                 Text="Choose what your friends see. Changes reach Discord within a few seconds." />
+
+      <Border Style="{StaticResource InfoStrip.Danger}" Visibility="{Binding ValidationMessage, Converter={StaticResource VisibleWhen}}">
+        <TextBlock Style="{StaticResource Text.Body}" Text="{Binding ValidationMessage}" views:LiveRegion.Announce="True" />
+      </Border>
+      <Border Style="{StaticResource InfoStrip}" Visibility="{Binding Controls.IsPaused, Converter={StaticResource VisibleWhen}}">
+        <TextBlock Style="{StaticResource Text.Body}" Text="You're paused. Changes are saved and show when you resume." />
+      </Border>
+
+      <Grid views:ResponsiveColumns.StackBelow="760" views:ResponsiveColumns.ReverseWhenStacked="True">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="24" />
+          <ColumnDefinition Width="340" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Left: the choices -->
+        <StackPanel>
+          <!-- 1. Style -->
+          <Border Style="{StaticResource SectionCard}">
+            <StackPanel>
+              <TextBlock Style="{StaticResource SectionTitle}" Text="Style" Margin="0,0,0,16" />
+              <Border Style="{StaticResource Badge}" HorizontalAlignment="Left" Margin="0,0,0,8" Visibility="{Binding HasOwnText, Converter={StaticResource VisibleWhen}}">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Style="{StaticResource Text.Label}" Text="Your own text" AutomationProperties.AutomationId="OwnTextChip" />
+                  <TextBlock Style="{StaticResource Text.Caption}" Text="Edit in Advanced" Margin="8,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+              </Border>
+              <ItemsControl ItemsSource="{Binding Cards}" KeyboardNavigation.IsTabStop="False">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <!-- Fixed-width tiles that wrap to the next row, so names wrap only between words and nothing clips at a larger font scale. -->
+                    <WrapPanel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <RadioButton Style="{StaticResource StyleCard}" Width="160" VerticalAlignment="Top" GroupName="StatusStyle" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                                 Command="{Binding DataContext.SelectStyleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Style}"
+                                 AutomationProperties.AutomationId="{Binding Style, StringFormat=StyleCard-{0}}" AutomationProperties.Name="{Binding AutomationName}">
+                      <StackPanel>
+                        <Border Style="{StaticResource Inset}" Margin="0,0,0,8" MinHeight="64" Padding="8">
+                          <StackPanel VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="{Binding Line1}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding Line2}" TextTrimming="CharacterEllipsis" />
+                          </StackPanel>
+                        </Border>
+                        <TextBlock Style="{StaticResource Text.Label}" Text="{Binding Name}" />
+                        <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding Caption}" />
+                      </StackPanel>
+                    </RadioButton>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <Grid Visibility="{Binding StyleNote, Converter={StaticResource VisibleWhen}}">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{StaticResource Text.Body}" Text="{Binding StyleNote}" VerticalAlignment="Center" Margin="0,0,16,0"
+                           views:LiveRegion.Announce="True" AutomationProperties.AutomationId="StyleNote" />
+                <Button Grid.Column="1" Content="Undo" Command="{Binding UndoStyleCommand}" AutomationProperties.AutomationId="UndoStyle" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- 2. What to show -->
+          <Border Style="{StaticResource SectionCard}">
+            <StackPanel>
+              <TextBlock Style="{StaticResource SectionTitle}" Text="What to show" Margin="0,0,0,8" />
+              <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding PrivateNote}" Margin="0,0,0,8" Visibility="{Binding IsPrivate, Converter={StaticResource VisibleWhen}}" />
+              <Border Style="{StaticResource InfoStrip}" Visibility="{Binding ShowScreenReadingOffStrip, Converter={StaticResource VisibleWhen}}" Margin="0,0,0,16">
+                <StackPanel>
+                  <TextBlock Style="{StaticResource Text.Body}" Text="{Binding ScreenReadingOffStrip}" AutomationProperties.AutomationId="ScreenReadingOffStrip" />
+                  <Button Style="{StaticResource Button.Subtle}" Content="Settings ›" HorizontalAlignment="Left" Margin="0,8,0,0"
+                          Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="settings"
+                          AutomationProperties.AutomationId="OpenSettingsFromStatus" />
+                </StackPanel>
+              </Border>
+
+              <TextBlock Style="{StaticResource Text.Overline}" Text="YOU" Margin="0,8,0,0" />
+              <StackPanel DataContext="{Binding Privacy}">
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowScene}" Content="Show where you are" AutomationProperties.AutomationId="ShowScene" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="Menu, lobby, searching, loading, in a match, spectating or after the match." />
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowRole}" Content="Show my role" AutomationProperties.AutomationId="ShowRole" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="Killer or Survivor." />
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowCharacter}" Content="Show my character" AutomationProperties.AutomationId="ShowCharacter" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="The killer or survivor you're playing." />
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowMode}" Content="Show the game mode" AutomationProperties.AutomationId="ShowMode" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="1v4, 2v8, custom game, an event, tutorial or another mode." />
+              </StackPanel>
+
+              <TextBlock Style="{StaticResource Text.Overline}" Text="THE MATCH" Margin="0,24,0,0" />
+              <StackPanel DataContext="{Binding Privacy}">
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowMap}" Content="Show the map" AutomationProperties.AutomationId="ShowMap" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="The map and realm of your match." />
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowLiveMatchStats}" Content="Show live match details" AutomationProperties.AutomationId="ShowLiveMatchStats" />
+                <TextBlock Style="{StaticResource Text.Caption}"
+                           Text="Generators left, survivors on hooks, and your hook or dying badge, while the match is on. Off by default so nobody can use it against you." />
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowResult}" Content="Show the match result" AutomationProperties.AutomationId="ShowResult" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="Escaped, sacrificed, or your killer result, after the match." />
+                <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowTimers}" Content="Show match timer" AutomationProperties.AutomationId="ShowTimers" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="How long you've been playing or in the match." />
+              </StackPanel>
+              <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE946;" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,8,0" VerticalAlignment="Top" />
+                <TextBlock Grid.Column="1" Style="{StaticResource Text.Muted}" Text="{Binding KillerLine}" AutomationProperties.AutomationId="KillerLine" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- 3. Pictures -->
+          <Border Style="{StaticResource SectionCard}">
+            <StackPanel>
+              <TextBlock Style="{StaticResource SectionTitle}" Text="Pictures" Margin="0,0,0,16" />
+              <TextBlock Style="{StaticResource Text.Label}" Text="Big picture" Margin="0,0,0,8" />
+              <ItemsControl ItemsSource="{Binding BigPictures}" KeyboardNavigation.IsTabStop="False" AutomationProperties.AutomationId="BigPictureChoices">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <RadioButton Style="{StaticResource Chip}" GroupName="BigPicture" Content="{Binding Label}"
+                                 Command="{Binding DataContext.SelectBigPictureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Value}"
+                                 AutomationProperties.AutomationId="{Binding Value, StringFormat=BigPicture-{0}}" AutomationProperties.Name="{Binding Label, StringFormat=Big picture: {0}}">
+                      <RadioButton.IsChecked>
+                        <MultiBinding Mode="OneWay" Converter="{StaticResource ValuesEqual}">
+                          <Binding Path="DataContext.SelectedBig" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                          <Binding Path="Value" />
+                        </MultiBinding>
+                      </RadioButton.IsChecked>
+                    </RadioButton>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Style="{StaticResource Text.Caption}" Text="Applies to every moment that shows a big picture. My character falls back to your role icon." />
+              <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding NoBigPictureNote}" Visibility="{Binding ShowNoBigPictureNote, Converter={StaticResource VisibleWhen}}"
+                         AutomationProperties.AutomationId="NoBigPictureNote" />
+
+              <TextBlock Style="{StaticResource Text.Label}" Text="Small badge" Margin="0,16,0,8" />
+              <ItemsControl ItemsSource="{Binding SmallBadges}" KeyboardNavigation.IsTabStop="False" AutomationProperties.AutomationId="SmallBadgeChoices">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <RadioButton Style="{StaticResource Chip}" GroupName="SmallBadge" Content="{Binding Label}"
+                                 Command="{Binding DataContext.SelectSmallBadgeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Value}"
+                                 AutomationProperties.AutomationId="{Binding Value, StringFormat=SmallBadge-{0}}" AutomationProperties.Name="{Binding Label, StringFormat=Small badge: {0}}">
+                      <RadioButton.IsChecked>
+                        <MultiBinding Mode="OneWay" Converter="{StaticResource ValuesEqual}">
+                          <Binding Path="DataContext.SelectedSmall" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                          <Binding Path="Value" />
+                        </MultiBinding>
+                      </RadioButton.IsChecked>
+                    </RadioButton>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" TextWrapping="Wrap" Text="{Binding AutomaticCaption}" AutomationProperties.AutomationId="AutomaticCaption" />
+              <Button Style="{StaticResource Button.Subtle}" Content="Choose character pictures ›" HorizontalAlignment="Left" Margin="0,16,0,0"
+                      Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="characters"
+                      AutomationProperties.AutomationId="ChooseCharacterPictures" />
+            </StackPanel>
+          </Border>
+
+          <!-- 4. When you're not playing -->
+          <Border Style="{StaticResource SectionCard}">
+            <StackPanel DataContext="{Binding Privacy}">
+              <TextBlock Style="{StaticResource SectionTitle}" Text="When you're not playing" Margin="0,0,0,8" />
+              <CheckBox Style="{StaticResource SettingSwitch}" IsChecked="{Binding ShowWhenNotRunning}" Content="Show “Taking a break” while the game is closed"
+                        AutomationProperties.AutomationId="ShowWhenNotRunning" />
+              <TextBlock Style="{StaticResource Text.Caption}" Text="Off: Discord shows nothing." />
+              <TextBlock Style="{StaticResource Text.Label}" Text="While paused" Margin="0,16,0,0" />
+              <RadioButton Style="{StaticResource Choice}" GroupName="WhilePaused" Content="Show nothing"
+                           IsChecked="{Binding PauseShowsGeneric, Converter={StaticResource BoolNot}}" AutomationProperties.AutomationId="PauseShowsNothing" />
+              <RadioButton Style="{StaticResource Choice}" GroupName="WhilePaused" Content="Show that I'm playing"
+                           IsChecked="{Binding PauseShowsGeneric}" AutomationProperties.AutomationId="PauseShowsGeneric" />
+            </StackPanel>
+          </Border>
+
+          <!-- 5. Name after "Playing" -->
+          <Border Style="{StaticResource SectionCard}">
+            <StackPanel DataContext="{Binding AppStartup}">
+              <TextBlock Style="{StaticResource SectionTitle}" Text="Name after “Playing”" Margin="0,0,0,8" />
+              <ComboBox Style="{StaticResource ChoiceCombo}" ItemsSource="{Binding DisplayNameChoices}" SelectedValue="{Binding SelectedDisplayName}"
+                        AutomationProperties.AutomationId="DisplayNameChoice" AutomationProperties.Name="Name shown after Playing"
+                        AutomationProperties.HelpText="Discord shows “Playing” followed by this text. Pick a quick name or choose Custom to type your own." />
+              <TextBox Text="{Binding CustomDisplayName, UpdateSourceTrigger=PropertyChanged}" MaxLength="128" MaxWidth="360" HorizontalAlignment="Left" MinWidth="280" Margin="0,8,0,0"
+                       Visibility="{Binding IsCustomDisplayName, Converter={StaticResource VisibleWhen}}"
+                       AutomationProperties.AutomationId="DisplayName" AutomationProperties.Name="Custom name shown after Playing"
+                       AutomationProperties.HelpText="1 to 128 characters. Saved as you type." />
+              <TextBlock Style="{StaticResource InlineMessage}" Foreground="{DynamicResource DangerBrush}" Text="{Binding DisplayNameError}"
+                         Visibility="{Binding DisplayNameError, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="DisplayNameError" />
+              <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{x:Static vm:AppCopy.NameIsOnlyText}" />
+            </StackPanel>
+          </Border>
+
+          <!-- 6. Advanced -->
+          <Expander Header="Advanced: write your own text, buttons and more" IsExpanded="False" Margin="0,0,0,16"
+                    AutomationProperties.AutomationId="StatusAdvancedExpander" AutomationProperties.Name="Advanced">
+            <views:StudioAdvancedView />
+          </Expander>
+        </StackPanel>
+
+        <!-- Right: the live preview (what Discord shows, D29) -->
+        <StackPanel Grid.Column="2">
+          <TextBlock Style="{StaticResource SectionTitle}" Text="Preview" Margin="0,8,0,8" />
+          <TextBlock Style="{StaticResource Text.Body}" Text="{Binding PausedLine}" Margin="0,0,0,8" Visibility="{Binding PausedLine, Converter={StaticResource VisibleWhen}}"
+                     AutomationProperties.AutomationId="PausedLine" />
+          <Grid Margin="0,0,0,8" Visibility="{Binding Live.DeliveryNote, Converter={StaticResource VisibleWhen}}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE7BA;" Foreground="{DynamicResource WarningBrush}" Margin="0,0,8,0" VerticalAlignment="Top" />
+            <TextBlock Grid.Column="1" Style="{StaticResource Text.Body}" Text="{Binding Live.DeliveryNote}" AutomationProperties.AutomationId="DeliveryNote" />
+          </Grid>
+          <ContentPresenter Content="{Binding Preview}" Visibility="{Binding Live.IsEmpty, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}" />
+          <Border Style="{StaticResource Inset}" MinHeight="120" Visibility="{Binding Live.IsEmpty, Converter={StaticResource VisibleWhen}}">
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding Live.EmptyText}" VerticalAlignment="Center" AutomationProperties.AutomationId="EmptyCardText" />
+          </Border>
+          <ItemsControl ItemsSource="{Binding Hints}" AutomationProperties.AutomationId="PreviewHints" />
+          <ItemsControl ItemsSource="{Binding ShownReasons}" Margin="0,16,0,0" AutomationProperties.AutomationId="WhyHidden" KeyboardNavigation.IsTabStop="False">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid Margin="0,8,0,0">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE946;" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,8,0" VerticalAlignment="Top" />
+                  <TextBlock Grid.Column="1" Style="{StaticResource Text.Body}" Text="{Binding}" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <Button Style="{StaticResource Button.Subtle}" Content="{Binding ShowAllLabel}" HorizontalAlignment="Left" Margin="0,8,0,0"
+                  Visibility="{Binding ShowAllVisible, Converter={StaticResource VisibleWhen}}" Command="{Binding ShowAllReasonsNowCommand}" AutomationProperties.AutomationId="ShowAllReasons" />
+        </StackPanel>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

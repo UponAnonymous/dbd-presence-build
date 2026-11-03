@@ -1,0 +1,156 @@
+# DBD Presence online service (ADR-0010). Always deploy with an explicit environment:
+#   npx wrangler deploy --env staging
+#   npx wrangler deploy --env production
+# Staging and production are fully separate: own Worker, database, buckets, hosts, keys and Discord application
+# (FR-ADM-06). Secrets are declared by name only and entered by the owner (docs/owner/cloudflare-setup.md);
+# no secret value is ever written in this repository. CONTENT_SIGNING_KEY signs the pack index (V2-S4).
+# The content host (cdn[-staging].arcavale.com) is a custom domain of the same Worker: every path on it reaches
+# src/routes/cdn.ts, which serves only /packs/<sha256>.<png|jpg> from the PACKS bucket, /u/<32 hex>.<png|jpg> from the
+# UPLOADS bucket and /releases/<sha256>.nupkg from the RELEASES bucket, and answers 404 to the rest.
+
+name = "dbd-presence-service"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+workers_dev = false
+preview_urls = false
+
+# ---------------------------------------------------------------------------------------------------------------
+[env.staging]
+name = "dbd-presence-service-staging"
+workers_dev = false
+preview_urls = false
+routes = [
+  { pattern = "api-staging.arcavale.com", custom_domain = true },
+  { pattern = "admin-staging.arcavale.com/api/*", zone_name = "arcavale.com" },
+  { pattern = "cdn-staging.arcavale.com", custom_domain = true },
+]
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+API_HOST = "api-staging.arcavale.com"
+ADMIN_HOST = "admin-staging.arcavale.com"
+CDN_HOST = "cdn-staging.arcavale.com"
+# Public halves of the owner's offline keys (V2-S6, ADR-0012): the release key signs release feeds and the recovery key
+# signs key replacements. Public values only, equal to this environment's entries in TrustedServiceKeys.json
+# (build/check-online-keys.py checks it). The private keys never reach the Worker (docs/owner/release-keys.md).
+OFFLINE_PUBLIC_KEYS = '[]'
+# Automatic labelling of the owner's study recordings (D37, ADR-0018, src/routes/study.ts): the model the relay asks for.
+# The key is the optional secret STUDY_LABELLER_KEY (not in the required list: without it the relay answers 503).
+STUDY_LABELLER_MODEL = "claude-opus-5-5"
+# Where the relay forwards and which headers the provider requires (kept here, not in src/, so the Worker bundle carries no
+# provider text and ci-service's branding scan of the bundle stays on). Checked at use; invalid or missing: 503.
+STUDY_LABELLER_PROVIDER = '{"url":"https://api.anthropic.com/v1/messages","keyHeader":"x-api-key","headers":{"anthropic-version":"2026-10-21","anthropic-beta":"server-side-fallback-2026-07-01"}}'
+
+# Daily: the audit export, then retention.
+[env.staging.triggers]
+crons = ["23 3 * * *"]
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "dbd-presence-staging"
+migrations_dir = "migrations"
+
+[[env.staging.r2_buckets]]
+binding = "PACKS"
+bucket_name = "dbd-presence-staging-packs"
+
+[[env.staging.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "dbd-presence-staging-uploads"
+
+# Daily append-only audit export (src/audit-export.ts). The Worker only writes new objects; the owner adds a bucket
+# lock rule so exported rows cannot be overwritten or deleted (docs/owner/cloudflare-setup.md).
+[[env.staging.r2_buckets]]
+binding = "AUDIT_EXPORT"
+bucket_name = "dbd-presence-staging-audit"
+
+# Signed update packages (V2-S6): <sha256>.nupkg, only the packages the published release feeds list (the last 3 per channel).
+[[env.staging.r2_buckets]]
+binding = "RELEASES"
+bucket_name = "dbd-presence-staging-releases"
+
+# The staging Discord application is separate from production; its (public) client ID is entered like a secret
+# because that application is registered by the owner during set-up.
+[env.staging.secrets]
+required = [
+  "DISCORD_CLIENT_ID",
+  "DISCORD_CLIENT_SECRET",
+  "INVITE_HMAC_KEYS",
+  "BAN_HMAC_KEY",
+  "LICENCE_SIGNING_KEY",
+  "CONFIG_SIGNING_KEY",
+  "CONTENT_SIGNING_KEY",
+  "ACCESS_AUD",
+  "ACCESS_TEAM_DOMAIN",
+  "OWNER_EMAILS",
+]
+
+# ---------------------------------------------------------------------------------------------------------------
+[env.production]
+name = "dbd-presence-service-production"
+workers_dev = false
+preview_urls = false
+routes = [
+  { pattern = "api.arcavale.com", custom_domain = true },
+  { pattern = "admin.arcavale.com/api/*", zone_name = "arcavale.com" },
+  { pattern = "cdn.arcavale.com", custom_domain = true },
+]
+
+[env.production.vars]
+ENVIRONMENT = "production"
+API_HOST = "api.arcavale.com"
+ADMIN_HOST = "admin.arcavale.com"
+CDN_HOST = "cdn.arcavale.com"
+# The official "Dead by Daylight" application (public identifier; src/DbdPresence.Configuration/ApplicationCatalog.cs).
+DISCORD_CLIENT_ID = "1563291325107937340"
+# Public halves of the owner's offline keys (V2-S6, ADR-0012): the release key signs release feeds and the recovery key
+# signs key replacements. Public values only, equal to this environment's entries in TrustedServiceKeys.json
+# (build/check-online-keys.py checks it). The private keys never reach the Worker (docs/owner/release-keys.md).
+OFFLINE_PUBLIC_KEYS = '[]'
+# Automatic labelling of the owner's study recordings (D37, ADR-0018, src/routes/study.ts): the model the relay asks for.
+# The key is the optional secret STUDY_LABELLER_KEY (not in the required list: without it the relay answers 503).
+STUDY_LABELLER_MODEL = "claude-opus-5-5"
+# Where the relay forwards and which headers the provider requires (kept here, not in src/, so the Worker bundle carries no
+# provider text and ci-service's branding scan of the bundle stays on). Checked at use; invalid or missing: 503.
+STUDY_LABELLER_PROVIDER = '{"url":"https://api.anthropic.com/v1/messages","keyHeader":"x-api-key","headers":{"anthropic-version":"2026-10-21","anthropic-beta":"server-side-fallback-2026-07-01"}}'
+
+# Daily: the audit export, then retention.
+[env.production.triggers]
+crons = ["23 3 * * *"]
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "dbd-presence-production"
+migrations_dir = "migrations"
+
+[[env.production.r2_buckets]]
+binding = "PACKS"
+bucket_name = "dbd-presence-production-packs"
+
+[[env.production.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "dbd-presence-production-uploads"
+
+# Daily append-only audit export (src/audit-export.ts). The Worker only writes new objects; the owner adds a bucket
+# lock rule so exported rows cannot be overwritten or deleted (docs/owner/cloudflare-setup.md).
+[[env.production.r2_buckets]]
+binding = "AUDIT_EXPORT"
+bucket_name = "dbd-presence-production-audit"
+
+# Signed update packages (V2-S6): <sha256>.nupkg, only the packages the published release feeds list (the last 3 per channel).
+[[env.production.r2_buckets]]
+binding = "RELEASES"
+bucket_name = "dbd-presence-production-releases"
+
+[env.production.secrets]
+required = [
+  "DISCORD_CLIENT_SECRET",
+  "INVITE_HMAC_KEYS",
+  "BAN_HMAC_KEY",
+  "LICENCE_SIGNING_KEY",
+  "CONFIG_SIGNING_KEY",
+  "CONTENT_SIGNING_KEY",
+  "ACCESS_AUD",
+  "ACCESS_TEAM_DOMAIN",
+  "OWNER_EMAILS",
+]

@@ -1,0 +1,26 @@
+# Files that control what CI runs, what it can reach and what gets signed (threat-model review 2026-10-25, TM-03, TM-13).
+# With "Require review from Code Owners" on in the branch rule for main, a change here needs the owner's approval.
+# docs/owner/cloudflare-setup.md ("Protect the main branch") says how to switch that on.
+/.github/                        @UponAnonymous
+/service/scripts/                @UponAnonymous
+/build/                          @UponAnonymous
+/tools/DbdPresence.ReleaseSigner/ @UponAnonymous
+# The owner's local CI program runs with administrator rights on the owner's PC (local CI round 3, red-team M6): what it is built from, what tests it and
+# the guide that says what it does are reviewed by the owner too.
+/tools/DbdPresence.LocalCi/       @UponAnonymous
+/tests/DbdPresence.LocalCi.Tests/ @UponAnonymous
+/tests/DbdPresence.ArchitectureTests/LocalCiToolBoundaryTests*.cs @UponAnonymous
+/docs/owner/free-ci.md            @UponAnonymous
+# What the program is built with and what guards its rules (local CI round 4, red-team F11 and QA minor 1): the shared build files (a package or a setting added there is built
+# into the program without appearing in its own project file), the tool versions, the compiler and style rules, the solution, and the whole architecture test project (its helpers
+# and its project file decide what the boundary tests can see, not only the test files named above).
+/Directory.Build.props            @UponAnonymous
+/Directory.Build.targets          @UponAnonymous
+/Directory.Packages.props         @UponAnonymous
+/global.json                      @UponAnonymous
+/nuget.config                     @UponAnonymous
+/.config/                         @UponAnonymous
+/.editorconfig                    @UponAnonymous
+/DbdPresence.slnx                 @UponAnonymous
+/tests/DbdPresence.ArchitectureTests/ @UponAnonymous
+# These rules do nothing unless "Require review from Code Owners" is switched on in the branch rule for main. That is a repository setting this program cannot see: UNVERIFIED.

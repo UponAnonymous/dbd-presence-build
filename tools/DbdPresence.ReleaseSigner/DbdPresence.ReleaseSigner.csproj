@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Offline release-signing tool (V2-S6; PLAN_V2 §6.2, §6.5; ADR-0012; FR-ONL-10, NFR-SVC-05). The owner runs it on their own PC, ideally
+    disconnected, to make the release and recovery keys, sign release feeds and sign key replacements (docs/owner/release-keys.md).
+    It lives outside src/, never ships with the app, has no network code and starts no process:
+    tests/DbdPresence.ArchitectureTests/ReleaseSignerBoundaryTests.cs scans its source and its built assembly.
+    Every rule a signed document must meet is the app's own code (DbdPresence.Packs), so the tool cannot sign what the app would refuse.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Windows CI publishes it self-contained for the owner's PC (artifact release-signer-win-x64); the lock file carries the RID. -->
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>DbdPresence.ReleaseSigner</AssemblyName>
+    <RootNamespace>DbdPresence.ReleaseSigner</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Packs/DbdPresence.Packs.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DbdPresence.ReleaseSigner.Tests" />
+    <InternalsVisibleTo Include="DbdPresence.Updates.Tests" />
+  </ItemGroup>
+</Project>

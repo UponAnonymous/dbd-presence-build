@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DbdPresence.Core.Tests" />
+    <!-- The evaluator runs the engine's own K-of-N confirmation window (DETECTION_VALIDATION §6). -->
+    <InternalsVisibleTo Include="DbdPresence.Vision" />
+  </ItemGroup>
+</Project>

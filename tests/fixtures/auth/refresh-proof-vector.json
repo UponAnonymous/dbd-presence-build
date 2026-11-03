@@ -1,0 +1,18 @@
+{
+  "description": "Refresh proof made with service/src/auth/device.ts (ES256, IEEE P1363). message = 'dbdp-refresh-proof-v1\\n' + tokenHash + '\\n' + timestamp + '\\n' + nonce",
+  "refreshToken": "rt_AbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_AbCdE",
+  "tokenHash": "FSKYopnnfviQZaIEoJqw1nIdgQkkin-IB7J_tP6k_74",
+  "timestamp": 1798000000,
+  "nonce": "nonce_0123456789abcdef",
+  "message": "dbdp-refresh-proof-v1\nFSKYopnnfviQZaIEoJqw1nIdgQkkin-IB7J_tP6k_74\n1798000000\nnonce_0123456789abcdef",
+  "privateJwk": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "KVf-Pgy-EtJ7FlvlCsw40iQ6eQFHEq75Qq76U9tpVQQ",
+    "y": "93RzFSKMaAsplQ3TxJa9A9UtkIBhBjdHIw7Amilpq7w",
+    "d": "GdtdAyQ3CG8sSZi2HMnlJ0VHEHrRch1s57KFK3K8oa0"
+  },
+  "publicJwkCanonical": "{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"KVf-Pgy-EtJ7FlvlCsw40iQ6eQFHEq75Qq76U9tpVQQ\",\"y\":\"93RzFSKMaAsplQ3TxJa9A9UtkIBhBjdHIw7Amilpq7w\"}",
+  "thumbprint": "VqGVoKaFDMo8K0GD0AQYFvRchS7X7s5vZXTFsN1nJ1I",
+  "signature": "cQwBJINlou2qroWnRMXJRpMs2YmJahLB7belGT2Zdv-GeQa2Izvtn1ty3L0dRCtehg-0cCUY4rAuFOYRL0yRPA"
+}

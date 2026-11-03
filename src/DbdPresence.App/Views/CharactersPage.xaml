@@ -1,0 +1,760 @@
+<UserControl x:Class="DbdPresence.App.Views.CharactersPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:DbdPresence.App.Views"
+             xmlns:chars="clr-namespace:DbdPresence.Presentation.Characters;assembly=DbdPresence.Presentation"
+             AutomationProperties.AutomationId="CharactersPage">
+  <!-- The Characters page (docs/design/characters-page.md). Every picture shown is a local file; nothing is loaded from the web. Spacing is 8, 16, 24, 32 (4 inside a control). -->
+  <UserControl.CommandBindings>
+    <CommandBinding Command="ApplicationCommands.Find" Executed="OnFind" />
+  </UserControl.CommandBindings>
+  <UserControl.InputBindings>
+    <KeyBinding Key="F" Modifiers="Ctrl" Command="ApplicationCommands.Find" />
+  </UserControl.InputBindings>
+
+  <UserControl.Resources>
+    <!-- A glyph that is the warning sign for the strip kinds that need attention and the info sign otherwise. -->
+    <Style x:Key="StripIcon" TargetType="TextBlock" BasedOn="{StaticResource Text.Icon}">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}" />
+      <Setter Property="Text" Value="&#xE946;" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Margin" Value="0,0,16,0" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding StatusKind}" Value="RulesDeclined">
+          <Setter Property="Text" Value="&#xE7BA;" />
+          <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding StatusKind}" Value="StorageFull">
+          <Setter Property="Text" Value="&#xE7BA;" />
+          <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding StatusKind}" Value="SavingOff">
+          <Setter Property="Text" Value="&#xE7BA;" />
+          <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="WarningGlyph" TargetType="TextBlock" BasedOn="{StaticResource Text.Icon}">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}" />
+      <Setter Property="Text" Value="&#xE7BA;" />
+      <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Margin" Value="0,0,8,0" />
+    </Style>
+
+    <Style x:Key="InfoGlyph" TargetType="TextBlock" BasedOn="{StaticResource Text.Icon}">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}" />
+      <Setter Property="Text" Value="&#xE946;" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Margin" Value="0,0,8,0" />
+    </Style>
+
+    <!-- The outline shown where there is no picture. -->
+    <Style x:Key="Silhouette" TargetType="TextBlock" BasedOn="{StaticResource Text.Icon}">
+      <Setter Property="Text" Value="&#xE77B;" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- One character tile. -->
+    <DataTemplate x:Key="TileTemplate" DataType="{x:Type chars:CharacterTileViewModel}">
+      <StackPanel ToolTip="{Binding Name}">
+        <Grid Width="96" Height="96">
+          <Border Style="{StaticResource PictureFrame}">
+            <Grid>
+              <Image Source="{Binding PreviewPath, Converter={StaticResource PicturePath}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+              <TextBlock Style="{StaticResource Silhouette}" Visibility="{Binding PreviewPath, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}" />
+            </Grid>
+          </Border>
+          <Border Style="{StaticResource Badge}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4"
+                  Visibility="{Binding IsNew, Converter={StaticResource VisibleWhen}}">
+            <TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="New" />
+          </Border>
+          <Border Style="{StaticResource PreviewMark}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="4"
+                  Visibility="{Binding IsPreviewOnly, Converter={StaticResource VisibleWhen}}" ToolTip="{Binding PreviewOnlyTooltip}">
+            <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeCaption}" Text="&#xE7B3;" HorizontalAlignment="Center"
+                       Foreground="{DynamicResource WarningBrush}" AutomationProperties.Name="{Binding PreviewOnlyTooltip}" />
+          </Border>
+        </Grid>
+        <TextBlock Style="{StaticResource Text.Body}" Text="{Binding Name}" Margin="0,8,0,0" />
+        <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding SourceCaption}" Margin="0,4,0,0" />
+      </StackPanel>
+    </DataTemplate>
+
+    <!-- The name of a list group and how many characters it holds. -->
+    <DataTemplate x:Key="GroupHeaderTemplate">
+      <StackPanel Orientation="Horizontal" Margin="0,16,0,8">
+        <TextBlock Style="{StaticResource Text.Label}" Text="{Binding Name}" />
+        <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding ItemCount}" Margin="8,0,0,0" VerticalAlignment="Center" />
+      </StackPanel>
+    </DataTemplate>
+
+    <!-- One picture option of the selected character. The Remove button sits beside the radio, not inside it. -->
+    <DataTemplate x:Key="PictureOptionTemplate" DataType="{x:Type chars:PictureOptionViewModel}">
+      <StackPanel Margin="0,8,0,0">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <RadioButton Style="{StaticResource PictureOption}" GroupName="CharacterPictures" IsChecked="{Binding IsInUse, Mode=OneWay}" Command="{Binding ChooseCommand}"
+                       AutomationProperties.Name="{Binding AutomationName}" AutomationProperties.AutomationId="{Binding Index, StringFormat=Picture-{0}}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Border Style="{StaticResource PictureFrame}" Width="56" Height="56" Margin="0,0,8,0" VerticalAlignment="Top"
+                      BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1">
+                <Grid>
+                  <Image Source="{Binding ThumbnailPath, Converter={StaticResource PicturePath}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                  <TextBlock Style="{StaticResource Silhouette}" Visibility="{Binding ThumbnailPath, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}" />
+                  <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE71B;" HorizontalAlignment="Center" Visibility="{Binding IsLink, Converter={StaticResource VisibleWhen}}"
+                             ToolTip="Shown by Discord, not previewed" AutomationProperties.Name="Shown by Discord, not previewed" />
+                </Grid>
+              </Border>
+              <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Style="{StaticResource Text.Label}" Text="{Binding Title}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                  <Border Style="{StaticResource Badge}" Margin="8,0,0,0" Visibility="{Binding IsInUse, Converter={StaticResource VisibleWhen}}">
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeCaption}" Text="&#xE73E;" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,4,0" />
+                      <TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="In use" />
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+                <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding SourceCaption}" Margin="0,4,0,0" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding DiscordLine}" Margin="0,4,0,0" />
+              </StackPanel>
+            </Grid>
+          </RadioButton>
+          <Button Grid.Column="1" Style="{StaticResource Button.Icon}" Content="&#xE74D;" Margin="8,0,0,0" VerticalAlignment="Center" Command="{Binding RemoveCommand}"
+                  Visibility="{Binding CanRemove, Converter={StaticResource VisibleWhen}}" ToolTip="Remove this picture"
+                  AutomationProperties.AutomationId="{Binding Index, StringFormat=RemovePicture-{0}}">
+            <AutomationProperties.Name>
+              <MultiBinding StringFormat="Remove {0} from {1}">
+                <Binding Path="Title" />
+                <Binding Path="DataContext.SelectedTile.Name" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+              </MultiBinding>
+            </AutomationProperties.Name>
+          </Button>
+        </Grid>
+        <Border Style="{StaticResource Inset}" Margin="0,8,0,0" Visibility="{Binding IsConfirmingRemove, Converter={StaticResource VisibleWhen}}">
+          <StackPanel>
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding RemoveConfirmText}" AutomationProperties.AutomationId="RemoveConfirmText" />
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+              <Button Style="{StaticResource Button.Danger}" Content="Remove" Command="{Binding ConfirmRemoveCommand}" AutomationProperties.AutomationId="ConfirmRemovePicture" />
+              <Button Style="{StaticResource Button.Subtle}" Content="Keep" Command="{Binding KeepPictureCommand}" Margin="8,0,0,0" AutomationProperties.AutomationId="KeepPicture" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </DataTemplate>
+
+    <!-- A picture of another pack that can be added. -->
+    <DataTemplate x:Key="PackPictureTemplate" DataType="{x:Type chars:PackPictureChoiceViewModel}">
+      <Grid Margin="0,8,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Border Style="{StaticResource PictureFrame}" Width="48" Height="48" Margin="0,0,8,0">
+          <Grid>
+            <Image Source="{Binding ThumbnailPath, Converter={StaticResource PicturePath}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+            <TextBlock Style="{StaticResource Silhouette}" Visibility="{Binding ThumbnailPath, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}" />
+          </Grid>
+        </Border>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+          <TextBlock Style="{StaticResource Text.Label}" Text="{Binding PackName}" />
+          <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding SourceCaption}" Margin="0,4,0,0" />
+        </StackPanel>
+        <Button Grid.Column="2" Content="{Binding ActionText}" Command="{Binding AddCommand}" IsEnabled="{Binding IsAdded, Converter={StaticResource BoolNot}}" Margin="8,0,0,0"
+                AutomationProperties.Name="{Binding PackName, StringFormat=Add the picture from {0}}" />
+      </Grid>
+    </DataTemplate>
+
+    <!-- A pack in the Packs panel. -->
+    <DataTemplate x:Key="PackRowTemplate" DataType="{x:Type chars:PackRowViewModel}">
+      <Border Style="{StaticResource Inset}" Margin="0,8,0,0">
+        <StackPanel>
+          <TextBlock Style="{StaticResource Text.Label}" Text="{Binding Name}" AutomationProperties.AutomationId="{Binding Id, StringFormat=Pack-{0}}" />
+          <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding Caption}" Margin="0,4,0,0" />
+          <Button Style="{StaticResource Button.Danger}" Content="Remove pack" Command="{Binding RequestRemoveCommand}" HorizontalAlignment="Left" Margin="0,16,0,0"
+                  Visibility="{Binding CanRemove, Converter={StaticResource VisibleWhen}}" AutomationProperties.Name="{Binding RemoveName}" AutomationProperties.AutomationId="RemovePack" />
+          <StackPanel Margin="0,16,0,0" Visibility="{Binding IsConfirmingRemove, Converter={StaticResource VisibleWhen}}">
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding RemoveConfirmText}" AutomationProperties.AutomationId="RemovalPrompt" />
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+              <Button Style="{StaticResource Button.Danger}" Content="Remove" Command="{Binding ConfirmRemoveCommand}" AutomationProperties.AutomationId="ConfirmRemoval" />
+              <Button Style="{StaticResource Button.Subtle}" Content="Keep it" Command="{Binding KeepCommand}" Margin="8,0,0,0" AutomationProperties.AutomationId="CancelRemoval" />
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+
+    <!-- A file that needs a choice in the import review. -->
+    <DataTemplate x:Key="NeedsChoiceTemplate" DataType="{x:Type chars:ImportReviewRowViewModel}">
+      <Grid Margin="0,8,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Border Style="{StaticResource PictureFrame}" Width="64" Height="64" Margin="0,0,16,0">
+          <Image Source="{Binding Png, Converter={StaticResource PngBytes}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+        </Border>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+          <TextBlock Style="{StaticResource Text.Label}" Text="{Binding FileName}" />
+          <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding Caption}" Margin="0,4,0,0" />
+        </StackPanel>
+        <ComboBox Grid.Column="2" Style="{StaticResource ChoiceCombo}" DisplayMemberPath="Name" MinWidth="240" Margin="16,0,0,0" VerticalAlignment="Center"
+                  ItemsSource="{Binding DataContext.ImportReview.ChoicesWithNone, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  SelectedItem="{Binding SelectedOrNone, Mode=TwoWay}" IsTextSearchEnabled="True" TextSearch.TextPath="Name"
+                  AutomationProperties.Name="{Binding AutomationName}" AutomationProperties.AutomationId="{Binding Index, StringFormat=ImportChoice-{0}}" />
+      </Grid>
+    </DataTemplate>
+
+    <!-- A file whose character already has three pictures. -->
+    <DataTemplate x:Key="FullRowTemplate" DataType="{x:Type chars:ImportReviewRowViewModel}">
+      <Grid Margin="0,8,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Border Style="{StaticResource PictureFrame}" Width="64" Height="64" Margin="0,0,16,0">
+          <Image Source="{Binding Png, Converter={StaticResource PngBytes}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+        </Border>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+          <TextBlock Style="{StaticResource Text.Label}" Text="{Binding FileName}" />
+          <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding Caption}" Margin="0,4,0,0" />
+        </StackPanel>
+        <ComboBox Grid.Column="2" Style="{StaticResource ChoiceCombo}" ItemsSource="{Binding ReplaceChoices}" SelectedItem="{Binding SelectedReplace, Mode=TwoWay}"
+                  DisplayMemberPath="Label" MinWidth="240" Margin="16,0,0,0" VerticalAlignment="Center"
+                  AutomationProperties.Name="{Binding FileName, StringFormat=What to do with {0}}" AutomationProperties.AutomationId="{Binding Index, StringFormat=ImportFull-{0}}" />
+      </Grid>
+    </DataTemplate>
+
+    <!-- A matched file: a small tile with an Import check box. -->
+    <DataTemplate x:Key="MatchedTemplate" DataType="{x:Type chars:ImportReviewRowViewModel}">
+      <StackPanel Width="88" Margin="0,8,8,0">
+        <Border Style="{StaticResource PictureFrame}" Width="64" Height="64" HorizontalAlignment="Left">
+          <Image Source="{Binding Png, Converter={StaticResource PngBytes}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+        </Border>
+        <TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="{Binding Character.Name}" Margin="0,4,0,0" />
+        <CheckBox Style="{StaticResource SettingSwitch.Inline}" Content="Import" IsChecked="{Binding Included, Mode=TwoWay}" Margin="0,4,0,0"
+                  AutomationProperties.Name="{Binding AutomationName}" AutomationProperties.AutomationId="{Binding Index, StringFormat=ImportMatched-{0}}" />
+      </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate x:Key="NotImportedTemplate" DataType="{x:Type chars:ImportReviewRowViewModel}">
+      <TextBlock Style="{StaticResource Text.Muted}" Margin="0,4,0,0">
+        <Run Text="{Binding FileName, Mode=OneWay}" FontWeight="SemiBold" /><Run Text=": " /><Run Text="{Binding Caption, Mode=OneWay}" />
+      </TextBlock>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <ScrollViewer x:Name="Scroller" Style="{StaticResource PageScroll}">
+    <StackPanel Style="{StaticResource PageBody}">
+      <!-- Everything above the body: its height decides how tall the body can be. -->
+      <StackPanel x:Name="Top">
+        <TextBlock Style="{StaticResource Text.Title}" Text="Characters" />
+        <TextBlock Style="{StaticResource Text.Muted}" Margin="0,4,0,16" MaxWidth="640" HorizontalAlignment="Left"
+                   Text="Choose the picture your Discord status shows for each killer and survivor. It appears when you set that character on Home or from the tray." />
+
+        <!-- Status strip: what Discord can show right now. -->
+        <Border Style="{StaticResource SectionCard}">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource StripIcon}" />
+            <StackPanel Grid.Column="1">
+              <TextBlock Style="{StaticResource Text.Body}" Text="{Binding StatusStripText}" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="CharactersStatus" />
+              <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding StatusStripCaption}" Margin="0,4,0,0" Visibility="{Binding StatusStripCaption, Converter={StaticResource VisibleWhen}}" />
+              <ProgressBar Style="{StaticResource ProgressLine}" Value="{Binding StorageFraction, Mode=OneWay}" MaxWidth="320" HorizontalAlignment="Stretch" Margin="0,8,0,0"
+                           Visibility="{Binding StatusKind, Converter={StaticResource EnumIs}, ConverterParameter=StorageFull}"
+                           AutomationProperties.AutomationId="StatusStorageMeter" AutomationProperties.Name="{Binding StorageText, StringFormat=Online storage: {0}}" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="16,0,0,0">
+              <Button Content="Go to Account" Command="{Binding GoToAccountCommand}" AutomationProperties.AutomationId="GoToAccount">
+                <Button.Style>
+                  <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding StatusKind}" Value="SignedOut"><Setter Property="Visibility" Value="Visible" /></DataTrigger>
+                      <DataTrigger Binding="{Binding StatusKind}" Value="FirstRun"><Setter Property="Visibility" Value="Visible" /></DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </Button.Style>
+              </Button>
+              <Button Content="Review the rules" Command="{Binding ReviewRulesCommand}" AutomationProperties.AutomationId="ReviewRules"
+                      Visibility="{Binding StatusKind, Converter={StaticResource EnumIs}, ConverterParameter=RulesDeclined}" />
+              <Button Content="Free up space" Command="{Binding ShowPacksCommand}" AutomationProperties.AutomationId="FreeUpSpace" AutomationProperties.Name="Free up online space"
+                      Visibility="{Binding StatusKind, Converter={StaticResource EnumIs}, ConverterParameter=StorageFull}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+          <TextBlock Style="{StaticResource InfoGlyph}" VerticalAlignment="Center" />
+          <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding BehaviourNotice}" VerticalAlignment="Center" AutomationProperties.AutomationId="CharactersBehaviourNotice" />
+        </StackPanel>
+
+        <!-- Banners: each shows only when it applies. -->
+        <Border Style="{StaticResource SectionCard}" Visibility="{Binding MigrationNoticeText, Converter={StaticResource VisibleWhen}}">
+          <DockPanel LastChildFill="True">
+            <Button DockPanel.Dock="Right" Style="{StaticResource Button.Subtle}" Content="Dismiss" Command="{Binding DismissMigrationNoticeCommand}" Margin="16,0,0,0"
+                    AutomationProperties.AutomationId="DismissMigrationNotice" />
+            <TextBlock DockPanel.Dock="Left" Style="{StaticResource InfoGlyph}" />
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding MigrationNoticeText}" AutomationProperties.AutomationId="MigrationNotice" />
+          </DockPanel>
+        </Border>
+
+        <Border Style="{StaticResource SectionCard}" Visibility="{Binding NewCharactersText, Converter={StaticResource VisibleWhen}}">
+          <DockPanel LastChildFill="True">
+            <Button DockPanel.Dock="Right" Style="{StaticResource Button.Subtle}" Content="Dismiss" Command="{Binding DismissNewCommand}" Margin="16,0,0,0"
+                    AutomationProperties.AutomationId="DismissNew" />
+            <TextBlock DockPanel.Dock="Left" Style="{StaticResource InfoGlyph}" />
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding NewCharactersText}" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="NewCharacters" />
+          </DockPanel>
+        </Border>
+
+        <Border Style="{StaticResource SectionCard}" BorderBrush="{DynamicResource DangerBrush}" Visibility="{Binding ImportError, Converter={StaticResource VisibleWhen}}">
+          <DockPanel LastChildFill="True">
+            <Button DockPanel.Dock="Right" Style="{StaticResource Button.Subtle}" Content="Dismiss" Command="{Binding DismissImportErrorCommand}" Margin="16,0,0,0"
+                    AutomationProperties.AutomationId="DismissImportError" />
+            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xEA39;" Foreground="{DynamicResource DangerBrush}"
+                       VerticalAlignment="Top" Margin="0,0,8,0" />
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding ImportError}" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="CharactersError" />
+          </DockPanel>
+        </Border>
+
+        <Border Style="{StaticResource SectionCard}" Visibility="{Binding ImportResultText, Converter={StaticResource VisibleWhen}}">
+          <DockPanel LastChildFill="True">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="16,0,0,0">
+              <Button Content="Undo" Command="{Binding UndoImportCommand}" Visibility="{Binding CanUndoImport, Converter={StaticResource VisibleWhen}}"
+                      AutomationProperties.AutomationId="UndoImport" AutomationProperties.Name="Undo the import" />
+              <Button Style="{StaticResource Button.Subtle}" Content="Dismiss" Command="{Binding DismissImportResultCommand}" Margin="8,0,0,0" AutomationProperties.AutomationId="DismissImportResult" />
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE73E;" Foreground="{DynamicResource SuccessBrush}"
+                       VerticalAlignment="Top" Margin="0,0,8,0" />
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding ImportResultText}" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="ImportResult" />
+          </DockPanel>
+        </Border>
+
+        <Border Style="{StaticResource SectionCard}" Visibility="{Binding Stage, Converter={StaticResource EnumIs}, ConverterParameter=Reading}">
+          <DockPanel LastChildFill="True">
+            <Button DockPanel.Dock="Right" Content="Stop" Command="{Binding CancelReadingCommand}" Margin="16,0,0,0" AutomationProperties.AutomationId="CancelReading" />
+            <TextBlock DockPanel.Dock="Left" Style="{StaticResource InfoGlyph}" />
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding ReadingText}" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="ReadingPack" />
+          </DockPanel>
+        </Border>
+
+        <Border Style="{StaticResource SectionCard}" Visibility="{Binding ShowRulesPanel, Converter={StaticResource VisibleWhen}}">
+          <StackPanel>
+            <TextBlock Style="{StaticResource SectionTitle}" Text="Before your pictures can appear on Discord" AutomationProperties.AutomationId="PictureRules" />
+            <ItemsControl ItemsSource="{Binding RuleLines}" KeyboardNavigation.IsTabStop="False">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Style="{StaticResource Text.Body}" Text="{Binding StringFormat=• {0}}" Margin="0,4,0,0" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Style="{StaticResource Text.Muted}" Margin="0,16,0,0"
+                       Text="When you add or import your own pictures, a copy of each is saved online at an unlisted address so Discord can show it. Only your status uses them. They aren't listed or shared, but anyone who sees your status can see them. You can store up to 60 MB. Removing a picture deletes its online copy; Discord may show a cached copy for a while." />
+            <TextBlock Style="{StaticResource Text.Body}" Margin="0,8,0,0" Text="{Binding RulesCountText}" Visibility="{Binding RulesCountText, Converter={StaticResource VisibleWhen}}" />
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+              <Button Content="Accept" Command="{Binding AcceptRulesCommand}" AutomationProperties.AutomationId="AcceptPictureRules" AutomationProperties.Name="Accept the picture rules" />
+              <Button Style="{StaticResource Button.Subtle}" Content="Keep in preview only" Command="{Binding DeclineRulesCommand}" Margin="8,0,0,0" AutomationProperties.AutomationId="DeclinePictureRules" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- Toolbar. -->
+        <WrapPanel Visibility="{Binding Stage, Converter={StaticResource EnumIs}, ConverterParameter=Browse}">
+          <Grid Width="240" Margin="0,0,8,8">
+            <TextBox x:Name="SearchInput" Style="{StaticResource SearchBox}" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     AutomationProperties.AutomationId="CharacterSearch" AutomationProperties.Name="Search characters" />
+            <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE721;" Foreground="{DynamicResource TextMutedBrush}"
+                       HorizontalAlignment="Left" Margin="8,0,0,0" IsHitTestVisible="False" />
+            <TextBlock Text="Search characters" Margin="32,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Muted}">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Text, ElementName=SearchInput}" Value="">
+                      <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+            <Button Style="{StaticResource Button.Icon}" Content="&#xE711;" HorizontalAlignment="Right" Command="{Binding ClearSearchCommand}" ToolTip="Clear search"
+                    Visibility="{Binding SearchText, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="ClearSearch" AutomationProperties.Name="Clear search" />
+          </Grid>
+
+          <Border Style="{StaticResource SegmentedTrack}" Margin="0,0,8,8" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" KeyboardNavigation.TabNavigation="Once" KeyboardNavigation.DirectionalNavigation="Cycle">
+              <RadioButton Style="{StaticResource Segmented}" GroupName="CharacterFilter" Content="{Binding AllFilterText}"
+                           IsChecked="{Binding Filter, Converter={StaticResource EnumChoice}, ConverterParameter=All, Mode=TwoWay}"
+                           AutomationProperties.AutomationId="Filter-all" AutomationProperties.Name="All characters" />
+              <RadioButton Style="{StaticResource Segmented}" GroupName="CharacterFilter" Content="{Binding KillersFilterText}"
+                           IsChecked="{Binding Filter, Converter={StaticResource EnumChoice}, ConverterParameter=Killers, Mode=TwoWay}"
+                           AutomationProperties.AutomationId="Filter-killers" AutomationProperties.Name="Killers" />
+              <RadioButton Style="{StaticResource Segmented}" GroupName="CharacterFilter" Content="{Binding SurvivorsFilterText}"
+                           IsChecked="{Binding Filter, Converter={StaticResource EnumChoice}, ConverterParameter=Survivors, Mode=TwoWay}"
+                           AutomationProperties.AutomationId="Filter-survivors" AutomationProperties.Name="Survivors" />
+            </StackPanel>
+          </Border>
+
+          <ToggleButton Style="{StaticResource FilterChip}" Content="Changed by me" IsChecked="{Binding ChangedByMeOnly, Mode=TwoWay}" Margin="0,0,8,8" VerticalAlignment="Top"
+                        AutomationProperties.AutomationId="FilterChanged" AutomationProperties.Name="Show only characters I changed" />
+          <Button Content="Packs" Command="{Binding ShowPacksCommand}" Margin="0,0,8,8" VerticalAlignment="Top" AutomationProperties.AutomationId="ShowPacks" />
+          <Button Style="{StaticResource Button.Primary}" Content="Import pack…" Command="{Binding ImportPackCommand}" Margin="0,0,8,8" VerticalAlignment="Top"
+                  AutomationProperties.AutomationId="ImportPack"
+                  AutomationProperties.HelpText="Choose a pack file (.zip) you downloaded. Its pictures are matched to characters by file name, then you review them." />
+        </WrapPanel>
+        <TextBlock Style="{StaticResource Text.Caption}" Margin="0,0,0,8" Text="{Binding ResultCountText}" views:LiveRegion.Announce="True"
+                   Visibility="{Binding ResultCountText, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="CharacterResultCount" />
+        <TextBlock Style="{StaticResource InlineMessage}" Margin="0,0,0,8" Text="{Binding StatusMessage}" views:LiveRegion.Announce="True"
+                   Visibility="{Binding StatusMessage, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="CharactersMessage" />
+      </StackPanel>
+
+      <!-- Body: the list and the side panel scroll separately; the page scrolls as a whole when the window is too short. -->
+      <Grid x:Name="Body" views:ResponsiveColumns.StackBelow="720" views:ResponsiveColumns.ReverseWhenStacked="True" views:ResponsiveColumns.StackedMinHeight="880"
+            Visibility="{Binding Stage, Converter={StaticResource EnumIs}, ConverterParameter=Browse}">
+        <Grid.Height>
+          <MultiBinding Converter="{StaticResource FillHeight}" ConverterParameter="320">
+            <Binding Path="ViewportHeight" ElementName="Scroller" />
+            <Binding Path="ActualHeight" ElementName="Top" />
+          </MultiBinding>
+        </Grid.Height>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="24" />
+          <ColumnDefinition Width="320" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+          <ListBox x:Name="CharacterList" Style="{StaticResource TileList}" ItemsSource="{Binding Tiles}" SelectedItem="{Binding SelectedTile, Mode=TwoWay}"
+                   SelectionMode="Single" views:ListGrouping.By="Group" TextSearch.TextPath="Name" IsTextSearchEnabled="True"
+                   AutomationProperties.AutomationId="CharacterList" AutomationProperties.Name="Characters" ItemTemplate="{StaticResource TileTemplate}">
+            <ListBox.ItemContainerStyle>
+              <Style TargetType="ListBoxItem" BasedOn="{StaticResource CharacterTile}">
+                <Setter Property="AutomationProperties.Name" Value="{Binding AutomationName}" />
+                <Setter Property="AutomationProperties.AutomationId" Value="{Binding Code, StringFormat=Character-{0}}" />
+              </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.GroupStyle>
+              <GroupStyle HeaderTemplate="{StaticResource GroupHeaderTemplate}" />
+            </ListBox.GroupStyle>
+          </ListBox>
+          <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="{Binding NoResultsText, Converter={StaticResource VisibleWhen}}">
+            <TextBlock Style="{StaticResource Text.Body}" Text="{Binding NoResultsText}" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="NoResults" />
+            <Button Content="Clear search" Command="{Binding ClearSearchCommand}" HorizontalAlignment="Left" Margin="0,16,0,0" AutomationProperties.AutomationId="NoResultsClear" />
+          </StackPanel>
+        </Grid>
+
+        <Border Style="{StaticResource SectionCard}" Margin="0">
+          <ScrollViewer Style="{StaticResource PageScroll}">
+            <Grid>
+              <!-- Character: previews and pictures. -->
+              <StackPanel Visibility="{Binding PanelMode, Converter={StaticResource EnumIs}, ConverterParameter=Character}">
+                <DockPanel LastChildFill="True">
+                  <!-- Collapsed unless a character is selected and new: with no selection the bound path is unresolved and a plain Visibility binding would show the chip. -->
+                  <Border DockPanel.Dock="Right" VerticalAlignment="Top">
+                    <Border.Style>
+                      <Style TargetType="Border" BasedOn="{StaticResource Badge}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding SelectedTile.IsNew}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </Border.Style>
+                    <TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="New" />
+                  </Border>
+                  <StackPanel>
+                    <TextBlock AutomationProperties.AutomationId="SelectedCharacterName">
+                      <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Subtitle}">
+                          <Setter Property="Text" Value="{Binding SelectedTile.Name}" />
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedTile}" Value="{x:Null}">
+                              <Setter Property="Text" Value="Select a character" />
+                            </DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding SelectedTile.RoleText}" Margin="0,4,0,0" />
+                  </StackPanel>
+                </DockPanel>
+
+                <Grid Margin="0,16,0,0">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <StackPanel>
+                    <TextBlock Margin="0,0,0,4">
+                      <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Caption}">
+                          <Setter Property="Text" Value="Your preview" />
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding PreviewAndDiscordSame}" Value="True">
+                              <Setter Property="Text" Value="Your preview and Discord" />
+                            </DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </TextBlock.Style>
+                    </TextBlock>
+                    <Border Style="{StaticResource PictureFrame}" Width="96" Height="96" HorizontalAlignment="Left">
+                      <Grid>
+                        <Image Source="{Binding PreviewImagePath, Converter={StaticResource PicturePath}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"
+                               AutomationProperties.AutomationId="PreviewImage" AutomationProperties.Name="{Binding SelectedTile.Name, StringFormat=Your preview of {0}}" />
+                        <TextBlock Style="{StaticResource Silhouette}"
+                                   Visibility="{Binding PreviewImagePath, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}" />
+                        <TextBlock Style="{StaticResource Text.Caption}" Text="Shown by Discord, not previewed" TextAlignment="Center" Margin="8" VerticalAlignment="Center"
+                                   Visibility="{Binding PreviewLink, Converter={StaticResource VisibleWhen}}" />
+                      </Grid>
+                    </Border>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Margin="16,0,0,0" Visibility="{Binding PreviewAndDiscordSame, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}">
+                    <TextBlock Style="{StaticResource Text.Caption}" Text="Discord shows" Margin="0,0,0,4" />
+                    <Border Style="{StaticResource PictureFrame}" Width="96" Height="96" HorizontalAlignment="Left">
+                      <Grid>
+                        <Image Source="{Binding DiscordImagePath, Converter={StaticResource PicturePath}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"
+                               AutomationProperties.AutomationId="DiscordImage" AutomationProperties.Name="{Binding SelectedTile.Name, StringFormat=What Discord shows for {0}}" />
+                        <TextBlock Style="{StaticResource Silhouette}"
+                                   Visibility="{Binding DiscordImagePath, Converter={StaticResource VisibleWhen}, ConverterParameter=invert}" />
+                      </Grid>
+                    </Border>
+                  </StackPanel>
+                </Grid>
+                <DockPanel Margin="0,8,0,0" Visibility="{Binding DifferenceText, Converter={StaticResource VisibleWhen}}">
+                  <TextBlock DockPanel.Dock="Left" Style="{StaticResource WarningGlyph}" />
+                  <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding DifferenceText}" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="DiscordDifference" />
+                </DockPanel>
+
+                <Border Style="{StaticResource Divider}" Margin="0,16" />
+
+                <DockPanel>
+                  <TextBlock DockPanel.Dock="Right" Style="{StaticResource Text.Caption}" Text="{Binding CounterText}" VerticalAlignment="Center" AutomationProperties.AutomationId="PictureCounter" />
+                  <TextBlock Style="{StaticResource Text.Label}" Text="Pictures" />
+                </DockPanel>
+                <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding HelperText}" Margin="0,4,0,0" />
+                <ItemsControl ItemsSource="{Binding PictureOptions}" ItemTemplate="{StaticResource PictureOptionTemplate}" Margin="0,8,0,0"
+                              KeyboardNavigation.TabNavigation="Once" KeyboardNavigation.DirectionalNavigation="Cycle" AutomationProperties.AutomationId="PictureOptions"
+                              AutomationProperties.Name="Pictures" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding NoDefaultText}" Margin="0,8,0,0" Visibility="{Binding NoDefaultText, Converter={StaticResource VisibleWhen}}" />
+                <Button Content="Add picture" Command="{Binding ShowAddPictureCommand}" HorizontalAlignment="Stretch" Margin="0,16,0,0"
+                        Visibility="{Binding CanAddPicture, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="AddPicture"
+                        AutomationProperties.Name="{Binding SelectedTile.Name, StringFormat=Add a picture for {0}}" />
+                <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding FullText}" Margin="0,16,0,0" Visibility="{Binding FullText, Converter={StaticResource VisibleWhen}}"
+                           AutomationProperties.AutomationId="PicturesFull" />
+              </StackPanel>
+
+              <!-- Add a picture. -->
+              <StackPanel Visibility="{Binding PanelMode, Converter={StaticResource EnumIs}, ConverterParameter=AddPicture}">
+                <Button Style="{StaticResource Button.Subtle}" HorizontalAlignment="Left" Command="{Binding BackCommand}" AutomationProperties.AutomationId="BackFromAdd" AutomationProperties.Name="Back">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE72B;" Margin="0,0,8,0" />
+                    <TextBlock Text="Back" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+                <TextBlock Style="{StaticResource Text.Label}" Margin="0,16,0,0" Text="{Binding SelectedTile.Name, StringFormat=Add a picture for {0}}" />
+
+                <TextBlock Style="{StaticResource Text.Label}" Margin="0,24,0,0" Text="From another pack" />
+                <ItemsControl ItemsSource="{Binding PackPictures}" ItemTemplate="{StaticResource PackPictureTemplate}" KeyboardNavigation.IsTabStop="False" />
+                <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding NoPackPicturesText}" Visibility="{Binding NoPackPicturesText, Converter={StaticResource VisibleWhen}}" />
+
+                <Button Content="From my PC…" Command="{Binding AddFromPcCommand}" HorizontalAlignment="Left" Margin="0,24,0,0" AutomationProperties.AutomationId="AddFromPc" />
+                <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding PcHelpText}" />
+                <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding BusyText}" views:LiveRegion.Announce="True"
+                           Visibility="{Binding BusyText, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="PictureBusy" />
+
+                <Button Content="From a link…" Command="{Binding ShowAddLinkCommand}" HorizontalAlignment="Left" Margin="0,24,0,0" AutomationProperties.AutomationId="AddFromLink" />
+                <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding LinkHelpText}" />
+
+                <DockPanel Margin="0,16,0,0" Visibility="{Binding ErrorMessage, Converter={StaticResource VisibleWhen}}">
+                  <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xEA39;" Foreground="{DynamicResource DangerBrush}"
+                             VerticalAlignment="Top" Margin="0,0,8,0" />
+                  <TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource DangerBrush}" Text="{Binding ErrorMessage}" views:LiveRegion.Announce="True"
+                             AutomationProperties.AutomationId="PictureError" />
+                </DockPanel>
+              </StackPanel>
+
+              <!-- Add a link. -->
+              <StackPanel Visibility="{Binding PanelMode, Converter={StaticResource EnumIs}, ConverterParameter=AddLink}">
+                <Button Style="{StaticResource Button.Subtle}" HorizontalAlignment="Left" Command="{Binding BackCommand}" AutomationProperties.AutomationId="BackFromLink" AutomationProperties.Name="Back">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE72B;" Margin="0,0,8,0" />
+                    <TextBlock Text="Back" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+                <TextBlock Style="{StaticResource Text.Label}" Margin="0,16,0,0" Text="{Binding SelectedTile.Name, StringFormat=Add a link for {0}}" />
+                <TextBlock Style="{StaticResource FieldLabel}" Text="Image link" />
+                <TextBox Text="{Binding LinkText, UpdateSourceTrigger=PropertyChanged}" MaxLength="512" AutomationProperties.AutomationId="LinkUrl" AutomationProperties.Name="Image link" />
+                <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding LinkFormHelp}" />
+                <DockPanel Margin="0,8,0,0">
+                  <TextBlock DockPanel.Dock="Left" Style="{StaticResource WarningGlyph}" />
+                  <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding LinkWarning}" />
+                </DockPanel>
+                <DockPanel Margin="0,8,0,0" Visibility="{Binding LinkError, Converter={StaticResource VisibleWhen}}">
+                  <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xEA39;" Foreground="{DynamicResource DangerBrush}"
+                             VerticalAlignment="Top" Margin="0,0,8,0" />
+                  <TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource DangerBrush}" Text="{Binding LinkError}" views:LiveRegion.Announce="True"
+                             AutomationProperties.AutomationId="LinkError" />
+                </DockPanel>
+                <DockPanel Margin="0,8,0,0" Visibility="{Binding ErrorMessage, Converter={StaticResource VisibleWhen}}">
+                  <TextBlock DockPanel.Dock="Left" Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xEA39;" Foreground="{DynamicResource DangerBrush}"
+                             VerticalAlignment="Top" Margin="0,0,8,0" />
+                  <TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource DangerBrush}" Text="{Binding ErrorMessage}" views:LiveRegion.Announce="True"
+                             AutomationProperties.AutomationId="LinkFormError" />
+                </DockPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                  <Button Content="Add link" Command="{Binding AddLinkCommand}" AutomationProperties.AutomationId="AddLink" />
+                  <Button Style="{StaticResource Button.Subtle}" Content="Cancel" Command="{Binding BackCommand}" Margin="8,0,0,0" AutomationProperties.AutomationId="CancelLink" />
+                </StackPanel>
+              </StackPanel>
+
+              <!-- Packs, online storage and the size of pictures. -->
+              <StackPanel Visibility="{Binding PanelMode, Converter={StaticResource EnumIs}, ConverterParameter=Packs}">
+                <Button Style="{StaticResource Button.Subtle}" HorizontalAlignment="Left" Command="{Binding BackCommand}" AutomationProperties.AutomationId="BackFromPacks" AutomationProperties.Name="Back">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource Text.Icon}" FontSize="{DynamicResource FontSizeBody}" Text="&#xE72B;" Margin="0,0,8,0" />
+                    <TextBlock Text="Back" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+                <TextBlock Style="{StaticResource Text.Label}" Margin="0,16,0,0" Text="Packs" />
+
+                <TextBlock Style="{StaticResource Text.Label}" Margin="0,24,0,0" Text="Your online storage" />
+                <ProgressBar Style="{StaticResource ProgressLine}" Value="{Binding StorageFraction, Mode=OneWay}" Margin="0,8,0,0"
+                             AutomationProperties.AutomationId="StorageMeter" AutomationProperties.Name="{Binding StorageText, StringFormat=Online storage: {0}}" />
+                <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding StorageCaption}" />
+
+                <ItemsControl ItemsSource="{Binding PackRows}" ItemTemplate="{StaticResource PackRowTemplate}" Margin="0,16,0,0" KeyboardNavigation.IsTabStop="False" />
+
+                <StackPanel Margin="0,16,0,0" Visibility="{Binding ShowSyncSection, Converter={StaticResource VisibleWhen}}">
+                  <TextBlock Style="{StaticResource Text.Body}" Text="{Binding SyncStatusText}" Visibility="{Binding SyncStatusText, Converter={StaticResource VisibleWhen}}"
+                             AutomationProperties.AutomationId="SyncStatus" />
+                  <DockPanel Margin="0,8,0,0" Visibility="{Binding HasSyncNote, Converter={StaticResource VisibleWhen}}">
+                    <TextBlock DockPanel.Dock="Left" Style="{StaticResource InfoGlyph}" />
+                    <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding SyncNote}" views:LiveRegion.Announce="True" AutomationProperties.AutomationId="SyncNote" />
+                  </DockPanel>
+                  <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding SyncUnavailableText}"
+                             Visibility="{Binding SyncUnavailable, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="SyncUnavailable" />
+                  <Button Content="{Binding CheckForPacksText}" Command="{Binding CheckForPacksCommand}" IsEnabled="{Binding CanCheckForPacks}" HorizontalAlignment="Left" Margin="0,16,0,0"
+                          Visibility="{Binding CanSync, Converter={StaticResource VisibleWhen}}" AutomationProperties.AutomationId="CheckForPacks" AutomationProperties.Name="Check for updates"
+                          AutomationProperties.HelpText="Asks the DBD Presence service for new default portraits. The service may ask the app to wait between checks." />
+                </StackPanel>
+
+                <TextBlock Style="{StaticResource FieldLabel}" Margin="0,24,0,8" Text="Size of your pictures on Discord" />
+                <ComboBox Style="{StaticResource ChoiceCombo}" ItemsSource="{Binding PictureSizes}" SelectedItem="{Binding SelectedPictureSize, Mode=TwoWay}" HorizontalAlignment="Stretch"
+                          MinWidth="0" AutomationProperties.AutomationId="PictureSize" AutomationProperties.Name="Size of your pictures on Discord" />
+                <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding PictureSizeHelp}" />
+              </StackPanel>
+            </Grid>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+
+      <!-- Import review: replaces the toolbar and the body while it is open. -->
+      <Border Style="{StaticResource SectionCard}" DataContext="{Binding ImportReview}" Visibility="{Binding DataContext.Stage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumIs}, ConverterParameter=Review}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionTitle}" Text="Review the import" Margin="0,0,0,16" AutomationProperties.AutomationId="ImportReview" />
+          <TextBlock Style="{StaticResource Text.Muted}" MaxWidth="640" HorizontalAlignment="Left">
+            <Run Text="From " /><Run Text="{Binding ArchiveName, Mode=OneWay}" /><Run Text=". Pictures were matched to characters by their file names. Check the matches, choose the rest, then import." />
+          </TextBlock>
+
+          <Grid Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="16" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Style="{StaticResource Text.Label}" Text="Pack name" Margin="0,0,0,4" />
+              <TextBox Text="{Binding PackName, UpdateSourceTrigger=PropertyChanged}" MaxLength="64" AutomationProperties.AutomationId="ImportPackName" AutomationProperties.Name="Pack name" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Style="{StaticResource Text.Label}" Text="Creator (optional)" Margin="0,0,0,4" />
+              <TextBox Text="{Binding Creator, UpdateSourceTrigger=PropertyChanged}" MaxLength="64" AutomationProperties.AutomationId="ImportCreator" AutomationProperties.Name="Creator (optional)" />
+              <TextBlock Style="{StaticResource Text.Caption}" Margin="0,4,0,0" Text="Shown with the pack so you remember whose artwork it is." />
+            </StackPanel>
+          </Grid>
+
+          <TextBlock Style="{StaticResource Text.Label}" Margin="0,24,0,0" Text="After importing" />
+          <RadioButton Style="{StaticResource Choice}" GroupName="AfterImport" Content="Use the imported pictures on Discord"
+                       IsChecked="{Binding UseImported, Mode=TwoWay}" AutomationProperties.AutomationId="UseImported" />
+          <RadioButton Style="{StaticResource Choice}" GroupName="AfterImport" Content="Add them, but keep my current choices"
+                       IsChecked="{Binding UseImported, Converter={StaticResource BoolNot}, Mode=TwoWay}" AutomationProperties.AutomationId="KeepChoices" />
+
+          <WrapPanel Margin="0,24,0,0">
+            <Border Style="{StaticResource Badge}" Margin="0,0,8,8"><TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="{Binding MatchedBadge}" /></Border>
+            <Border Style="{StaticResource Badge}" Margin="0,0,8,8"><TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="{Binding NeedsChoiceBadge}" /></Border>
+            <Border Style="{StaticResource Badge}" Margin="0,0,8,8"><TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="{Binding FullBadge}" /></Border>
+            <Border Style="{StaticResource Badge}" Margin="0,0,8,8"><TextBlock Style="{StaticResource Text.Caption}" Foreground="{DynamicResource TextBrush}" Text="{Binding NotImportedBadge}" /></Border>
+          </WrapPanel>
+          <TextBlock Style="{StaticResource Text.Caption}" Text="{Binding StorageLine}" AutomationProperties.AutomationId="ImportStorageLine" />
+
+          <StackPanel Margin="0,24,0,0" Visibility="{Binding NeedsChoiceHeading, Converter={StaticResource VisibleWhen}}">
+            <TextBlock Style="{StaticResource Text.Label}" Text="{Binding NeedsChoiceHeading}" />
+            <ItemsControl ItemsSource="{Binding NeedsChoice}" ItemTemplate="{StaticResource NeedsChoiceTemplate}" KeyboardNavigation.IsTabStop="False" />
+          </StackPanel>
+
+          <StackPanel Margin="0,24,0,0" Visibility="{Binding FullHeading, Converter={StaticResource VisibleWhen}}">
+            <TextBlock Style="{StaticResource Text.Label}" Text="{Binding FullHeading}" />
+            <ItemsControl ItemsSource="{Binding Full}" ItemTemplate="{StaticResource FullRowTemplate}" KeyboardNavigation.IsTabStop="False" />
+          </StackPanel>
+
+          <Expander Margin="0,24,0,0" Header="{Binding MatchedHeading}" Visibility="{Binding MatchedHeading, Converter={StaticResource VisibleWhen}}"
+                    AutomationProperties.AutomationId="MatchedExpander" AutomationProperties.Name="{Binding MatchedHeading}">
+            <ItemsControl ItemsSource="{Binding Matched}" ItemTemplate="{StaticResource MatchedTemplate}" KeyboardNavigation.IsTabStop="False">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </Expander>
+
+          <StackPanel Margin="0,24,0,0" Visibility="{Binding NotImportedHeading, Converter={StaticResource VisibleWhen}}">
+            <TextBlock Style="{StaticResource Text.Label}" Text="{Binding NotImportedHeading}" />
+            <ItemsControl ItemsSource="{Binding NotImported}" ItemTemplate="{StaticResource NotImportedTemplate}" KeyboardNavigation.IsTabStop="False" />
+            <ItemsControl ItemsSource="{Binding SkippedFiles}" KeyboardNavigation.IsTabStop="False">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Style="{StaticResource Text.Muted}" Margin="0,4,0,0">
+                    <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold" /><Run Text=": " /><Run Text="{Binding Reason, Mode=OneWay}" />
+                  </TextBlock>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+
+          <TextBlock Style="{StaticResource Text.Caption}" Margin="0,24,0,0" Text="{Binding Note}" />
+          <TextBlock Style="{StaticResource Text.Caption}" Margin="0,8,0,0" Text="{Binding ImportHint}" Visibility="{Binding ImportHint, Converter={StaticResource VisibleWhen}}" />
+          <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+            <Button Style="{StaticResource Button.Primary}" Content="{Binding ImportButtonText}" Command="{Binding ConfirmCommand}" AutomationProperties.AutomationId="ConfirmImport" />
+            <Button Content="Cancel" Command="{Binding CancelCommand}" Margin="8,0,0,0" AutomationProperties.AutomationId="CancelImport" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,16 @@
+# Cloudflare Pages configuration for the Owner Panel (ADR-0014). No account ID is stored here. The projects are
+# created and deployed by .github/workflows/deploy-service.yml, or by hand (docs/owner/cloudflare-setup.md §12).
+#
+# Two separate Pages projects, like the two Workers (FR-ADM-06):
+#   production  dbd-presence-panel          -> https://admin.arcavale.com
+#   staging     dbd-presence-panel-staging  -> https://admin-staging.arcavale.com
+# Deploy the built site (npm ci && npm run build here; npm ci in service/ provides wrangler), always to the production
+# branch so that no preview URL is created:
+#   ../service/node_modules/.bin/wrangler pages deploy dist --project-name dbd-presence-panel-staging --branch main
+#   ../service/node_modules/.bin/wrangler pages deploy dist --project-name dbd-presence-panel --branch main
+# Response headers, including the Content-Security-Policy, come from dist/_headers (public/_headers).
+# The admin API under /api/* is not part of this site: the Worker's route admin[-staging].arcavale.com/api/* serves it.
+
+name = "dbd-presence-panel"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-01"

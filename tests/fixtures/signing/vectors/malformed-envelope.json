@@ -1,0 +1,10 @@
+{
+  "name": "malformed-envelope",
+  "description": "Validly signed bytes that are not an envelope.",
+  "expectedPurpose": "pack-index",
+  "expectedChannel": "stable",
+  "now": "2026-01-15T12:00:00.000Z",
+  "storedVersions": [],
+  "expected": "Malformed",
+  "documentText": "{\u0022kid\u0022:\u0022test-content-1\u0022,\u0022signed\u0022:\u0022dGhpcyBpcyBub3QganNvbg\u0022,\u0022sig\u0022:\u0022RO9w9vislwBMeBmW2yQqMRjtLKW3UzAMGWbRVHnqkU36e0vT6HXWdEUgntKXIKFtiMgMMH8B3JeS0hlqxHVkfg\u0022}"
+}

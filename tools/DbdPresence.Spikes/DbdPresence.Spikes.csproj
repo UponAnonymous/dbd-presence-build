@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Unshipped spike tool for V2-S1 (docs/PLAN_V2.md 2.2, 2.5, 3.1). It is not a product project: it lives outside src/,
+    so the architecture tests (which enumerate src/*) never inspect it, and the app's publish output never includes it.
+  -->
+  <PropertyGroup>
+    <TargetFramework>$(WindowsTfm)</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>DbdPresence.Spikes</AssemblyName>
+    <RootNamespace>DbdPresence.Spikes</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DbdPresence.Discord/DbdPresence.Discord.csproj" />
+  </ItemGroup>
+</Project>

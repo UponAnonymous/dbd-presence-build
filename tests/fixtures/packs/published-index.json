@@ -1,0 +1,123 @@
+{
+  "name": "published-index",
+  "description": "A pack index as the service publishes it (two packs, one Behaviour-art pack that is also the default pack, and one fallback pack; PNG and JPEG; one entry with its source hash; one licensed entry; one withdrawn licensed entry, which the payload leaves out). Response body of GET /v1/packs is { schemaVersion: 1, document }.",
+  "expectedPurpose": "pack-index",
+  "expectedChannel": "stable",
+  "now": "2026-11-03T00:00:00.000Z",
+  "expectedVersion": 1793613600,
+  "expectedIssuedAt": "2026-11-02T10:00:00.000Z",
+  "expectedExpiresAt": "2026-12-02T10:00:00.000Z",
+  "withdrawnEntryIds": [
+    "e000000000000000000000005"
+  ],
+  "expectedPayload": {
+    "schemaVersion": 1,
+    "packs": [
+      {
+        "id": "backup",
+        "name": "Backup tiles",
+        "version": 1,
+        "author": "DBD Presence",
+        "licenceNote": "Made for DBD Presence.",
+        "credit": "Line art by the owner",
+        "fallback": true,
+        "behaviourArt": false,
+        "default": false
+      },
+      {
+        "id": "original",
+        "name": "Original",
+        "version": 1,
+        "author": "Behaviour Interactive",
+        "licenceNote": "Unofficial fan content. Dead by Daylight artwork © Behaviour Interactive Inc.",
+        "credit": null,
+        "fallback": false,
+        "behaviourArt": true,
+        "default": true
+      }
+    ],
+    "entries": [
+      {
+        "id": "e000000000000000000000006",
+        "pack": "backup",
+        "kind": "map",
+        "key": "map:generic",
+        "sha256": "cf7a7622e516a7708789abeb4a790407baec2a255bacdba9d899e95267b772cd",
+        "sourceSha256": null,
+        "size": 357,
+        "width": 1024,
+        "height": 576,
+        "format": "png",
+        "licensed": null
+      },
+      {
+        "id": "e000000000000000000000007",
+        "pack": "backup",
+        "kind": "role",
+        "key": "role:killer",
+        "sha256": "9063730d8074eaa79b7241d735fe622e90031e23896d3f18ab60d54cf0e9889e",
+        "sourceSha256": null,
+        "size": 957,
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "licensed": null
+      },
+      {
+        "id": "e000000000000000000000004",
+        "pack": "original",
+        "kind": "character",
+        "key": "character:the-shape",
+        "sha256": "1db676c6fe6c3741863e05aa42f18847eb83594551b4cc48f7c3c78a7742ea20",
+        "sourceSha256": null,
+        "size": 1535,
+        "width": 1024,
+        "height": 1024,
+        "format": "jpeg",
+        "licensed": {
+          "holder": "Example Rights Holder"
+        }
+      },
+      {
+        "id": "e000000000000000000000003",
+        "pack": "original",
+        "kind": "character",
+        "key": "character:the-trapper",
+        "sha256": "a32022864fba7eb85cf2c0393380607d613178ea0a01ba3964b62cdaa35a5bae",
+        "sourceSha256": "a32022864fba7eb85cf2c0393380607d613178ea0a01ba3964b62cdaa35a5bae",
+        "size": 1654,
+        "width": 1024,
+        "height": 1024,
+        "format": "jpeg",
+        "licensed": null
+      },
+      {
+        "id": "e000000000000000000000001",
+        "pack": "original",
+        "kind": "role",
+        "key": "role:killer",
+        "sha256": "9063730d8074eaa79b7241d735fe622e90031e23896d3f18ab60d54cf0e9889e",
+        "sourceSha256": null,
+        "size": 957,
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "licensed": null
+      },
+      {
+        "id": "e000000000000000000000002",
+        "pack": "original",
+        "kind": "role",
+        "key": "role:survivor",
+        "sha256": "71cc115de16db8b7f1b0808dc80a747b4841d62702ab30359ca0355a2908804a",
+        "sourceSha256": null,
+        "size": 757,
+        "width": 1024,
+        "height": 1024,
+        "format": "png",
+        "licensed": null
+      }
+    ]
+  },
+  "documentText": "{\"kid\":\"test-content-1\",\"signed\":\"eyJraWQiOiJ0ZXN0LWNvbnRlbnQtMSIsInB1cnBvc2UiOiJwYWNrLWluZGV4IiwiY2hhbm5lbCI6InN0YWJsZSIsInZlcnNpb24iOjE3OTM2MTM2MDAsImlzc3VlZEF0IjoiMjAyNi0xMS0wMlQxMDowMDowMC4wMDBaIiwiZXhwaXJlc0F0IjoiMjAyNi0xMi0wMlQxMDowMDowMC4wMDBaIiwicGF5bG9hZCI6eyJzY2hlbWFWZXJzaW9uIjoxLCJwYWNrcyI6W3siaWQiOiJiYWNrdXAiLCJuYW1lIjoiQmFja3VwIHRpbGVzIiwidmVyc2lvbiI6MSwiYXV0aG9yIjoiREJEIFByZXNlbmNlIiwibGljZW5jZU5vdGUiOiJNYWRlIGZvciBEQkQgUHJlc2VuY2UuIiwiY3JlZGl0IjoiTGluZSBhcnQgYnkgdGhlIG93bmVyIiwiZmFsbGJhY2siOnRydWUsImJlaGF2aW91ckFydCI6ZmFsc2UsImRlZmF1bHQiOmZhbHNlfSx7ImlkIjoib3JpZ2luYWwiLCJuYW1lIjoiT3JpZ2luYWwiLCJ2ZXJzaW9uIjoxLCJhdXRob3IiOiJCZWhhdmlvdXIgSW50ZXJhY3RpdmUiLCJsaWNlbmNlTm90ZSI6IlVub2ZmaWNpYWwgZmFuIGNvbnRlbnQuIERlYWQgYnkgRGF5bGlnaHQgYXJ0d29yayDCqSBCZWhhdmlvdXIgSW50ZXJhY3RpdmUgSW5jLiIsImNyZWRpdCI6bnVsbCwiZmFsbGJhY2siOmZhbHNlLCJiZWhhdmlvdXJBcnQiOnRydWUsImRlZmF1bHQiOnRydWV9XSwiZW50cmllcyI6W3siaWQiOiJlMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA2IiwicGFjayI6ImJhY2t1cCIsImtpbmQiOiJtYXAiLCJrZXkiOiJtYXA6Z2VuZXJpYyIsInNoYTI1NiI6ImNmN2E3NjIyZTUxNmE3NzA4Nzg5YWJlYjRhNzkwNDA3YmFlYzJhMjU1YmFjZGJhOWQ4OTllOTUyNjdiNzcyY2QiLCJzb3VyY2VTaGEyNTYiOm51bGwsInNpemUiOjM1Nywid2lkdGgiOjEwMjQsImhlaWdodCI6NTc2LCJmb3JtYXQiOiJwbmciLCJsaWNlbnNlZCI6bnVsbH0seyJpZCI6ImUwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDciLCJwYWNrIjoiYmFja3VwIiwia2luZCI6InJvbGUiLCJrZXkiOiJyb2xlOmtpbGxlciIsInNoYTI1NiI6IjkwNjM3MzBkODA3NGVhYTc5YjcyNDFkNzM1ZmU2MjJlOTAwMzFlMjM4OTZkM2YxOGFiNjBkNTRjZjBlOTg4OWUiLCJzb3VyY2VTaGEyNTYiOm51bGwsInNpemUiOjk1Nywid2lkdGgiOjEwMjQsImhlaWdodCI6MTAyNCwiZm9ybWF0IjoicG5nIiwibGljZW5zZWQiOm51bGx9LHsiaWQiOiJlMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA0IiwicGFjayI6Im9yaWdpbmFsIiwia2luZCI6ImNoYXJhY3RlciIsImtleSI6ImNoYXJhY3Rlcjp0aGUtc2hhcGUiLCJzaGEyNTYiOiIxZGI2NzZjNmZlNmMzNzQxODYzZTA1YWE0MmYxODg0N2ViODM1OTQ1NTFiNGNjNDhmN2MzYzc4YTc3NDJlYTIwIiwic291cmNlU2hhMjU2IjpudWxsLCJzaXplIjoxNTM1LCJ3aWR0aCI6MTAyNCwiaGVpZ2h0IjoxMDI0LCJmb3JtYXQiOiJqcGVnIiwibGljZW5zZWQiOnsiaG9sZGVyIjoiRXhhbXBsZSBSaWdodHMgSG9sZGVyIn19LHsiaWQiOiJlMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAzIiwicGFjayI6Im9yaWdpbmFsIiwia2luZCI6ImNoYXJhY3RlciIsImtleSI6ImNoYXJhY3Rlcjp0aGUtdHJhcHBlciIsInNoYTI1NiI6ImEzMjAyMjg2NGZiYTdlYjg1Y2YyYzAzOTMzODA2MDdkNjEzMTc4ZWEwYTAxYmEzOTY0YjYyY2RhYTM1YTViYWUiLCJzb3VyY2VTaGEyNTYiOiJhMzIwMjI4NjRmYmE3ZWI4NWNmMmMwMzkzMzgwNjA3ZDYxMzE3OGVhMGEwMWJhMzk2NGI2MmNkYWEzNWE1YmFlIiwic2l6ZSI6MTY1NCwid2lkdGgiOjEwMjQsImhlaWdodCI6MTAyNCwiZm9ybWF0IjoianBlZyIsImxpY2Vuc2VkIjpudWxsfSx7ImlkIjoiZTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMSIsInBhY2siOiJvcmlnaW5hbCIsImtpbmQiOiJyb2xlIiwia2V5Ijoicm9sZTpraWxsZXIiLCJzaGEyNTYiOiI5MDYzNzMwZDgwNzRlYWE3OWI3MjQxZDczNWZlNjIyZTkwMDMxZTIzODk2ZDNmMThhYjYwZDU0Y2YwZTk4ODllIiwic291cmNlU2hhMjU2IjpudWxsLCJzaXplIjo5NTcsIndpZHRoIjoxMDI0LCJoZWlnaHQiOjEwMjQsImZvcm1hdCI6InBuZyIsImxpY2Vuc2VkIjpudWxsfSx7ImlkIjoiZTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMiIsInBhY2siOiJvcmlnaW5hbCIsImtpbmQiOiJyb2xlIiwia2V5Ijoicm9sZTpzdXJ2aXZvciIsInNoYTI1NiI6IjcxY2MxMTVkZTE2ZGI4YjdmMWIwODA4ZGM4MGE3NDdiNDg0MWQ2MjcwMmFiMzAzNTljYTAzNTVhMjkwODgwNGEiLCJzb3VyY2VTaGEyNTYiOm51bGwsInNpemUiOjc1Nywid2lkdGgiOjEwMjQsImhlaWdodCI6MTAyNCwiZm9ybWF0IjoicG5nIiwibGljZW5zZWQiOm51bGx9XX19\",\"sig\":\"lrJQJNUPc8CzFAQ36V-CnCUQt3QSJj-0x-tefWC7OJHp7rzseVY3Ri1CQQcPi812JFhjZTvJjjaY2YRs8bZT1w\"}"
+}

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Staging (default) or Production. Release CI passes -p:OnlineEnvironment=Production; the build then fails unless the
+         production key set in TrustedServiceKeys.json is filled in and differs from staging (ADR-0016, docs/owner/cloudflare-setup.md). -->
+    <OnlineEnvironment Condition="'$(OnlineEnvironment)' == ''">Staging</OnlineEnvironment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(OnlineEnvironment)' == 'Production'">
+    <DefineConstants>$(DefineConstants);ONLINE_PRODUCTION</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DbdPresence.Core/DbdPresence.Core.csproj" />
+    <ProjectReference Include="../DbdPresence.Packs/DbdPresence.Packs.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TrustedServiceKeys.json" LogicalName="TrustedServiceKeys.json" />
+    <InternalsVisibleTo Include="DbdPresence.Online.Tests" />
+  </ItemGroup>
+  <Target Name="RequireProductionServiceKeys" BeforeTargets="CoreCompile" Condition="'$(OnlineEnvironment)' == 'Production'">
+    <Exec Condition="'$(OS)' != 'Windows_NT'" Command="python3 &quot;$(MSBuildThisFileDirectory)../../build/check-online-keys.py&quot; --release" />
+    <Exec Condition="'$(OS)' == 'Windows_NT'" Command="python &quot;$(MSBuildThisFileDirectory)../../build/check-online-keys.py&quot; --release" />
+  </Target>
+</Project>
