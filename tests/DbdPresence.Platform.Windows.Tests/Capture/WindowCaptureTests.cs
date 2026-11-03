@@ -46,7 +46,9 @@ public sealed class WindowCaptureTests
         using var source = new WgcWindowCaptureSource(CaptureTestWindow.ProcessId, TimeProvider.System);
         await StartOrSkipAsync(source, window);
 
-        var sample = await source.CaptureFullFrameAsync(TestContext.Current.CancellationToken);
+        // A frame can arrive before WPF has drawn the quadrants (the window's own dark background, observed once on CI run 41569174555):
+        // wait, bounded, for the drawn content before asserting on the corners.
+        var sample = await CaptureUntilAsync(source, window, f => IsNear(f.GetPixel(0, 0), 255, 0, 0));
 
         Assert.NotNull(sample.Frame);
         var frame = sample.Frame;
@@ -197,6 +199,24 @@ public sealed class WindowCaptureTests
         Assert.Equal(CaptureStatus.Ready, state.Status);
         return state;
     }
+
+    /// <summary>Captures until <paramref name="drawn"/> holds for the frame or about five seconds pass; returns the last sample either way.</summary>
+    private static async Task<FullFrameSample> CaptureUntilAsync(WgcWindowCaptureSource source, CaptureTestWindow window, Func<PixelBuffer, bool> drawn)
+    {
+        var ct = TestContext.Current.CancellationToken;
+        var sample = await source.CaptureFullFrameAsync(ct);
+        for (var attempt = 0; attempt < 50 && (sample.Frame is null || !drawn(sample.Frame)); attempt++)
+        {
+            window.Repaint();
+            await Task.Delay(TimeSpan.FromMilliseconds(100), ct);
+            sample = await source.CaptureFullFrameAsync(ct);
+        }
+
+        return sample;
+    }
+
+    private static bool IsNear((byte R, byte G, byte B, byte A) pixel, int r, int g, int b) =>
+        Math.Abs(pixel.R - r) <= 6 && Math.Abs(pixel.G - g) <= 6 && Math.Abs(pixel.B - b) <= 6;
 
     private static void AssertPixel(PixelBuffer frame, int x, int y, int r, int g, int b)
     {

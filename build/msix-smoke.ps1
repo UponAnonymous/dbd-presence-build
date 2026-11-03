@@ -41,8 +41,19 @@ function Invoke-Ps([string] $command, [string] $what) {
   Write-Host "$what"
   $out = Join-Path $work ("out-" + [guid]::NewGuid().ToString('N') + '.txt')
   $err = Join-Path $work ("err-" + [guid]::NewGuid().ToString('N') + '.txt')
-  $arguments = @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', ('"' + ($command -replace '"', '\"') + '"'))
-  $process = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -PassThru -WindowStyle Hidden -RedirectStandardOutput $out -RedirectStandardError $err
+  $arguments = @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', ('"Import-Module Microsoft.PowerShell.Security; ' + ($command -replace '"', '\"') + '"'))
+  # Windows PowerShell must not inherit PowerShell 7's module path: it would load the PowerShell 7 copy of Microsoft.PowerShell.Security,
+  # and then the Cert: drive does not exist (observed on CI run 41569174555). Give the child Windows PowerShell's own module folders.
+  $savedModulePath = $env:PSModulePath
+  try {
+    $env:PSModulePath = @(
+      (Join-Path $env:ProgramFiles 'WindowsPowerShell\Modules'),
+      (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\Modules')) -join ';'
+    $process = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -PassThru -WindowStyle Hidden -RedirectStandardOutput $out -RedirectStandardError $err
+  }
+  finally {
+    $env:PSModulePath = $savedModulePath
+  }
   if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
     $process.Kill($true)
     Fail "$what did not finish within $TimeoutSeconds s"
