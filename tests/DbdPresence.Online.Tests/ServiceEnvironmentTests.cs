@@ -10,13 +10,16 @@ public sealed class ServiceEnvironmentTests
     {
         var keys = ServiceEnvironment.LoadKeys("staging");
 
-        // The pack-index entry is awaiting its public key is issued (it is then trusted too); the two others are always present.
-        Assert.Equal(["config-staging-1", "licence-staging-1"], keys.Keys.Where(k => !k.StartsWith("pack-index-", StringComparison.Ordinal)).Order(StringComparer.Ordinal));
+        // The service keys and, since 2026-11-03, the owner's offline release and recovery keys (docs/owner/release-keys.md).
+        Assert.Equal(["config-staging-1", "licence-staging-1", "recovery-staging-1", "release-staging-1"], keys.Keys.Where(k => !k.StartsWith("pack-index-", StringComparison.Ordinal)).Order(StringComparer.Ordinal));
         var set = new TrustedKeySet(keys); // throws unless every key is a valid P-256 SPKI
         Assert.True(set.IsAllowedFor("licence-staging-1", SignedPurposes.Licence));
         Assert.False(set.IsAllowedFor("licence-staging-1", SignedPurposes.Config));
         Assert.True(set.IsAllowedFor("config-staging-1", SignedPurposes.Config));
         Assert.False(set.IsAllowedFor("config-staging-1", SignedPurposes.Releases));
+        Assert.True(set.IsAllowedFor("release-staging-1", SignedPurposes.Releases));
+        Assert.False(set.IsAllowedFor("release-staging-1", SignedPurposes.Config));
+        Assert.False(set.IsAllowedFor("recovery-staging-1", SignedPurposes.Releases));
     }
 
     [Fact]

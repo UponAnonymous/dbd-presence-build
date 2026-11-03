@@ -27,15 +27,30 @@
       "purposes": [
         "releases"
       ],
-      "awaitingKey": true
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEb2zVFhAJH0EcX3yptJcvRpWKwXLh5CmZ3wSoHMO3ZWMSD1lMSb7U0tQCxIsYnrH0sYsGxWfR8Xp7x-f__9M3vQ"
     },
     {
       "kid": "recovery-staging-1",
       "purposes": [
         "key-replacement"
       ],
-      "awaitingKey": true
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDtoTX5S-w0WfpIAtYilGzJAB1kCaixCk3breZohsXWykKcSdnGfSvssP_GfNey1gMsFQ2TLY_26mzZ2qTLIlfg"
     }
   ],
-  "production": []
+  "production": [
+    {
+      "kid": "release-prod-1",
+      "purposes": [
+        "releases"
+      ],
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDNE3k7uV60dQcaXdFVqW_SmEmGtrVXnUSoaIRVVS0LlGajr-LYWKcVhqozbv3ewhyQ4o7Sv0YzcSY56EcOPitQ"
+    },
+    {
+      "kid": "recovery-prod-1",
+      "purposes": [
+        "key-replacement"
+      ],
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtcI_8p4wvJEDm7NGq4DmzjWVlVuaAwx0KikqkUdxMLgC2BpfxPEDafn1CxPQivt9Oi1kXY9t-pGbgblWw6oyLw"
+    }
+  ]
 }

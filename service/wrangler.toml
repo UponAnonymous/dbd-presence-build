@@ -33,7 +33,7 @@ CDN_HOST = "cdn-staging.arcavale.com"
 # Public halves of the owner's offline keys (V2-S6, ADR-0012): the release key signs release feeds and the recovery key
 # signs key replacements. Public values only, equal to this environment's entries in TrustedServiceKeys.json
 # (build/check-online-keys.py checks it). The private keys never reach the Worker (docs/owner/release-keys.md).
-OFFLINE_PUBLIC_KEYS = '[]'
+OFFLINE_PUBLIC_KEYS = '[{"kid":"recovery-staging-1","purposes":["key-replacement"],"spki":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDtoTX5S-w0WfpIAtYilGzJAB1kCaixCk3breZohsXWykKcSdnGfSvssP_GfNey1gMsFQ2TLY_26mzZ2qTLIlfg"},{"kid":"release-staging-1","purposes":["releases"],"spki":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEb2zVFhAJH0EcX3yptJcvRpWKwXLh5CmZ3wSoHMO3ZWMSD1lMSb7U0tQCxIsYnrH0sYsGxWfR8Xp7x-f__9M3vQ"}]'
 # Automatic labelling of the owner's study recordings (D37, ADR-0018, src/routes/study.ts): the model the relay asks for.
 # The key is the optional secret STUDY_LABELLER_KEY (not in the required list: without it the relay answers 503).
 STUDY_LABELLER_MODEL = "claude-opus-5-5"
@@ -106,7 +106,7 @@ DISCORD_CLIENT_ID = "1563291325107937340"
 # Public halves of the owner's offline keys (V2-S6, ADR-0012): the release key signs release feeds and the recovery key
 # signs key replacements. Public values only, equal to this environment's entries in TrustedServiceKeys.json
 # (build/check-online-keys.py checks it). The private keys never reach the Worker (docs/owner/release-keys.md).
-OFFLINE_PUBLIC_KEYS = '[]'
+OFFLINE_PUBLIC_KEYS = '[{"kid":"recovery-prod-1","purposes":["key-replacement"],"spki":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtcI_8p4wvJEDm7NGq4DmzjWVlVuaAwx0KikqkUdxMLgC2BpfxPEDafn1CxPQivt9Oi1kXY9t-pGbgblWw6oyLw"},{"kid":"release-prod-1","purposes":["releases"],"spki":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDNE3k7uV60dQcaXdFVqW_SmEmGtrVXnUSoaIRVVS0LlGajr-LYWKcVhqozbv3ewhyQ4o7Sv0YzcSY56EcOPitQ"}]'
 # Automatic labelling of the owner's study recordings (D37, ADR-0018, src/routes/study.ts): the model the relay asks for.
 # The key is the optional secret STUDY_LABELLER_KEY (not in the required list: without it the relay answers 503).
 STUDY_LABELLER_MODEL = "claude-opus-5-5"
