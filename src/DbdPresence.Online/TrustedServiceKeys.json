@@ -39,6 +39,28 @@
   ],
   "production": [
     {
+      "kid": "licence-prod-1",
+      "purposes": [
+        "licence"
+      ],
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmfCWERG2FGMNyvMMFyY31rQztw8OBY7QxS52CB-K1nEVTNJ6OYXmuGspLvRq1ggoUmA1hmgt5uATWoMqRsC-Xg"
+    },
+    {
+      "kid": "config-prod-1",
+      "purposes": [
+        "config"
+      ],
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtNCPsk8OAoBOMuLYAZ10-SQhYTSvsbqQFgh-xfOxUDuCFL6nRFGwNJtxs-mJXdHkZ0HCszUAbwkDXsC4pgqy0A"
+    },
+    {
+      "kid": "pack-index-prod-1",
+      "purposes": [
+        "pack-index",
+        "roster"
+      ],
+      "spki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPDT1cOeP-XKulNJisTSBe456jLf6k_PI6B_IarKcTsRZSffdOoUuncjceLtDIAAKL7-Kb_yOZoYBAU8L3JseaA"
+    },
+    {
       "kid": "release-prod-1",
       "purposes": [
         "releases"
