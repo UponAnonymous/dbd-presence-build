@@ -380,6 +380,8 @@ describe("files and takedown", () => {
   });
 
   it("the owner's purge removes unused uploads after an hour and R2 objects with no record", async () => {
+    // R2 stamps objects with the real clock, so the service clock starts there too; with the fixed T0 the test broke once the real date passed it.
+    h.now = Math.max(h.now, Date.now());
     const unused = await uploadFile(png({ idatBytes: 55 }));
     await env.PACKS.put(`${"a".repeat(64)}.png`, new Uint8Array([1]));
     const early = await h.admin("POST", "/api/pack-files/purge", {});

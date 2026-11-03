@@ -71,7 +71,7 @@ $manifest = $manifest.Replace('{{IDENTITY_NAME}}', (& $esc $IdentityName))
 $manifest = $manifest.Replace('{{PUBLISHER}}', (& $esc $Publisher))
 $manifest = $manifest.Replace('{{PUBLISHER_DISPLAY_NAME}}', (& $esc $PublisherDisplayName))
 $manifest = $manifest.Replace('{{VERSION}}', $version)
-if ($manifest -match '\{\{') { throw 'the manifest still has an unfilled {{value}}' }
+if ($manifest -match '\{\{[A-Z_]+\}\}') { throw "the manifest still has an unfilled value: $($Matches[0])" }
 [void][xml]$manifest   # throws when the filled manifest is not well-formed
 [IO.File]::WriteAllText((Join-Path (Resolve-Path $layout) 'AppxManifest.xml'), $manifest, (New-Object Text.UTF8Encoding $false))
 
