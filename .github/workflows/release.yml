@@ -179,14 +179,15 @@ jobs:
         run: ./build/install-smoke.ps1 -SetupExe installer/dist/DBD-Presence-Setup.exe -TimeoutSeconds 180
 
       # The Microsoft Store package: UNSIGNED on purpose, the Store signs what it publishes. The identity is the owner's, from Partner Center
-      # (Product identity), kept in repository variables (docs/owner). It is built from the same publish folder, so it is the same production build.
+      # (Product identity, 2026-11-03: public values, not secrets). Repository variables override them if ever set. It is built from the same publish
+      # folder, so it is the same production build.
       - name: Pack the Store package (MSIX, unsigned, owner's Partner Center identity)
         shell: pwsh
         timeout-minutes: 10
         env:
-          STORE_IDENTITY_NAME: ${{ vars.STORE_IDENTITY_NAME }}
-          STORE_PUBLISHER: ${{ vars.STORE_PUBLISHER }}
-          STORE_PUBLISHER_DISPLAY_NAME: ${{ vars.STORE_PUBLISHER_DISPLAY_NAME }}
+          STORE_IDENTITY_NAME: ${{ vars.STORE_IDENTITY_NAME || 'Arcavale.DBDPresence' }}
+          STORE_PUBLISHER: ${{ vars.STORE_PUBLISHER || 'CN=C81D4ACF-7AB3-401A-A7EB-A3565FE05852' }}
+          STORE_PUBLISHER_DISPLAY_NAME: ${{ vars.STORE_PUBLISHER_DISPLAY_NAME || 'Arcavale' }}
           RELEASE_SHA: ${{ steps.commit.outputs.sha }}
         run: |
           $ErrorActionPreference = 'Stop'
